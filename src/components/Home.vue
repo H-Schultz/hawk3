@@ -7,8 +7,8 @@
         class="theme-toggle"
         aria-label="Toggle theme"
       >
-        <span v-if="isDarkMode" class="icon">🌞</span>
-        <span v-else class="icon">🌙</span>
+        <span v-if="isDarkMode" class="icon">🌙</span>
+        <span v-else class="icon">🌞</span>
       </button>
       <h1 class="title">HAWK3</h1>
       <div class="header-line"></div>
@@ -17,13 +17,14 @@
     <!-- Main Content -->
     <main class="main-content">
       <div class="games-grid">
-        <!-- Game Tile -->
         <div
+            v-for="game in games"
+            :key="game.name"
             class="game-tile"
-            @click="startDungeonCrawler"
+            @click="startGame(game.url)"
         >
           <div class="neon-line"></div>
-          <h2 class="game-title">Dungeon Crawler</h2>
+          <h2 class="game-title">{{ game.title }}</h2>
           <div class="pixel-grid">
             <div v-for="n in 9" :key="n" class="pixel"></div>
           </div>
@@ -45,6 +46,13 @@ import {useRouter} from 'vue-router'
 
 const router = useRouter()
 const isDarkMode = ref(false)
+const games = [
+  { url: '/dungeon-crawler', title: 'Dungeon Crawler' },
+  { url: '/mystic-paths', title: 'Mystic Paths' },
+  { url: '/dungeon-labyrinth', title: 'Dungeon Labyrinth' },
+  { url: '/whack-a-mole', title: 'Whack a Mole' },
+  { url: '/droid-hacking', title: 'Droid Hacking' }
+];
 
 const toggleTheme = () => {
   isDarkMode.value = !isDarkMode.value
@@ -56,8 +64,8 @@ watchEffect(() => {
   document.documentElement.setAttribute('data-theme', isDarkMode.value ? 'dark' : 'light')
 })
 
-const startDungeonCrawler = () => {
-  router.push('/dungeon-crawler')
+const startGame = (url) => {
+  router.push(url)
 }
 
 onMounted(() => {
