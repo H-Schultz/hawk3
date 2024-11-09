@@ -1,18 +1,18 @@
 <script setup>
 import {ref, onMounted, onUnmounted, computed, watch} from 'vue';
 import {useRouter} from 'vue-router';
-import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
 import {
-  GAME_STATE, MAPS, ANIMATION_SPEED, DISPLAY_SIZE, TILES,
+  GAME_STATE, MAPS, ANIMATION_SPEED,
   MAX_HEALTH, LEVEL_CONFIG, WHIRLWIND_DURATION, CHARGE_TIME,
-  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, ITEM_TYPES, PLAYER_SPRITES
+  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, ITEM_TYPES
 } from './constants.js';
 import Player from './Player.vue';
 import Enemy from './Enemy.vue';
 import Item from './Item.vue';
-import Sword from './Sword.vue';
 import GameUI from './GameUI.vue';
 import Overlay from './Overlay.vue';
+import Tile from './Tile.vue';
+import NPC from './NPC.vue';
 
 
 const playerHealth = ref(MAX_HEALTH);
@@ -34,10 +34,12 @@ const coins = ref(0);
 const gameState = ref(GAME_STATE.PLAYING);
 const defeatedEnemies = ref(0);
 const currentMapIndex = ref(0);
-const currentMap = ref(null);
+const currentMap = ref([]);
 const isStairActive = ref(false);
 const dungeonMap = ref(null);
 const router = useRouter();
+const activeQuest = ref(null);
+const questItems = ref([]);
 
 function goBack() {
   router.push('/');
@@ -90,7 +92,7 @@ const loadMap = (mapIndex) => {
 
   for (let y = 0; y < layout.length; y++) {
     for (let x = 0; x < layout[y].length; x++) {
-      if (layout[y][x] === 2) {
+      if (layout[y][x] === 90) {
         startPos = {x, y};
         break;
       }
@@ -99,7 +101,7 @@ const loadMap = (mapIndex) => {
 
   isStairActive.value = false;
   const processedLayout = layout.map(row =>
-      row.map(tile => tile === 2 || (tile === 8 && !isStairActive.value) ? 0 : tile)
+      row.map(tile => tile === 90 || (tile === 98 && !isStairActive.value) ? 20 : tile)
   );
 
   currentMapIndex.value = mapIndex;
@@ -111,7 +113,13 @@ const loadMap = (mapIndex) => {
   enemies.value = [];
   droppedItems.value = [];
 
-  // Boss-Map Behandlung
+  if (mapData.type === 'quest') {
+    activeQuest.value = mapData.quest;
+    activeQuest.value.started = false;
+    activeQuest.value.completed = false;
+    activeQuest.value.count = 0;
+  }
+
   if (mapData.type === 'boss' && mapData.bossConfig) {
     const bossConfig = mapData.bossConfig;
     const bossType = ENEMY_TYPES[bossConfig.name];
@@ -143,15 +151,27 @@ const loadMap = (mapIndex) => {
   return true;
 };
 
+const startQuest = (quest) => {
+  if (quest.completed || quest.started) return;
+  activeQuest.value = quest;
+  activeQuest.value.started = true;
+  activeQuest.value.count = 0;
+  activeQuest.value.completed = false;
+  questItems.value = quest.spots.map(spot => ({
+    ...spot,
+    collected: false
+  }));
+};
+
 const dropItem = (position) => {
   const dropChance = Math.random();
-  if (dropChance > 0.3) return; // 30% Chance für einen Drop
+  if (dropChance > 0.30) return; // 30% Chance für einen Drop
 
   const itemTypes = Object.keys(ITEM_TYPES);
   const randomItem = itemTypes[Math.floor(Math.random() * itemTypes.length)];
 
   droppedItems.value.push({
-    id: Date.now(),
+    id: Math.random().toString(36).substr(2, 9),
     type: randomItem,
     position: {...position},
     collectAnimation: false
@@ -161,8 +181,6 @@ const dropItem = (position) => {
 // Funktion zum Einsammeln von Items
 const collectItem = (item) => {
   item.collectAnimation = true;
-
-  // Effekt nach kurzer Animation ausführen
   setTimeout(() => {
     if (item.type === 'COIN') {
       coins.value++;
@@ -178,7 +196,8 @@ const isValidMove = (position) => {
 
   if (!dungeonMap.value[y] ||
       dungeonMap.value[y][x] === undefined ||
-      dungeonMap.value[y][x] === 1) {
+      dungeonMap.value[y][x] === 10 ||
+      dungeonMap.value[y][x] === 99) {
     return false;
   }
 
@@ -192,20 +211,6 @@ const isValidMove = (position) => {
   }
 
   return true;
-};
-
-
-const getTileStyle = (tileType) => {
-  const position = TILES[tileType];
-  if (!position) return {};
-
-  return {
-    width: `${DISPLAY_SIZE}px`,
-    height: `${DISPLAY_SIZE}px`,
-    backgroundImage: `url(${dungeonSprite})`,
-    backgroundPosition: `-${position.x * 4}px -${position.y * 4}px`,
-    backgroundSize: '2048px 2048px',
-  };
 };
 
 // Funktion zum Überprüfen der Angriffsrichtung
@@ -324,43 +329,6 @@ const applyWhirlwindDamage = (surroundingPositions) => {
   });
 };
 
-const getPlayerStyle = () => {
-  const sprite = PLAYER_SPRITES[playerState.value][currentFrame.value];
-  return {
-    backgroundImage: `url(${dungeonSprite})`,
-    backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,
-    backgroundSize: '2048px 2048px',
-    left: `${playerPosition.value.x * DISPLAY_SIZE}px`,
-    top: `${playerPosition.value.y * DISPLAY_SIZE}px`,
-    transform: playerDirection.value === 'left' ? 'scaleX(-1)' : 'none',
-    filter: isUnderAttack.value ? 'brightness(1.5) sepia(1) saturate(1000%) hue-rotate(0deg)' : 'none',
-    animation: isAttacking.value ? 'swordSwing 0.4s ease-in-out' : 'none'
-  };
-};
-
-const getEnemyStyle = (enemy) => {
-  const enemyType = ENEMY_TYPES[enemy.name];
-  const sprite = enemyType.sprites[enemy.state][enemyFrame.value];
-  const healthPercentage = enemy.health / enemy.maxHealth;
-  const grayscaleValue = (1 - healthPercentage) * 0.5;
-
-  return {
-    backgroundImage: `url(${dungeonSprite})`,
-    backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,
-    backgroundSize: '2048px 2048px',
-    left: `${enemy.position.x * DISPLAY_SIZE}px`,
-    top: `${enemy.position.y * DISPLAY_SIZE}px`,
-    width: `${enemy.spriteSize.x}px`,
-    height: `${enemy.spriteSize.y}px`,
-    transform: enemy.direction === 'left' ? 'scaleX(-1)' : 'none',
-    opacity: enemy.health > 0 ? 1 : 0,
-    filter: `grayscale(${grayscaleValue})
-             ${enemy.isUnderAttack ? 'brightness(1.5) sepia(1) saturate(1000%) hue-rotate(0deg)' : ''}
-             ${enemy.isPreparingAttack ? 'saturate(2) brightness(1.2)' : ''}
-             ${activeEnemiesNearPlayer.value.includes(enemy) ? 'saturate(1.5)' : ''}`
-  };
-};
-
 const updateBossAttackPattern = (boss) => {
   if (!boss.specialAttackTimer) {
     boss.specialAttackTimer = 0;
@@ -403,7 +371,7 @@ const findSpawnPosition = () => {
   while (attempts < maxAttempts) {
     const x = Math.floor(Math.random() * dungeonMap.value[0].length);
     const y = Math.floor(Math.random() * dungeonMap.value.length);
-    if (dungeonMap.value[y][x] === 0 && // Kein Wandfeld
+    if ((dungeonMap.value[y][x] >= 20 && dungeonMap.value[y][x] <= 29) && // Kein Wandfeld
         !enemies.value.some(e => e.health > 0 && e.position.x === x && e.position.y === y) && // Kein Feind
         Math.abs(x - playerPosition.value.x) > 1 && // Nicht zu nah am Spieler (X-Achse)
         Math.abs(y - playerPosition.value.y) > 1) { // Nicht zu nah am Spieler (Y-Achse)
@@ -417,7 +385,7 @@ const findSpawnPosition = () => {
 
 // Funktion zum Spawnen eines neuen Feindes
 const spawnEnemy = () => {
-  if (currentMap.value.type === 'boss') {
+  if (currentMap.value.type === 'boss' || currentMap.value.allowedEnemyTypes.length === 0) {
     return;
   }
 
@@ -486,7 +454,7 @@ const moveEnemy = (enemy) => {
 
   if (dungeonMap.value[newPosition.y] &&
       dungeonMap.value[newPosition.y][newPosition.x] !== undefined &&
-      dungeonMap.value[newPosition.y][newPosition.x] !== 1 &&
+      (dungeonMap.value[newPosition.y][newPosition.x] >= 20 && dungeonMap.value[newPosition.y][newPosition.x] <= 29) &&
       !isSamePosition(newPosition, playerPosition.value) &&
       !enemies.value.some(otherEnemy =>
           otherEnemy !== enemy &&
@@ -608,8 +576,31 @@ const movePlayer = (dx, dy) => {
   playerState.value = 'run';
 
   if (isValidMove(newPosition)) {
-    // Prüfe ob Spieler die Treppe erreicht hat
-    if (dungeonMap.value[newPosition.y][newPosition.x] === 8) {
+    // Prüfe Quest-Items
+    if (activeQuest.value) {
+      const questItem = questItems.value.find(item =>
+          !item.collected &&
+          item.x === newPosition.x &&
+          item.y === newPosition.y
+      );
+
+      if (questItem) {
+        questItem.collected = true;
+
+        // Prüfe ob Quest abgeschlossen
+        const collectedCount = questItems.value.filter(i => i.collected).length;
+        activeQuest.value.count = collectedCount;
+        if (collectedCount >= activeQuest.value.goal) {
+          activeQuest.value.completed = true;
+          // Belohnung geben
+          if (activeQuest.value.gift === 'sword') {
+            // Implementiere Belohnungslogik
+          }
+        }
+      }
+    }
+
+    if (dungeonMap.value[newPosition.y][newPosition.x] === 98) {
       startNextLevel();
       return;
     }
@@ -635,8 +626,8 @@ const showStairs = () => {
   // Finde Treppenposition und aktiviere sie
   for (let y = 0; y < layout.length; y++) {
     for (let x = 0; x < layout[y].length; x++) {
-      if (layout[y][x] === 8) {
-        dungeonMap.value[y][x] = 8;
+      if (layout[y][x] === 98) {
+        dungeonMap.value[y][x] = 98;
         break;
       }
     }
@@ -779,61 +770,53 @@ watch(() => gameState.value, (newState) => {
     </header>
     <main class="main-content">
       <div class="game-container">
-
         <GameUI :player-health="playerHealth" :coins="coins" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
         <Overlay :game-state="gameState" :coins="coins"></Overlay>
-
         <div class="dungeon-container">
           <div
             v-for="(row, rowIndex) in dungeonMap"
             :key="rowIndex"
             class="map-row"
           >
-            <div
+            <Tile
               v-for="(tile, tileIndex) in row"
               :key="`${rowIndex}-${tileIndex}`"
-              class="tile"
-              :style="getTileStyle(tile)"
+              :tile="tile"
             />
           </div>
-          <div
-            class="player"
-            :class="{
-              'attacking': isAttacking,
-              'charging ': isCharging,
-              'whirlwindAttacking': isWhirlwindAttacking,
-            }" :style="getPlayerStyle()"
-          >
-            <Sword :player-direction="playerDirection" />
-          </div>
-
-          <div
+          <Player
+            :position="playerPosition"
+            :health="playerHealth"
+            :is-attacking="isAttacking"
+            :is-charging="isCharging"
+            :is-whirlwind-attacking="isWhirlwindAttacking"
+            :is-under-attack="isUnderAttack"
+            :game-state="gameState"
+            :player-state="playerState"
+            :direction="playerDirection"
+          />
+          <Enemy
             v-for="enemy in enemies"
             :key="enemy.id"
-            class="enemy"
-            :class="{
-              [`enemy--${enemy.direction}-direction`]: true,
-              [`enemy--${enemy.type.toLowerCase()}`]: true
-            }"
-            :style="getEnemyStyle(enemy)"
-          >
-            <div v-if="enemy.health > 0" class="enemy-health">
-              <div
-                class="health-bar"
-                :style="{ width: `${(enemy.health / enemy.maxHealth) * 100}%` }"
-              />
-            </div>
-          </div>
-
-<!--          <div-->
-<!--              v-for="item in droppedItems"-->
-<!--              :key="item.id"-->
-<!--              class="item"-->
-<!--              :class="[item.type.toLowerCase(), { collecting: item.collectAnimation }]"-->
-<!--              :style="getItemStyle(item)"-->
-<!--          />-->
-
+            :enemy="enemy"
+            :active-enemies-near-player="activeEnemiesNearPlayer"
+          />
           <Item v-for="item in droppedItems" :key="item.id" :item="item" />
+          <template
+            v-if="currentMap.type === 'quest'"
+          >
+            <NPC
+              :quest="currentMap.quest"
+              :player-position="playerPosition"
+              @start-quest="startQuest"
+              @show-stairs="showStairs"
+            />
+            <Item
+              v-for="item in questItems"
+              :key="`${item.x}-${item.y}`"
+              :item="{position: {x: item.x, y: item.y}, name: item.name, type: item.type, collectAnimation: item.collected}"
+            />
+          </template>
         </div>
       </div>
     </main>
@@ -841,92 +824,21 @@ watch(() => gameState.value, (newState) => {
 </template>
 
 <style scoped>
-.game-container {
-  position: relative;
-  overflow: hidden;
-}
+  .game-container {
+    position: relative;
+    overflow: hidden;
+  }
 
-.dungeon-container {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  image-rendering: pixelated;
-  -webkit-font-smoothing: none;
-}
+  .dungeon-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    image-rendering: pixelated;
+    -webkit-font-smoothing: none;
+  }
 
-.map-row {
-  display: flex;
-}
-
-.tile {
-  width: 64px;
-  height: 64px;
-  image-rendering: pixelated;
-  background-repeat: no-repeat;
-}
-
-.player,
-.enemy {
-  position: absolute;
-  width: 64px;
-  height: 128px;
-  image-rendering: pixelated;
-  background-repeat: no-repeat;
-  transition: left 0.1s ease, top 0.1s ease, filter 0.2s ease;
-}
-
-.player {
-  margin-top: -72px;
-  z-index: 103;
-  transform-origin: center;
-}
-
-.enemy {
-  width: 64px;
-  height: 96px;
-  margin-top: -48px;
-  z-index: 102;
-}
-
-.health-bar {
-  height: 100%;
-  background: #ff0000;
-  transition: width 0.3s ease;
-}
-
-.enemy--boss {
-  width: 128px;
-  height: 128px;
-  margin-top: -74px;
-  margin-left: -32px;
-}
-
-.enemy-health {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 8px;
-  background: #444;
-  border: 1px solid #000;
-  z-index: 104;
-}
-
-.enemy--left-direction .enemy-health {
-  transform: scaleX(-1) translateX(50%);
-}
-
-.health-bar {
-  height: 100%;
-  transition: width 0.3s ease;
-}
-
-.enemy--boss .enemy-health {
-  width: 80px;
-  height: 12px;
-  top: 0;
-}
-
+  .map-row {
+    display: flex;
+  }
 </style>

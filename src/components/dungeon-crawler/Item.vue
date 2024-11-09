@@ -106,7 +106,8 @@
     }
   }
 
-  .item.heart.collecting {
+  .item.heart.collecting,
+  .item.blue_potion.collecting {
     animation: collectHeart 0.3s ease-out forwards;
   }
 

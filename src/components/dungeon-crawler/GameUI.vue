@@ -55,11 +55,14 @@
     </div>
     <div class="level-info">
       <span>{{ props.currentMap?.name }}</span>
-      <span v-if="props.currentMap?.type !== 'boss'">
+      <span v-if="props.currentMap?.type === 'default'">
         Enemies: {{ props.defeatedEnemies }}/{{ props.currentMap?.enemiesRequired }}
       </span>
-      <span v-else>
+      <span v-if="props.currentMap?.type === 'boss'">
         Boss Health: {{ props.enemies[0]?.health }}/{{ props.enemies[0]?.maxHealth }}
+      </span>
+      <span v-if="props.currentMap?.type === 'quest' && props.currentMap?.quest.started">
+        Quest Items: {{ props.currentMap?.quest.count }}/{{ props.currentMap?.quest.goal }}
       </span>
     </div>
     <div class="coins-container">
