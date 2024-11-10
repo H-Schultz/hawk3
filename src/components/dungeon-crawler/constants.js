@@ -41,21 +41,6 @@ export const MAPS = [
     {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 20, 20, 23, 20, 20, 20, 20, 98, 10],
-            [10, 90, 20, 20, 22, 20, 20, 21, 20, 10],
-            [10, 20, 21, 20, 20, 22, 20, 20, 23, 10],
-            [10, 21, 23, 21, 20, 20, 22, 21, 24, 10],
-            [10, 25, 23, 23, 20, 20, 21, 20, 21, 10],
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-        ],
-        enemiesRequired: 1,
-        name: 'Eingangshalle',
-        type: 'default',
-        allowedEnemyTypes: ['GOBLIN']
-    },
-    {
-        layout: [
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             [10, 20, 20, 21, 22, 20, 20, 20, 20, 10],
             [10, 98, 22, 20, 23, 20, 20, 22, 20, 10],
             [10, 90, 20, 20, 20, 23, 20, 20, 99, 10],
@@ -81,16 +66,30 @@ export const MAPS = [
                 {x: 5, y: 5, collected: false, name: 'potion', type: 'BLUE_POTION'}
             ]
         }
-    },
-    {
+    }, {
         layout: [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1, 2, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 8, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 20, 20, 23, 20, 20, 20, 20, 98, 10],
+            [10, 90, 20, 20, 22, 20, 20, 21, 20, 10],
+            [10, 20, 21, 20, 20, 22, 20, 20, 23, 10],
+            [10, 21, 23, 21, 20, 20, 22, 21, 24, 10],
+            [10, 25, 23, 23, 20, 20, 21, 20, 21, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        ],
+        enemiesRequired: 1,
+        name: 'Eingangshalle',
+        type: 'default',
+        allowedEnemyTypes: ['GOBLIN'],
+        allowedItems: ['HEART', 'COIN']
+    }, {
+        layout: [
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 20, 20, 21, 22, 20, 20, 10, 90, 10],
+            [10, 21, 22, 20, 23, 20, 20, 10, 20, 10],
+            [10, 22, 20, 20, 20, 23, 20, 10, 21, 10],
+            [10, 20, 20, 23, 20, 20, 22, 98, 20, 10],
+            [10, 23, 20, 20, 22, 20, 23, 24, 25, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
         enemiesRequired: 1,
         name: 'Orghalle',
@@ -103,58 +102,58 @@ export const MAPS = [
     },
     {
         layout: [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 8, 0, 0, 1, 0, 0, 0, 0, 1],
-            [1, 2, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 1, 0, 0, 0, 1, 1, 0, 1],
-            [1, 0, 1, 0, 0, 0, 1, 2, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 98, 20, 21, 22, 20, 20, 20, 20, 10],
+            [10, 20, 22, 20, 23, 20, 20, 22, 20, 10],
+            [10, 20, 10, 20, 20, 23, 10, 10, 20, 10],
+            [10, 20, 10, 23, 20, 20, 10, 90, 20, 10],
+            [10, 23, 20, 20, 22, 20, 23, 24, 25, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
-        enemiesRequired: 5,
+        enemiesRequired: 1,
         name: 'Schatzkammer',
         type: 'default',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN']
     },
     {
         layout: [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 2, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 0, 0, 1, 0, 1, 0, 0, 1],
-            [1, 0, 1, 1, 1, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 0, 8, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 90, 10, 21, 22, 20, 20, 20, 20, 10],
+            [10, 20, 10, 20, 23, 20, 20, 22, 20, 10],
+            [10, 20, 10, 20, 20, 23, 10, 10, 20, 10],
+            [10, 20, 10, 23, 20, 20, 10, 10, 98, 10],
+            [10, 23, 20, 20, 22, 20, 23, 24, 25, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
-        enemiesRequired: 4,
+        enemiesRequired: 1,
         name: 'Kerker',
         type: 'default',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC']
     },
     {
         layout: [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-            [1, 2, 1, 0, 0, 0, 0, 1, 0, 1],
-            [1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 1, 1, 1, 1, 0, 1],
-            [1, 8, 1, 0, 0, 0, 0, 0, 2, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 98, 20, 21, 22, 20, 20, 20, 20, 10],
+            [10, 20, 22, 20, 23, 20, 20, 22, 20, 10],
+            [10, 20, 10, 20, 20, 23, 10, 10, 20, 10],
+            [10, 20, 10, 23, 20, 20, 10, 11, 90, 10],
+            [10, 23, 20, 20, 22, 20, 20, 22, 21, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
-        enemiesRequired: 6,
+        enemiesRequired: 1,
         name: 'Thronsaal',
         type: 'default',
         allowedEnemyTypes: ['ORC']
     },
     {
         layout: [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 8, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 2, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 90, 20, 21, 22, 20, 20, 20, 20, 10],
+            [10, 20, 22, 20, 23, 20, 10, 10, 20, 10],
+            [10, 20, 10, 20, 20, 23, 10, 20, 20, 10],
+            [10, 20, 10, 23, 20, 20, 10, 20, 10, 10],
+            [10, 23, 20, 20, 22, 20, 10, 22, 98, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
         enemiesRequired: 1,
         name: 'Bosshalle',
@@ -201,6 +200,7 @@ export const ENEMY_TYPES = {
         type: 'default',
         maxHealth: 3,
         damage: 1,
+        intelligence: 0.2,
         moveSpeed: 2000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
@@ -209,6 +209,12 @@ export const ENEMY_TYPES = {
                 {x: SPRITE_SIZE * 24, y: SPRITE_SIZE * 5},
                 {x: SPRITE_SIZE * 25, y: SPRITE_SIZE * 5},
                 {x: SPRITE_SIZE * 26, y: SPRITE_SIZE * 5},
+            ],
+            attack: [
+                {x: SPRITE_SIZE * 27, y: SPRITE_SIZE * 5},
+                {x: SPRITE_SIZE * 28, y: SPRITE_SIZE * 5},
+                {x: SPRITE_SIZE * 29, y: SPRITE_SIZE * 5},
+                {x: SPRITE_SIZE * 30, y: SPRITE_SIZE * 5},
             ],
             run: [
                 {x: SPRITE_SIZE * 27, y: SPRITE_SIZE * 5},
@@ -223,7 +229,8 @@ export const ENEMY_TYPES = {
         type: 'default',
         maxHealth: 2,
         damage: 1,
-        moveSpeed: 1500,
+        intelligence: 0.5,
+        moveSpeed: 1000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
             idle: [
@@ -231,6 +238,12 @@ export const ENEMY_TYPES = {
                 {x: SPRITE_SIZE * 24, y: (SPRITE_SIZE * 9) + 8},
                 {x: SPRITE_SIZE * 25, y: (SPRITE_SIZE * 9) + 8},
                 {x: SPRITE_SIZE * 26, y: (SPRITE_SIZE * 9) + 8},
+            ],
+            attack: [
+                {x: SPRITE_SIZE * 27, y: (SPRITE_SIZE * 9) + 8},
+                {x: SPRITE_SIZE * 28, y: (SPRITE_SIZE * 9) + 8},
+                {x: SPRITE_SIZE * 29, y: (SPRITE_SIZE * 9) + 8},
+                {x: SPRITE_SIZE * 30, y: (SPRITE_SIZE * 9) + 8},
             ],
             run: [
                 {x: SPRITE_SIZE * 27, y: (SPRITE_SIZE * 9) + 8},
@@ -245,6 +258,7 @@ export const ENEMY_TYPES = {
         type: 'default',
         maxHealth: 5,
         damage: 1,
+        intelligence: 0.8,
         moveSpeed: 2500,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
@@ -253,6 +267,12 @@ export const ENEMY_TYPES = {
                 {x: SPRITE_SIZE * 24, y: SPRITE_SIZE * 11},
                 {x: SPRITE_SIZE * 25, y: SPRITE_SIZE * 11},
                 {x: SPRITE_SIZE * 26, y: SPRITE_SIZE * 11},
+            ],
+            attack: [
+                {x: SPRITE_SIZE * 27, y: SPRITE_SIZE * 11},
+                {x: SPRITE_SIZE * 28, y: SPRITE_SIZE * 11},
+                {x: SPRITE_SIZE * 29, y: SPRITE_SIZE * 11},
+                {x: SPRITE_SIZE * 30, y: SPRITE_SIZE * 11},
             ],
             run: [
                 {x: SPRITE_SIZE * 27, y: SPRITE_SIZE * 11},
@@ -267,7 +287,8 @@ export const ENEMY_TYPES = {
         type: 'boss',
         maxHealth: 14,
         damage: 1,
-        moveSpeed: 3000,
+        intelligence: 1,
+        moveSpeed: 2000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE * 2, y: SPRITE_SIZE * SPRITE_SCALE * 2},
         sprites: {
             idle: [
@@ -275,6 +296,12 @@ export const ENEMY_TYPES = {
                 {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 24},
                 {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 24},
                 {x: SPRITE_SIZE * 7, y: SPRITE_SIZE * 24},
+            ],
+            attack: [
+                {x: SPRITE_SIZE * 9, y: SPRITE_SIZE * 24},
+                {x: SPRITE_SIZE * 11, y: SPRITE_SIZE * 24},
+                {x: SPRITE_SIZE * 13, y: SPRITE_SIZE * 24},
+                {x: SPRITE_SIZE * 15, y: SPRITE_SIZE * 24},
             ],
             run: [
                 {x: SPRITE_SIZE * 9, y: SPRITE_SIZE * 24},
@@ -289,10 +316,17 @@ export const ENEMY_TYPES = {
         type: 'boss',
         maxHealth: 20,
         damage: 2,
-        moveSpeed: 3000,
+        intelligence: 1,
+        moveSpeed: 2000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE * 2, y: SPRITE_SIZE * SPRITE_SCALE * 2},
         sprites: {
             idle: [
+                {x: SPRITE_SIZE, y: SPRITE_SIZE * 21},
+                {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 21},
+                {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 21},
+                {x: SPRITE_SIZE * 7, y: SPRITE_SIZE * 21},
+            ],
+            attack: [
                 {x: SPRITE_SIZE, y: SPRITE_SIZE * 21},
                 {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 21},
                 {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 21},

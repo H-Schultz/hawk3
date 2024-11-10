@@ -165,9 +165,9 @@ const startQuest = (quest) => {
 
 const dropItem = (position) => {
   const dropChance = Math.random();
-  if (dropChance > 0.30) return; // 30% Chance für einen Drop
+  if (dropChance > 0.99) return; // 30% Chance für einen Drop
 
-  const itemTypes = Object.keys(ITEM_TYPES);
+  const itemTypes = currentMap.value.allowedItems || [];
   const randomItem = itemTypes[Math.floor(Math.random() * itemTypes.length)];
 
   droppedItems.value.push({
@@ -421,51 +421,86 @@ const spawnEnemy = () => {
 };
 
 const moveEnemy = (enemy) => {
-  if (ENEMY_TYPES[enemy.name].type === 'boss') {
-    updateBossAttackPattern(enemy);
+  // Wenn der Feind einen Angriff vorbereitet, nicht bewegen
+  if (enemy.isPreparingAttack) return;
+
+  const dx = playerPosition.value.x - enemy.position.x;
+  const dy = playerPosition.value.y - enemy.position.y;
+  const distanceToPlayer = Math.sqrt(dx * dx + dy * dy);
+
+  // Nutze die intelligence direkt aus dem ENEMY_TYPES
+  const intelligence = ENEMY_TYPES[enemy.name].intelligence || 0.5;
+
+  let movePatterns = [];
+
+  // Intelligente Bewegung in Richtung Spieler
+  if (Math.random() < intelligence) {
+    if (Math.abs(dx) > Math.abs(dy)) {
+      movePatterns.push({dx: Math.sign(dx), dy: 0});
+      movePatterns.push({dx: 0, dy: Math.sign(dy)});
+    } else {
+      movePatterns.push({dx: 0, dy: Math.sign(dy)});
+      movePatterns.push({dx: Math.sign(dx), dy: 0});
+    }
   }
-  let movePatterns = [
+
+  // Basis Bewegungsmuster
+  let randomPatterns = [
     {dx: -1, dy: 0},
     {dx: 1, dy: 0},
     {dx: 0, dy: -1},
     {dx: 0, dy: 1}
   ];
 
-  const dx = playerPosition.value.x - enemy.position.x;
-  const dy = playerPosition.value.y - enemy.position.y;
-  const distanceToPlayer = Math.sqrt(dx * dx + dy * dy);
-
-  if (distanceToPlayer < 4) {
-    if (dx > 0) movePatterns.push({dx: 1, dy: 0});
-    if (dx < 0) movePatterns.push({dx: -1, dy: 0});
-    if (dy > 0) movePatterns.push({dx: 0, dy: 1});
-    if (dy < 0) movePatterns.push({dx: 0, dy: -1});
+  // Füge diagonale Bewegungen für hohe Intelligenz hinzu
+  if (intelligence >= 0.7) {
+    randomPatterns = [
+      ...randomPatterns,
+      {dx: -1, dy: -1},
+      {dx: 1, dy: -1},
+      {dx: -1, dy: 1},
+      {dx: 1, dy: 1}
+    ];
   }
 
-  const randomMove = movePatterns[Math.floor(Math.random() * movePatterns.length)];
+  movePatterns = [
+    ...movePatterns,
+    ...randomPatterns
+  ];
+
+  // Gewichtete Auswahl der Bewegung basierend auf Intelligenz
+  let selectedMove;
+  if (movePatterns.length > 0) {
+    if (Math.random() < intelligence && movePatterns.length > 2) {
+      // Intelligente Bewegung: Wähle aus den ersten beiden Optionen
+      selectedMove = movePatterns[Math.floor(Math.random() * 2)];
+    } else {
+      // Zufällige Bewegung
+      selectedMove = movePatterns[Math.floor(Math.random() * movePatterns.length)];
+    }
+  }
+
+  if (!selectedMove) return;
+
   const newPosition = {
-    x: enemy.position.x + randomMove.dx,
-    y: enemy.position.y + randomMove.dy
+    x: enemy.position.x + selectedMove.dx,
+    y: enemy.position.y + selectedMove.dy
   };
 
-  if (randomMove.dx !== 0) {
-    enemy.direction = randomMove.dx > 0 ? 'right' : 'left';
+  // Aktualisiere die Richtung des Feindes
+  if (selectedMove.dx !== 0) {
+    enemy.direction = selectedMove.dx > 0 ? 'right' : 'left';
   }
 
-  if (dungeonMap.value[newPosition.y] &&
-      dungeonMap.value[newPosition.y][newPosition.x] !== undefined &&
-      (dungeonMap.value[newPosition.y][newPosition.x] >= 20 && dungeonMap.value[newPosition.y][newPosition.x] <= 29) &&
-      !isSamePosition(newPosition, playerPosition.value) &&
-      !enemies.value.some(otherEnemy =>
-          otherEnemy !== enemy &&
-          otherEnemy.health > 0 &&
-          isSamePosition(newPosition, otherEnemy.position)
-      )) {
+  // Bewegungsvalidierung
+  if (isValidEnemyMove(newPosition, enemy)) {
     enemy.position = newPosition;
     enemy.state = 'run';
 
     setTimeout(() => {
-      enemy.state = 'idle';
+      if (!enemy.isPreparingAttack) {
+        enemy.state = 'idle';
+      }
     }, 300);
   }
 };
@@ -492,18 +527,56 @@ const canEnemyAttackPlayer = (enemy) => {
   return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
 };
 
+const isValidEnemyMove = (newPosition, currentEnemy) => {
+  const {x, y} = newPosition;
+
+  // Grundlegende Kartenvalidierung
+  if (!dungeonMap.value[y] ||
+      dungeonMap.value[y][x] === undefined ||
+      dungeonMap.value[y][x] === 10 ||
+      dungeonMap.value[y][x] === 99) {
+    return false;
+  }
+
+  // Prüfe ob das Feld begehbar ist
+  if (!(dungeonMap.value[y][x] >= 20 && dungeonMap.value[y][x] <= 29)) {
+    return false;
+  }
+
+  // Kollision mit Spieler
+  if (isSamePosition(newPosition, playerPosition.value)) {
+    return false;
+  }
+
+  // Kollision mit anderen Feinden
+  if (enemies.value.some(enemy =>
+      enemy !== currentEnemy &&
+      enemy.health > 0 &&
+      isSamePosition(newPosition, enemy.position)
+  )) {
+    return false;
+  }
+
+  return true;
+};
+
 const enemyAttack = (enemy) => {
   if (!enemy.canAttack || enemy.health <= 0 || enemy.isPreparingAttack || gameState.value !== GAME_STATE.PLAYING) return;
 
   enemy.canAttack = false;
   enemy.isPreparingAttack = true;
+  enemy.state = 'attack';
 
   const attackDelay = Math.random() *
       (ENEMY_CONFIG.attackDelay.max - ENEMY_CONFIG.attackDelay.min) +
       ENEMY_CONFIG.attackDelay.min;
 
   setTimeout(() => {
-    if (enemy.health <= 0) return;
+    if (enemy.health <= 0) {
+      enemy.isPreparingAttack = false;
+      return;
+    }
+
     const dx = Math.abs(playerPosition.value.x - enemy.position.x);
     const dy = Math.abs(playerPosition.value.y - enemy.position.y);
 
@@ -511,7 +584,6 @@ const enemyAttack = (enemy) => {
       isUnderAttack.value = true;
       playerHealth.value -= ENEMY_TYPES[enemy.name].damage;
 
-      // Prüfe Game Over
       if (playerHealth.value <= 0) {
         gameState.value = GAME_STATE.GAME_OVER;
         playerHealth.value = 0;
@@ -523,6 +595,7 @@ const enemyAttack = (enemy) => {
     }
 
     enemy.isPreparingAttack = false;
+    enemy.state = 'idle';
 
     setTimeout(() => {
       enemy.canAttack = true;

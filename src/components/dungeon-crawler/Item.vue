@@ -63,8 +63,7 @@
   }
 
   .item.collecting {
-    transform: scale(1.5);
-    opacity: 0;
+    animation: collectItem 0.4s ease-out forwards;
   }
 
   @keyframes itemFloat {
@@ -76,42 +75,20 @@
     }
   }
 
-  @keyframes collectHeart {
+  @keyframes collectItem {
     0% {
       transform: scale(1);
       opacity: 1;
+      z-index: 202;
     }
     50% {
-      transform: scale(1.5) rotate(180deg);
+      transform: scale(1.5);
       opacity: 0.5;
     }
     100% {
-      transform: scale(2) rotate(360deg);
+      transform: scale(2);
       opacity: 0;
     }
   }
 
-  @keyframes collectCoin {
-    0% {
-      transform: scale(1) translateY(0);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.2) translateY(-20px);
-      opacity: 0.7;
-    }
-    100% {
-      transform: scale(1.5) translateY(-40px);
-      opacity: 0;
-    }
-  }
-
-  .item.heart.collecting,
-  .item.blue_potion.collecting {
-    animation: collectHeart 0.3s ease-out forwards;
-  }
-
-  .item.coin.collecting {
-    animation: collectCoin 0.4s ease-out forwards;
-  }
 </style>
