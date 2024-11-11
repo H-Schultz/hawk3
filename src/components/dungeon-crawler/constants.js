@@ -33,19 +33,44 @@ export const TILES = {
     23: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 4},
     24: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 5},
     25: {x: SPRITE_SIZE, y: SPRITE_SIZE * 5},
+    30: {
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 12},
+                {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 12},
+                {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 12},
+                {x: SPRITE_SIZE, y: SPRITE_SIZE * 12},
+            ],
+            active: [
+                {x: SPRITE_SIZE, y: SPRITE_SIZE * 12},
+                {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 12},
+                {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 12},
+                {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 12},
+            ],
+        },
+        x: SPRITE_SIZE,
+        y: SPRITE_SIZE * 12,
+        trap: {
+            damage: 1,
+            activationInterval: 3000,
+            activeTime: 1000,
+            activeSprite: {
+                x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 12
+            }
+        }},
+    80: {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 12},
     98: {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 12},
     99: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
 };
-
 export const MAPS = [
     {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 20, 20, 21, 22, 20, 20, 20, 20, 10],
-            [10, 98, 22, 20, 23, 20, 20, 22, 20, 10],
-            [10, 90, 20, 20, 20, 23, 20, 20, 99, 10],
-            [10, 20, 20, 23, 20, 20, 22, 20, 20, 10],
-            [10, 23, 20, 20, 22, 20, 23, 24, 25, 10],
+            [10, 90, 10, 20, 30, 20, 30, 20, 20, 10],
+            [10, 98, 10, 30, 10, 10, 10, 22, 20, 10],
+            [10, 21, 10, 20, 20, 30, 10, 20, 99, 10],
+            [10, 20, 10, 10, 10, 10, 10, 20, 20, 10],
+            [10, 25, 20, 20, 22, 20, 23, 21, 24, 10],
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
         completed: false,
@@ -62,8 +87,8 @@ export const MAPS = [
             spots: [
                 {x: 4, y: 1, collected: false, name: 'potion', type: 'BLUE_POTION'},
                 {x: 6, y: 1, collected: false, name: 'potion', type: 'BLUE_POTION'},
-                {x: 2, y: 2, collected: false, name: 'potion', type: 'BLUE_POTION'},
-                {x: 5, y: 5, collected: false, name: 'potion', type: 'BLUE_POTION'}
+                {x: 3, y: 2, collected: false, name: 'potion', type: 'BLUE_POTION'},
+                {x: 5, y: 3, collected: false, name: 'potion', type: 'BLUE_POTION'}
             ]
         }
     }, {
@@ -85,15 +110,16 @@ export const MAPS = [
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             [10, 20, 20, 21, 22, 20, 20, 10, 90, 10],
-            [10, 21, 22, 20, 23, 20, 20, 10, 20, 10],
+            [10, 30, 22, 20, 30, 20, 20, 10, 20, 10],
             [10, 22, 20, 20, 20, 23, 20, 10, 21, 10],
             [10, 20, 20, 23, 20, 20, 22, 98, 20, 10],
-            [10, 23, 20, 20, 22, 20, 23, 24, 25, 10],
+            [10, 30, 20, 20, 30, 20, 23, 24, 25, 10],
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
         enemiesRequired: 1,
         name: 'Orghalle',
         type: 'boss',
+        allowedItems: [],
         bossConfig: {
             type: 'boss',
             name: 'BOSS',
@@ -113,7 +139,8 @@ export const MAPS = [
         enemiesRequired: 1,
         name: 'Schatzkammer',
         type: 'default',
-        allowedEnemyTypes: ['SKELETON', 'GOBLIN']
+        allowedEnemyTypes: ['SKELETON', 'GOBLIN'],
+        allowedItems: ['HEART', 'COIN']
     },
     {
         layout: [
@@ -128,7 +155,8 @@ export const MAPS = [
         enemiesRequired: 1,
         name: 'Kerker',
         type: 'default',
-        allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC']
+        allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC'],
+        allowedItems: ['HEART', 'COIN']
     },
     {
         layout: [
@@ -136,28 +164,30 @@ export const MAPS = [
             [10, 98, 20, 21, 22, 20, 20, 20, 20, 10],
             [10, 20, 22, 20, 23, 20, 20, 22, 20, 10],
             [10, 20, 10, 20, 20, 23, 10, 10, 20, 10],
-            [10, 20, 10, 23, 20, 20, 10, 11, 90, 10],
+            [10, 20, 10, 23, 20, 20, 10, 21, 90, 10],
             [10, 23, 20, 20, 22, 20, 20, 22, 21, 10],
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
         enemiesRequired: 1,
         name: 'Thronsaal',
         type: 'default',
-        allowedEnemyTypes: ['ORC']
+        allowedEnemyTypes: ['ORC'],
+        allowedItems: ['HEART', 'COIN']
     },
     {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 90, 20, 21, 22, 20, 20, 20, 20, 10],
-            [10, 20, 22, 20, 23, 20, 10, 10, 20, 10],
-            [10, 20, 10, 20, 20, 23, 10, 20, 20, 10],
-            [10, 20, 10, 23, 20, 20, 10, 20, 10, 10],
-            [10, 23, 20, 20, 22, 20, 10, 22, 98, 10],
+            [10, 90, 30, 21, 22, 20, 30, 20, 20, 10],
+            [10, 30, 22, 20, 23, 30, 10, 10, 20, 10],
+            [10, 20, 10, 30, 20, 23, 10, 20, 20, 10],
+            [10, 20, 30, 23, 30, 20, 30, 20, 10, 10],
+            [10, 23, 20, 20, 22, 30, 10, 22, 98, 10],
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
         ],
         enemiesRequired: 1,
         name: 'Bosshalle',
         type: 'boss',
+        allowedItems: [],
         bossConfig: {
             type: 'boss',
             name: 'END_BOSS',

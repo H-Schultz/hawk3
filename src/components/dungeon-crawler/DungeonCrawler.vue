@@ -4,7 +4,7 @@ import {useRouter} from 'vue-router';
 import {
   GAME_STATE, MAPS, ANIMATION_SPEED,
   MAX_HEALTH, LEVEL_CONFIG, WHIRLWIND_DURATION, CHARGE_TIME,
-  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, ITEM_TYPES
+  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES,
 } from './constants.js';
 import Player from './Player.vue';
 import Enemy from './Enemy.vue';
@@ -40,6 +40,7 @@ const dungeonMap = ref(null);
 const router = useRouter();
 const activeQuest = ref(null);
 const questItems = ref([]);
+const traps = ref([]);
 
 function goBack() {
   router.push('/');
@@ -90,15 +91,6 @@ const loadMap = (mapIndex) => {
   const layout = mapData.layout;
   let startPos = {x: 1, y: 1};
 
-  for (let y = 0; y < layout.length; y++) {
-    for (let x = 0; x < layout[y].length; x++) {
-      if (layout[y][x] === 90) {
-        startPos = {x, y};
-        break;
-      }
-    }
-  }
-
   isStairActive.value = false;
   const processedLayout = layout.map(row =>
       row.map(tile => tile === 90 || (tile === 98 && !isStairActive.value) ? 20 : tile)
@@ -107,9 +99,22 @@ const loadMap = (mapIndex) => {
   currentMapIndex.value = mapIndex;
   currentMap.value = mapData;
   dungeonMap.value = processedLayout;
-  playerPosition.value = startPos;
-  defeatedEnemies.value = 0;
+  traps.value = [];
 
+  for (let y = 0; y < layout.length; y++) {
+    for (let x = 0; x < layout[y].length; x++) {
+      if (layout[y][x] === 90) {
+        startPos = {x, y};
+      }
+      if (layout[y][x] === 30) {
+        initializeTrap(x, y);
+      }
+    }
+  }
+
+  playerPosition.value = startPos;
+  console.log('Loaded map:', playerPosition.value);
+  defeatedEnemies.value = 0;
   enemies.value = [];
   droppedItems.value = [];
 
@@ -168,6 +173,7 @@ const dropItem = (position) => {
   if (dropChance > 0.99) return; // 30% Chance für einen Drop
 
   const itemTypes = currentMap.value.allowedItems || [];
+  if (itemTypes.length === 0) return;
   const randomItem = itemTypes[Math.floor(Math.random() * itemTypes.length)];
 
   droppedItems.value.push({
@@ -649,6 +655,9 @@ const movePlayer = (dx, dy) => {
   playerState.value = 'run';
 
   if (isValidMove(newPosition)) {
+    playerPosition.value = newPosition;
+    checkTrapDamage(newPosition);
+
     // Prüfe Quest-Items
     if (activeQuest.value) {
       const questItem = questItems.value.find(item =>
@@ -766,6 +775,52 @@ const executeAttack = () => {
   }
 };
 
+const getTileObjects = (tile, rowIndex, tileIndex) => {
+  if (tile === 30) {
+    return traps.value.find(trap => trap.x === tileIndex && trap.y === rowIndex);
+  }
+  return null;
+};
+
+const initializeTrap = (x, y) => {
+  traps.value.push({x, y, status: 'active'});
+  const toggleTrapStatus = () => {
+    const trap = traps.value.find(trap => trap.x === x && trap.y === y);
+    if (!trap) return;
+    trap.status = trap.status === 'active' ? 'idle' : 'active';
+    if (trap.status === 'active') {
+      checkTrapDamage(playerPosition.value);
+    }
+    trap.timerId = setTimeout(
+        toggleTrapStatus,
+        trap.status === 'active' ? TILES[30].trap.activeTime : TILES[30].trap.activationInterval
+    );
+  };
+  // Starte den ersten Timer
+  const trap = traps.value.find(trap => trap.x === x && trap.y === y);
+  if (trap) {
+    trap.timerId = setTimeout(toggleTrapStatus, TILES[30].trap.activeTime);
+  }
+  // Optional: Cleanup-Funktion zurückgeben
+  return () => {
+    const trap = traps.value.find(trap => trap.x === x && trap.y === y);
+    if (trap && trap.timerId) {
+      clearTimeout(trap.timerId);
+    }
+  };
+};
+
+const checkTrapDamage = (playerPosition) => {
+  const trap = traps.value.find(trap => trap.x === playerPosition.x && trap.y === playerPosition.y);
+  if (trap && trap.status === 'active') {
+    playerHealth.value -= 1;
+    if (playerHealth.value <= 0) {
+      gameState.value = GAME_STATE.GAME_OVER;
+      playerHealth.value = 0;
+    }
+  }
+};
+
 const handleKeydown = (e) => {
   if ((gameState.value === GAME_STATE.GAME_OVER || gameState.value === GAME_STATE.VICTORY) && e.key === 'r') {
     restartGame();
@@ -855,6 +910,7 @@ watch(() => gameState.value, (newState) => {
               v-for="(tile, tileIndex) in row"
               :key="`${rowIndex}-${tileIndex}`"
               :tile="tile"
+              :tile-object="getTileObjects(tile, rowIndex, tileIndex)"
             />
           </div>
           <Player

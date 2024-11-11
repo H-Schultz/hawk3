@@ -1,5 +1,4 @@
 <script setup>
-
   import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite.png";
   import {HEART_SPRITES, ITEM_TYPES} from "./constants.js";
 

@@ -3,29 +3,78 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
-import { TILES, DISPLAY_SIZE } from './constants.js';
+  import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
+  import { TILES, DISPLAY_SIZE, ANIMATION_SPEED } from './constants.js';
+  import { ref, onUnmounted, watch } from "vue";
 
-const props = defineProps({
-  tile: {
-    type: Number,
-    required: true
-  }
-});
+  const props = defineProps({
+    tile: {
+      type: Number,
+      required: true
+    },
+    tileObject: {
+      type: Object,
+      required: false
+    }
+  });
 
-const getTileStyle = (tileType) => {
-  const position = TILES[tileType];
-  if (!position) return {};
+  const currentFrame = ref(0);
+  let animationInterval;
 
-  return {
-    width: `${DISPLAY_SIZE}px`,
-    height: `${DISPLAY_SIZE}px`,
-    backgroundImage: `url(${dungeonSprite})`,
-    backgroundPosition: `-${position.x * 4}px -${position.y * 4}px`,
-    backgroundSize: '2048px 2048px',
+  watch(
+    () => props.tileObject?.status,
+    (newStatus) => {
+      if (newStatus) {
+        currentFrame.value = 0;
+        startAnimation();
+      }
+    }
+  );
+
+  const getTileStyle = (tileType) => {
+    const position = TILES[tileType];
+    if (!position) return {};
+
+    let sprite = TILES[tileType];
+    if (props.tileObject?.status) {
+      const maxFrames = TILES[tileType].sprites[props.tileObject.status].length;
+      if (currentFrame.value >= maxFrames) {
+        currentFrame.value = maxFrames - 1;
+        clearInterval(animationInterval);
+      }
+      sprite = TILES[tileType].sprites[props.tileObject.status][currentFrame.value];
+    }
+
+    return {
+      width: `${DISPLAY_SIZE}px`,
+      height: `${DISPLAY_SIZE}px`,
+      backgroundImage: `url(${dungeonSprite})`,
+      backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,
+      backgroundSize: '2048px 2048px',
+    };
   };
-};
+
+  const startAnimation = () => {
+    if (animationInterval) clearInterval(animationInterval);
+    if (!props.tileObject) return;
+    animationInterval = setInterval(() => {
+      const maxFrames = TILES[props.tile].sprites[props.tileObject.status].length;
+      if (currentFrame.value < maxFrames - 1) {
+        currentFrame.value += 1;
+      } else {
+        clearInterval(animationInterval);
+      }
+    }, ANIMATION_SPEED);
+  };
+
+  if (props.tileObject) {
+    startAnimation();
+  }
+
+  onUnmounted(() => {
+    clearInterval(animationInterval);
+    console.log('Tile destroyed', props.tile);
+  });
 </script>
 
 <style scoped>

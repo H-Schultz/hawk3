@@ -20,18 +20,18 @@
 </template>
 
 <script setup>
-import { GAME_STATE } from './constants.js';
+  import { GAME_STATE } from './constants.js';
 
-const props = defineProps({
-  gameState: {
-    type: String,
-    required: true
-  },
-  coins: {
-    type: Number,
-    required: true
-  }
-});
+  const props = defineProps({
+    gameState: {
+      type: String,
+      required: true
+    },
+    coins: {
+      type: Number,
+      required: true
+    }
+  });
 </script>
 
 <style scoped>
