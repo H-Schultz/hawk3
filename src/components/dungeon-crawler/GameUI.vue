@@ -64,12 +64,17 @@
         Quest Items: {{ props.currentMap?.quest.count }}/{{ props.currentMap?.quest.goal }}
       </span>
     </div>
-    <div class="coins-container">
+    <div class="items-container">
+      <div class="bomb-icon" :style="{
+        backgroundImage: `url(${dungeonSprite})`,
+        backgroundPosition: `-${ITEM_TYPES.BOMB.sprite.x * 4}px -${ITEM_TYPES.BOMB.sprite.y * 4}px`,
+      }"/>
+      <span class="item-count">{{ props.player.bombs }}</span>
       <div class="coin-icon" :style="{
         backgroundImage: `url(${dungeonSprite})`,
         backgroundPosition: `-${ITEM_TYPES.COIN.sprite.x * 4}px -${ITEM_TYPES.COIN.sprite.y * 4}px`,
       }"/>
-      <span class="coin-count">{{ props.coins }}</span>
+      <span class="item-count">{{ props.coins }}</span>
     </div>
   </div>
 </template>
@@ -106,7 +111,7 @@
   font-weight: bold;
 }
 
-.coins-container {
+.items-container {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -119,6 +124,7 @@
   border-radius: 15px;
 }
 
+.bomb-icon,
 .coin-icon {
   width: 32px;
   height: 32px;
@@ -127,7 +133,7 @@
   background-size: 2048px 2048px;
 }
 
-.coin-count {
+.item-count {
   color: white;
   font-size: 24px;
   font-weight: bold;

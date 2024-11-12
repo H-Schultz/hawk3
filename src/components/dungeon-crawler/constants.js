@@ -70,7 +70,7 @@ export const MAPS = [
         name: 'Eingangshalle',
         type: 'default',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['BOMB', 'GREEN_POISON']
+        allowedItems: ['GREEN_POISON']
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
@@ -227,7 +227,8 @@ export const ITEM_TYPES = {
         name: 'bomb',
         sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 20},
         size: {width: 16, height: 16},
-        frames: 1
+        frames: 1,
+        destroyable: false
     }
 };
 
@@ -265,7 +266,7 @@ export const ENEMY_TYPES = {
         name: 'goblin',
         type: 'default',
         maxHealth: 2,
-        damage: 1,
+        damage: 0,
         intelligence: 0.5,
         moveSpeed: 1000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},

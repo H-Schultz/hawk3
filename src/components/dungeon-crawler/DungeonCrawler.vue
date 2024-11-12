@@ -4,7 +4,7 @@ import {useRouter} from 'vue-router';
 import {
   GAME_STATE, MAPS,
   MAX_HEALTH, LEVEL_CONFIG, WHIRLWIND_DURATION, CHARGE_TIME,
-  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG
+  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG, ITEM_TYPES
 } from './constants.js';
 import Player from './Player.vue';
 import Enemy from './Enemy.vue';
@@ -42,6 +42,7 @@ const player = ref({
   isUnderAttack: false,
   hasExecutedWhirlwind: false,
   chargeStartTime: null,
+  bombs: 0,
   gameState
 });
 
@@ -182,6 +183,7 @@ const dropItem = (position) => {
   droppedItems.value.push({
     id: Math.random().toString(36).substr(2, 9),
     type: randomItem,
+    config: ITEM_TYPES[randomItem],
     position: {...position},
     collectAnimation: false
   });
@@ -195,7 +197,22 @@ const collectItem = (item) => {
       coins.value++;
     } else if (item.type === 'HEART') {
       player.value.health = Math.min(MAX_HEALTH, player.value.health + 2);
+    } else if (item.type === 'GREEN_POISON') {
+      player.value.health -= ITEM_TYPES.GREEN_POISON.damage;
+      if (player.value.health <= 0) {
+        gameState.value = GAME_STATE.GAME_OVER;
+        player.value.health = 0;
+      }
+    } else if (item.type === 'BOMB') {
+      player.value.bombs++;
     }
+    droppedItems.value = droppedItems.value.filter(i => i.id !== item.id);
+  }, 200);
+};
+
+const destroyItem = (item) => {
+  item.collectAnimation = true;
+  setTimeout(() => {
     droppedItems.value = droppedItems.value.filter(i => i.id !== item.id);
   }, 200);
 };
@@ -238,12 +255,19 @@ const getAttackPosition = () => {
   return position;
 };
 
-// Funktion für den Schwertangriff
 const attackWithSword = () => {
   if (player.value.isAttacking || gameState.value !== GAME_STATE.PLAYING) return;
 
   player.value.isAttacking = true;
   const attackPos = getAttackPosition();
+  const itemAtPosition = droppedItems.value.find(item =>
+      item.config.destroyable &&
+      item.position.x === attackPos.x &&
+      item.position.y === attackPos.y
+  );
+  if (itemAtPosition) {
+    destroyItem(itemAtPosition);
+  }
 
   enemies.value.forEach(enemy => {
     if (enemy.health > 0 &&
@@ -274,6 +298,7 @@ const attackWithSword = () => {
 };
 
 const executeWhirlwindAttack = () => {
+  const oldDropItems = JSON.parse(JSON.stringify(droppedItems.value));
   player.value.isWhirlwindAttacking = true;
 
   const surroundingPositions = [
@@ -289,27 +314,27 @@ const executeWhirlwindAttack = () => {
 
   // Erster Treffer nach 200ms (1/4 Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions);
+    applyWhirlwindDamage(surroundingPositions, oldDropItems);
   }, 200);
 
   // Zweiter Treffer nach 400ms (1/2 Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions);
+    applyWhirlwindDamage(surroundingPositions, oldDropItems);
   }, 400);
 
   // Dritter Treffer nach 600ms (3/4 Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions);
+    applyWhirlwindDamage(surroundingPositions, oldDropItems);
   }, 600);
 
   // Letzter Treffer nach 800ms (volle Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions);
+    applyWhirlwindDamage(surroundingPositions, oldDropItems);
     player.value.isWhirlwindAttacking = false;
   }, WHIRLWIND_DURATION);
 };
 
-const applyWhirlwindDamage = (surroundingPositions) => {
+const applyWhirlwindDamage = (surroundingPositions, oldDropItems) => {
   enemies.value.forEach(enemy => {
     if (enemy.health > 0) {
       const isInRange = surroundingPositions.some(pos =>
@@ -336,35 +361,20 @@ const applyWhirlwindDamage = (surroundingPositions) => {
       }
     }
   });
-};
 
-const updateBossAttackPattern = (boss) => {
-  if (!boss.specialAttackTimer) {
-    boss.specialAttackTimer = 0;
-  }
-  boss.specialAttackTimer++;
-
-  if (boss.specialAttackTimer >= 50) {
-    boss.specialAttackTimer = 0;
-
-    const dx = player.value.position.x - boss.position.x;
-    const dy = player.value.position.y - boss.position.y;
-    const targetX = player.value.position.x - Math.sign(dx);
-    const targetY = player.value.position.y - Math.sign(dy);
-
-    if (isValidMove({x: targetX, y: targetY})) {
-      boss.position.x = targetX;
-      boss.position.y = targetY;
-      boss.isPreparingAttack = true;
-
-      setTimeout(() => {
-        boss.isPreparingAttack = false;
-      }, 500);
+  const destroyedItems = oldDropItems.filter(item => {
+    if (item.config.destroyable && surroundingPositions.some(pos =>
+        item.position.x === player.value.position.x + pos.x &&
+        item.position.y === player.value.position.y + pos.y)) {
+      return true;
     }
+    return false;
+  });
+  if (destroyedItems?.length > 0) {
+    destroyedItems.forEach(item => destroyItem(item));
   }
 };
 
-// Funktion zum Finden einer freien Spawn-Position
 const findSpawnPosition = () => {
   const maxAttempts = 20;
   let attempts = 0;
@@ -383,7 +393,6 @@ const findSpawnPosition = () => {
   return null;
 };
 
-// Funktion zum Spawnen eines neuen Feindes
 const spawnEnemy = () => {
   if (currentMap.value.type === 'boss' || currentMap.value.allowedEnemyTypes.length === 0) {
     return;
@@ -421,19 +430,13 @@ const spawnEnemy = () => {
 };
 
 const moveEnemy = (enemy) => {
-  // Wenn der Feind einen Angriff vorbereitet, nicht bewegen
   if (enemy.isPreparingAttack) return;
 
   const dx = player.value.position.x - enemy.position.x;
   const dy = player.value.position.y - enemy.position.y;
-  const distanceToPlayer = Math.sqrt(dx * dx + dy * dy);
-
-  // Nutze die intelligence direkt aus dem ENEMY_TYPES
   const intelligence = ENEMY_TYPES[enemy.name].intelligence || 0.5;
-
   let movePatterns = [];
 
-  // Intelligente Bewegung in Richtung Spieler
   if (Math.random() < intelligence) {
     if (Math.abs(dx) > Math.abs(dy)) {
       movePatterns.push({dx: Math.sign(dx), dy: 0});
@@ -444,7 +447,6 @@ const moveEnemy = (enemy) => {
     }
   }
 
-  // Basis Bewegungsmuster
   let randomPatterns = [
     {dx: -1, dy: 0},
     {dx: 1, dy: 0},
@@ -452,7 +454,6 @@ const moveEnemy = (enemy) => {
     {dx: 0, dy: 1}
   ];
 
-  // Füge diagonale Bewegungen für hohe Intelligenz hinzu
   if (intelligence >= 0.7) {
     randomPatterns = [
       ...randomPatterns,
@@ -468,14 +469,11 @@ const moveEnemy = (enemy) => {
     ...randomPatterns
   ];
 
-  // Gewichtete Auswahl der Bewegung basierend auf Intelligenz
   let selectedMove;
   if (movePatterns.length > 0) {
     if (Math.random() < intelligence && movePatterns.length > 2) {
-      // Intelligente Bewegung: Wähle aus den ersten beiden Optionen
       selectedMove = movePatterns[Math.floor(Math.random() * 2)];
     } else {
-      // Zufällige Bewegung
       selectedMove = movePatterns[Math.floor(Math.random() * movePatterns.length)];
     }
   }
@@ -487,12 +485,10 @@ const moveEnemy = (enemy) => {
     y: enemy.position.y + selectedMove.dy
   };
 
-  // Aktualisiere die Richtung des Feindes
   if (selectedMove.dx !== 0) {
     enemy.direction = selectedMove.dx > 0 ? 'right' : 'left';
   }
 
-  // Bewegungsvalidierung
   if (isValidEnemyMove(newPosition, enemy)) {
     enemy.position = newPosition;
     enemy.state = 'run';
