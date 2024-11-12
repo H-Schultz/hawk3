@@ -4,11 +4,14 @@
 
 <script setup>
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
-  import {SWORD_SPRITE} from './constants.js';
 
   const props = defineProps({
     playerDirection: {
       type: String,
+      required: true
+    },
+    player: {
+      type: Object,
       required: true
     }
   });
@@ -16,7 +19,7 @@
   const getSwordStyle = () => {
     return {
       backgroundImage: `url(${dungeonSprite})`,
-      backgroundPosition: `-${SWORD_SPRITE.x * 4}px -${SWORD_SPRITE.y * 4}px`,
+      backgroundPosition: `-${props.player.weapon.sprite.x * 4}px -${props.player.weapon.sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
       transform: props.playerDirection === 'left' ? 'scaleX(-1)' : 'none',
       transformOrigin: props.playerDirection === 'left' ? 'calc(100% - 32px) calc(100% - 16px)' : 'calc(100% - 32px) calc(100% - 16px)',

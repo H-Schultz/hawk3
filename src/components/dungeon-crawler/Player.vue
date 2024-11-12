@@ -8,7 +8,7 @@
     }"
     :style="playerStyle"
   >
-    <Sword :player-direction="direction" />
+    <Sword :player-direction="direction" :player="player" />
   </div>
 </template>
 
@@ -55,13 +55,17 @@
       type: String,
       required: true
     },
+    player: {
+      type: Object,
+      required: true
+    }
   });
 
   const currentFrame = ref(0);
   let animationInterval;
 
   const playerStyle = computed(() => {
-    const sprite = PLAYER_SPRITES[props.playerState][currentFrame.value];
+    const sprite = props.player.character.sprites[props.playerState][currentFrame.value];
     return {
       backgroundImage: `url(${dungeonSprite})`,
       backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,

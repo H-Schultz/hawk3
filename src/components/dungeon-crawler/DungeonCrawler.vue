@@ -4,7 +4,7 @@ import {useRouter} from 'vue-router';
 import {
   GAME_STATE, MAPS, ANIMATION_SPEED,
   MAX_HEALTH, LEVEL_CONFIG, WHIRLWIND_DURATION, CHARGE_TIME,
-  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES,
+  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG
 } from './constants.js';
 import Player from './Player.vue';
 import Enemy from './Enemy.vue';
@@ -41,6 +41,21 @@ const router = useRouter();
 const activeQuest = ref(null);
 const questItems = ref([]);
 const traps = ref([]);
+
+const player = {
+  position: playerPosition,
+  health: playerHealth,
+  direction: playerDirection,
+  state: playerState,
+  weapon: WEAPON_CONFIG.SWORD,
+  character: PLAYER_CONFIG.KNIGHT,
+  isAttacking,
+  isCharging,
+  isWhirlwindAttacking,
+  isUnderAttack,
+  gameState,
+  currentFrame
+};
 
 function goBack() {
   router.push('/');
@@ -923,6 +938,7 @@ watch(() => gameState.value, (newState) => {
             :game-state="gameState"
             :player-state="playerState"
             :direction="playerDirection"
+            :player="player"
           />
           <Enemy
             v-for="enemy in enemies"

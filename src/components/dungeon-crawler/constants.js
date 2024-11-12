@@ -221,6 +221,12 @@ export const ITEM_TYPES = {
         sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 21},
         size: {width: 16, height: 16},
         frames: 1
+    },
+    BOMB: {
+        name: 'bomb',
+        sprite: {x: SPRITE_SIZE * 20, y: SPRITE_SIZE * 21},
+        size: {width: 16, height: 16},
+        frames: 1
     }
 };
 
@@ -416,4 +422,95 @@ export const NPC_SPRITES = {
     ]
 };
 
+export const PLAYER_CONFIG = {
+    DINO: {
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 14},
+                {x: SPRITE_SIZE * 9, y: SPRITE_SIZE * 14},
+                {x: SPRITE_SIZE * 10, y: SPRITE_SIZE * 14},
+                {x: SPRITE_SIZE * 11, y: SPRITE_SIZE * 14},
+            ],
+            run: [
+                {x: SPRITE_SIZE * 12, y: SPRITE_SIZE * 14},
+                {x: SPRITE_SIZE * 13, y: SPRITE_SIZE * 14},
+                {x: SPRITE_SIZE * 14, y: SPRITE_SIZE * 14},
+                {x: SPRITE_SIZE * 15, y: SPRITE_SIZE * 14},
+            ]
+        }
+    },
+    KNIGHT: {
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 6},
+                {x: SPRITE_SIZE * 9, y: SPRITE_SIZE * 6},
+                {x: SPRITE_SIZE * 10, y: SPRITE_SIZE * 6},
+                {x: SPRITE_SIZE * 11, y: SPRITE_SIZE * 6},
+            ],
+            run: [
+                {x: SPRITE_SIZE * 12, y: SPRITE_SIZE * 6},
+                {x: SPRITE_SIZE * 13, y: SPRITE_SIZE * 6},
+                {x: SPRITE_SIZE * 14, y: SPRITE_SIZE * 6},
+                {x: SPRITE_SIZE * 15, y: SPRITE_SIZE * 6},
+            ]
+        }
+    },
+    HUNTER_MAN: {
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 2},
+                {x: SPRITE_SIZE * 9, y: SPRITE_SIZE * 2},
+                {x: SPRITE_SIZE * 10, y: SPRITE_SIZE * 2},
+                {x: SPRITE_SIZE * 11, y: SPRITE_SIZE * 2},
+            ],
+            run: [
+                {x: SPRITE_SIZE * 12, y: SPRITE_SIZE * 2},
+                {x: SPRITE_SIZE * 13, y: SPRITE_SIZE * 2},
+                {x: SPRITE_SIZE * 14, y: SPRITE_SIZE * 2},
+                {x: SPRITE_SIZE * 15, y: SPRITE_SIZE * 2},
+            ]
+        }
+    },
+    HUNTER_WOMAN: {
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE * 8, y: 0},
+                {x: SPRITE_SIZE * 9, y: 0},
+                {x: SPRITE_SIZE * 10, y: 0},
+                {x: SPRITE_SIZE * 11, y: 0},
+            ],
+            run: [
+                {x: SPRITE_SIZE * 12, y: 0},
+                {x: SPRITE_SIZE * 13, y: 0},
+                {x: SPRITE_SIZE * 14, y: 0},
+                {x: SPRITE_SIZE * 15, y: 0},
+            ]
+        }
+    }
+};
+
 export const SWORD_SPRITE = {x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 2};
+export const WEAPON_CONFIG = {
+    MACE: {
+        damage: 1,
+        sprite: {
+            x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 2
+        },
+        size: {width: 16, height: 32},
+    },
+    SWORD: {
+        damage: 1,
+        sprite: {
+            x: SPRITE_SIZE * 21, y: 0
+        },
+        size: {width: 16, height: 32},
+    },
+    AXE: {
+        damage: 2,
+        sprite: {
+            x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 4
+        },
+        size: {width: 16, height: 32},
+    }
+
+}

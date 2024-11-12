@@ -58,6 +58,10 @@
     if (animationInterval) clearInterval(animationInterval);
     if (!props.tileObject) return;
     animationInterval = setInterval(() => {
+      if (!props.tileObject) {
+        clearInterval(animationInterval)
+        return;
+      }
       const maxFrames = TILES[props.tile].sprites[props.tileObject.status].length;
       if (currentFrame.value < maxFrames - 1) {
         currentFrame.value += 1;
