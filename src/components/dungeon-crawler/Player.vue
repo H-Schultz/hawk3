@@ -2,59 +2,23 @@
   <div
     class="player"
     :class="{
-      'attacking': isAttacking,
-      'charging': isCharging,
-      'whirlwindAttacking': isWhirlwindAttacking,
+      'attacking': player.isAttacking,
+      'charging': player.isCharging,
+      'whirlwindAttacking': player.isWhirlwindAttacking,
     }"
     :style="playerStyle"
   >
-    <Sword :player-direction="direction" :player="player" />
+    <Sword :player="player" />
   </div>
 </template>
 
 <script setup>
   import {computed, onMounted, ref} from 'vue';
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
-  import {PLAYER_SPRITES, DISPLAY_SIZE, ANIMATION_SPEED} from './constants.js';
+  import {DISPLAY_SIZE, ANIMATION_SPEED} from './constants.js';
   import Sword from './Sword.vue';
 
   const props = defineProps({
-    position: {
-      type: Object,
-      required: true
-    },
-    health: {
-      type: Number,
-      required: true
-    },
-    isAttacking: {
-      type: Boolean,
-      required: true
-    },
-    isCharging: {
-      type: Boolean,
-      required: true
-    },
-    isWhirlwindAttacking: {
-      type: Boolean,
-      required: true
-    },
-    isUnderAttack: {
-      type: Boolean,
-      default: false
-    },
-    gameState: {
-      type: String,
-      required: true
-    },
-    playerState: {
-      type: String,
-      required: true
-    },
-    direction: {
-      type: String,
-      required: true
-    },
     player: {
       type: Object,
       required: true
@@ -65,15 +29,15 @@
   let animationInterval;
 
   const playerStyle = computed(() => {
-    const sprite = props.player.character.sprites[props.playerState][currentFrame.value];
+    const sprite = props.player.character.sprites[props.player.state][currentFrame.value];
     return {
       backgroundImage: `url(${dungeonSprite})`,
       backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
-      left: `${props.position.x * DISPLAY_SIZE}px`,
-      top: `${props.position.y * DISPLAY_SIZE}px`,
-      transform: props.direction === 'left' ? 'scaleX(-1)' : 'none',
-      filter: props.isUnderAttack ? 'brightness(1.5) sepia(1) saturate(1000%) hue-rotate(0deg)' : 'none',
+      left: `${props.player.position.x * DISPLAY_SIZE}px`,
+      top: `${props.player.position.y * DISPLAY_SIZE}px`,
+      transform: props.player.direction === 'left' ? 'scaleX(-1)' : 'none',
+      filter: props.player.isUnderAttack ? 'brightness(1.5) sepia(1) saturate(1000%) hue-rotate(0deg)' : 'none',
     };
   });
 

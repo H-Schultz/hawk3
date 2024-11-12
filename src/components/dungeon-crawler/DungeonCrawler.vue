@@ -2,7 +2,7 @@
 import {ref, onMounted, onUnmounted, computed, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {
-  GAME_STATE, MAPS, ANIMATION_SPEED,
+  GAME_STATE, MAPS,
   MAX_HEALTH, LEVEL_CONFIG, WHIRLWIND_DURATION, CHARGE_TIME,
   SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG
 } from './constants.js';
@@ -14,21 +14,8 @@ import Overlay from './Overlay.vue';
 import Tile from './Tile.vue';
 import NPC from './NPC.vue';
 
-
-const playerHealth = ref(MAX_HEALTH);
-const isWhirlwindAttacking = ref(false);
-const chargeStartTime = ref(null);
-const isCharging = ref(false);
-const hasExecutedWhirlwind = ref(false);
 let chargeTimer = null;
 
-const playerPosition = ref({x: 1, y: 1});
-const playerDirection = ref('right');
-const playerState = ref('idle');
-const currentFrame = ref(0);
-const isAttacking = ref(false);
-const isUnderAttack = ref(false);
-const enemyFrame = ref(0);
 const droppedItems = ref([]);
 const coins = ref(0);
 const gameState = ref(GAME_STATE.PLAYING);
@@ -42,20 +29,21 @@ const activeQuest = ref(null);
 const questItems = ref([]);
 const traps = ref([]);
 
-const player = {
-  position: playerPosition,
-  health: playerHealth,
-  direction: playerDirection,
-  state: playerState,
+const player = ref({
+  position: { x: 1, y: 1 },
+  health: MAX_HEALTH,
+  direction: 'right',
+  state: 'idle',
   weapon: WEAPON_CONFIG.SWORD,
   character: PLAYER_CONFIG.KNIGHT,
-  isAttacking,
-  isCharging,
-  isWhirlwindAttacking,
-  isUnderAttack,
-  gameState,
-  currentFrame
-};
+  isAttacking: false,
+  isCharging: false,
+  isWhirlwindAttacking: false,
+  isUnderAttack: false,
+  hasExecutedWhirlwind: false,
+  chargeStartTime: null,
+  gameState
+});
 
 function goBack() {
   router.push('/');
@@ -93,8 +81,8 @@ const activeEnemiesNearPlayer = computed(() => {
   return enemies.value.filter(enemy => {
     if (enemy.health <= 0) return false;
 
-    const dx = Math.abs(playerPosition.value.x - enemy.position.x);
-    const dy = Math.abs(playerPosition.value.y - enemy.position.y);
+    const dx = Math.abs(player.value.position.x - enemy.position.x);
+    const dy = Math.abs(player.value.position.y - enemy.position.y);
     return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
   });
 });
@@ -127,8 +115,8 @@ const loadMap = (mapIndex) => {
     }
   }
 
-  playerPosition.value = startPos;
-  console.log('Loaded map:', playerPosition.value);
+  player.value.position = startPos;
+  console.log('Loaded map:', player.value.position);
   defeatedEnemies.value = 0;
   enemies.value = [];
   droppedItems.value = [];
@@ -206,7 +194,7 @@ const collectItem = (item) => {
     if (item.type === 'COIN') {
       coins.value++;
     } else if (item.type === 'HEART') {
-      playerHealth.value = Math.min(MAX_HEALTH, playerHealth.value + 2);
+      player.value.health = Math.min(MAX_HEALTH, player.value.health + 2);
     }
     droppedItems.value = droppedItems.value.filter(i => i.id !== item.id);
   }, 200);
@@ -236,9 +224,9 @@ const isValidMove = (position) => {
 
 // Funktion zum Überprüfen der Angriffsrichtung
 const getAttackPosition = () => {
-  const position = {...playerPosition.value};
+  const position = {...player.value.position};
 
-  switch (playerDirection.value) {
+  switch (player.value.direction) {
     case 'right':
       position.x += 1;
       break;
@@ -252,9 +240,9 @@ const getAttackPosition = () => {
 
 // Funktion für den Schwertangriff
 const attackWithSword = () => {
-  if (isAttacking.value || gameState.value !== GAME_STATE.PLAYING) return;
+  if (player.value.isAttacking || gameState.value !== GAME_STATE.PLAYING) return;
 
-  isAttacking.value = true;
+  player.value.isAttacking = true;
   const attackPos = getAttackPosition();
 
   enemies.value.forEach(enemy => {
@@ -281,12 +269,12 @@ const attackWithSword = () => {
   });
 
   setTimeout(() => {
-    isAttacking.value = false;
+    player.value.isAttacking = false;
   }, 400);
 };
 
 const executeWhirlwindAttack = () => {
-  isWhirlwindAttacking.value = true;
+  player.value.isWhirlwindAttacking = true;
 
   const surroundingPositions = [
     {x: -1, y: 0}, // Links
@@ -317,7 +305,7 @@ const executeWhirlwindAttack = () => {
   // Letzter Treffer nach 800ms (volle Rotation)
   setTimeout(() => {
     applyWhirlwindDamage(surroundingPositions);
-    isWhirlwindAttacking.value = false;
+    player.value.isWhirlwindAttacking = false;
   }, WHIRLWIND_DURATION);
 };
 
@@ -325,8 +313,8 @@ const applyWhirlwindDamage = (surroundingPositions) => {
   enemies.value.forEach(enemy => {
     if (enemy.health > 0) {
       const isInRange = surroundingPositions.some(pos =>
-          enemy.position.x === playerPosition.value.x + pos.x &&
-          enemy.position.y === playerPosition.value.y + pos.y
+          enemy.position.x === player.value.position.x + pos.x &&
+          enemy.position.y === player.value.position.y + pos.y
       );
 
       if (isInRange) {
@@ -359,10 +347,10 @@ const updateBossAttackPattern = (boss) => {
   if (boss.specialAttackTimer >= 50) {
     boss.specialAttackTimer = 0;
 
-    const dx = playerPosition.value.x - boss.position.x;
-    const dy = playerPosition.value.y - boss.position.y;
-    const targetX = playerPosition.value.x - Math.sign(dx);
-    const targetY = playerPosition.value.y - Math.sign(dy);
+    const dx = player.value.position.x - boss.position.x;
+    const dy = player.value.position.y - boss.position.y;
+    const targetX = player.value.position.x - Math.sign(dx);
+    const targetY = player.value.position.y - Math.sign(dy);
 
     if (isValidMove({x: targetX, y: targetY})) {
       boss.position.x = targetX;
@@ -376,15 +364,6 @@ const updateBossAttackPattern = (boss) => {
   }
 };
 
-const startAnimation = () => {
-  if (animationInterval) clearInterval(animationInterval);
-
-  animationInterval = setInterval(() => {
-    currentFrame.value = (currentFrame.value + 1) % 4;
-    enemyFrame.value = (enemyFrame.value + 1) % 4;
-  }, ANIMATION_SPEED);
-};
-
 // Funktion zum Finden einer freien Spawn-Position
 const findSpawnPosition = () => {
   const maxAttempts = 20;
@@ -394,8 +373,8 @@ const findSpawnPosition = () => {
     const y = Math.floor(Math.random() * dungeonMap.value.length);
     if ((dungeonMap.value[y][x] >= 20 && dungeonMap.value[y][x] <= 29) && // Kein Wandfeld
         !enemies.value.some(e => e.health > 0 && e.position.x === x && e.position.y === y) && // Kein Feind
-        Math.abs(x - playerPosition.value.x) > 1 && // Nicht zu nah am Spieler (X-Achse)
-        Math.abs(y - playerPosition.value.y) > 1) { // Nicht zu nah am Spieler (Y-Achse)
+        Math.abs(x - player.value.position.x) > 1 && // Nicht zu nah am Spieler (X-Achse)
+        Math.abs(y - player.value.position.y) > 1) { // Nicht zu nah am Spieler (Y-Achse)
       return {x, y};
     }
     attempts++;
@@ -445,8 +424,8 @@ const moveEnemy = (enemy) => {
   // Wenn der Feind einen Angriff vorbereitet, nicht bewegen
   if (enemy.isPreparingAttack) return;
 
-  const dx = playerPosition.value.x - enemy.position.x;
-  const dy = playerPosition.value.y - enemy.position.y;
+  const dx = player.value.position.x - enemy.position.x;
+  const dy = player.value.position.y - enemy.position.y;
   const distanceToPlayer = Math.sqrt(dx * dx + dy * dy);
 
   // Nutze die intelligence direkt aus dem ENEMY_TYPES
@@ -542,8 +521,8 @@ const startEnemyMovement = (enemy = null) => {
 const canEnemyAttackPlayer = (enemy) => {
   if (!enemy.canAttack || enemy.health <= 0 || enemy.isPreparingAttack) return false;
 
-  const dx = Math.abs(playerPosition.value.x - enemy.position.x);
-  const dy = Math.abs(playerPosition.value.y - enemy.position.y);
+  const dx = Math.abs(player.value.position.x - enemy.position.x);
+  const dy = Math.abs(player.value.position.y - enemy.position.y);
 
   return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
 };
@@ -565,7 +544,7 @@ const isValidEnemyMove = (newPosition, currentEnemy) => {
   }
 
   // Kollision mit Spieler
-  if (isSamePosition(newPosition, playerPosition.value)) {
+  if (isSamePosition(newPosition, player.value.position)) {
     return false;
   }
 
@@ -598,20 +577,20 @@ const enemyAttack = (enemy) => {
       return;
     }
 
-    const dx = Math.abs(playerPosition.value.x - enemy.position.x);
-    const dy = Math.abs(playerPosition.value.y - enemy.position.y);
+    const dx = Math.abs(player.value.position.x - enemy.position.x);
+    const dy = Math.abs(player.value.position.y - enemy.position.y);
 
     if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-      isUnderAttack.value = true;
-      playerHealth.value -= ENEMY_TYPES[enemy.name].damage;
+      player.value.isUnderAttack = true;
+      player.value.health -= ENEMY_TYPES[enemy.name].damage;
 
-      if (playerHealth.value <= 0) {
+      if (player.value.health <= 0) {
         gameState.value = GAME_STATE.GAME_OVER;
-        playerHealth.value = 0;
+        player.value.health = 0;
       }
 
       setTimeout(() => {
-        isUnderAttack.value = false;
+        player.value.isUnderAttack = false;
       }, 200);
     }
 
@@ -638,18 +617,18 @@ const startAttackCheck = () => {
 };
 
 const startCharging = () => {
-  if (isCharging.value || isAttacking.value || isWhirlwindAttacking.value || gameState.value !== GAME_STATE.PLAYING) return;
+  if (player.value.isCharging || player.value.isAttacking || player.value.isWhirlwindAttacking || gameState.value !== GAME_STATE.PLAYING) return;
 
-  if (!hasExecutedWhirlwind.value) {
-    chargeStartTime.value = Date.now();
-    isCharging.value = true;
+  if (!player.value.hasExecutedWhirlwind) {
+    player.value.chargeStartTime = Date.now();
+    player.value.isCharging = true;
 
     chargeTimer = setTimeout(() => {
-      if (isCharging.value) {
+      if (player.value.isCharging) {
         executeWhirlwindAttack();
-        isCharging.value = false;
-        chargeStartTime.value = null;
-        hasExecutedWhirlwind.value = true;
+        player.value.isCharging = false;
+        player.value.chargeStartTime = null;
+        player.value.hasExecutedWhirlwind = true;
       }
     }, CHARGE_TIME);
   }
@@ -659,18 +638,18 @@ const movePlayer = (dx, dy) => {
   if (gameState.value !== GAME_STATE.PLAYING) return;
 
   const newPosition = {
-    x: playerPosition.value.x + dx,
-    y: playerPosition.value.y + dy
+    x: player.value.position.x + dx,
+    y: player.value.position.y + dy
   };
 
   if (dx !== 0) {
-    playerDirection.value = dx > 0 ? 'right' : 'left';
+    player.value.direction = dx > 0 ? 'right' : 'left';
   }
 
-  playerState.value = 'run';
+  player.value.state = 'run';
 
   if (isValidMove(newPosition)) {
-    playerPosition.value = newPosition;
+    player.value.position = newPosition;
     checkTrapDamage(newPosition);
 
     // Prüfe Quest-Items
@@ -702,7 +681,7 @@ const movePlayer = (dx, dy) => {
       return;
     }
 
-    playerPosition.value = newPosition;
+    player.value.position = newPosition;
 
     const itemAtPosition = droppedItems.value.find(item =>
         !item.collectAnimation &&
@@ -736,7 +715,7 @@ const startNextLevel = () => {
 
   if (nextMapIndex < MAPS.length) {
     if (loadMap(nextMapIndex)) {
-      playerHealth.value = Math.min(MAX_HEALTH, playerHealth.value + LEVEL_CONFIG.healthBonus);
+      player.value.health = Math.min(MAX_HEALTH, player.value.health + LEVEL_CONFIG.healthBonus);
     }
   } else {
     gameState.value = GAME_STATE.VICTORY;
@@ -745,7 +724,7 @@ const startNextLevel = () => {
 
 const restartGame = () => {
   gameState.value = GAME_STATE.PLAYING;
-  playerHealth.value = MAX_HEALTH;
+  player.value.health = MAX_HEALTH;
   coins.value = 0;
   loadMap(0);
 };
@@ -773,19 +752,19 @@ const startSpawnSystem = () => {
 };
 
 const executeAttack = () => {
-  if (!isCharging.value || gameState.value !== GAME_STATE.PLAYING) return;
+  if (!player.value.isCharging || gameState.value !== GAME_STATE.PLAYING) return;
 
   if (chargeTimer) {
     clearTimeout(chargeTimer);
     chargeTimer = null;
   }
 
-  const chargeTime = Date.now() - chargeStartTime.value;
-  isCharging.value = false;
-  chargeStartTime.value = null;
+  const chargeTime = Date.now() - player.value.chargeStartTime;
+  player.value.isCharging = false;
+  player.value.chargeStartTime = null;
 
   // Nur normaler Angriff wenn vor 2 Sekunden losgelassen und kein Whirlwind ausgeführt
-  if (chargeTime < CHARGE_TIME && !hasExecutedWhirlwind.value) {
+  if (chargeTime < CHARGE_TIME && !player.value.hasExecutedWhirlwind) {
     attackWithSword();
   }
 };
@@ -804,7 +783,7 @@ const initializeTrap = (x, y) => {
     if (!trap) return;
     trap.status = trap.status === 'active' ? 'idle' : 'active';
     if (trap.status === 'active') {
-      checkTrapDamage(playerPosition.value);
+      checkTrapDamage(player.value.position);
     }
     trap.timerId = setTimeout(
         toggleTrapStatus,
@@ -828,10 +807,10 @@ const initializeTrap = (x, y) => {
 const checkTrapDamage = (playerPosition) => {
   const trap = traps.value.find(trap => trap.x === playerPosition.x && trap.y === playerPosition.y);
   if (trap && trap.status === 'active') {
-    playerHealth.value -= 1;
-    if (playerHealth.value <= 0) {
+    player.value.health -= 1;
+    if (player.value.health <= 0) {
       gameState.value = GAME_STATE.GAME_OVER;
-      playerHealth.value = 0;
+      player.value.health = 0;
     }
   }
 };
@@ -868,16 +847,15 @@ const handleKeydown = (e) => {
 const handleKeyup = (e) => {
   if (e.key === 'e') {
     executeAttack();
-    hasExecutedWhirlwind.value = false;
+    player.value.hasExecutedWhirlwind = false;
   }
-  playerState.value = 'idle';
+  player.value.state = 'idle';
 };
 
 onMounted(() => {
   loadMap(0);
   window.addEventListener('keydown', handleKeydown);
   window.addEventListener('keyup', handleKeyup);
-  startAnimation();
   startEnemyMovement();
   startSpawnSystem();
   startAttackCheck();
@@ -913,7 +891,7 @@ watch(() => gameState.value, (newState) => {
     </header>
     <main class="main-content">
       <div class="game-container">
-        <GameUI :player-health="playerHealth" :coins="coins" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
+        <GameUI :player="player" :coins="coins" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
         <Overlay :game-state="gameState" :coins="coins"></Overlay>
         <div class="dungeon-container">
           <div
@@ -929,15 +907,6 @@ watch(() => gameState.value, (newState) => {
             />
           </div>
           <Player
-            :position="playerPosition"
-            :health="playerHealth"
-            :is-attacking="isAttacking"
-            :is-charging="isCharging"
-            :is-whirlwind-attacking="isWhirlwindAttacking"
-            :is-under-attack="isUnderAttack"
-            :game-state="gameState"
-            :player-state="playerState"
-            :direction="playerDirection"
             :player="player"
           />
           <Enemy
@@ -952,7 +921,7 @@ watch(() => gameState.value, (newState) => {
           >
             <NPC
               :quest="currentMap.quest"
-              :player-position="playerPosition"
+              :player="player"
               @start-quest="startQuest"
               @show-stairs="showStairs"
             />

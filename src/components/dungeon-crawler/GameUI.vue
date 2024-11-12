@@ -3,8 +3,8 @@
   import {HEART_SPRITES, ITEM_TYPES} from "./constants.js";
 
   const props = defineProps({
-    playerHealth: {
-      type: Number,
+    player: {
+      type: Object,
       required: true
     },
     coins: {
@@ -26,7 +26,7 @@
   });
 
   const getHeartSprite = (index) => {
-    const currentHealth = props.playerHealth;
+    const currentHealth = props.player.health;
     const heartPosition = index * 2;
 
     if (currentHealth >= heartPosition + 2) {

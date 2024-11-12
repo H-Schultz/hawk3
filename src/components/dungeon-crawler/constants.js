@@ -19,13 +19,6 @@ export const WHIRLWIND_DURATION = 800;
 export const CHARGE_TIME = 2000;
 
 export const TILES = {
-    0: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
-    1: {x: SPRITE_SIZE, y: SPRITE_SIZE},
-    3: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 4},
-    4: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 5},
-    5: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 4},
-    8: {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 12},
-    9: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
     10: {x: SPRITE_SIZE, y: SPRITE_SIZE},
     20: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
     21: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 5},
@@ -63,7 +56,22 @@ export const TILES = {
     99: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
 };
 export const MAPS = [
-    {
+     {
+        layout: [
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 20, 20, 23, 20, 20, 20, 20, 98, 10],
+            [10, 90, 20, 20, 22, 20, 20, 21, 20, 10],
+            [10, 20, 21, 20, 20, 22, 20, 20, 23, 10],
+            [10, 21, 23, 21, 20, 20, 22, 21, 24, 10],
+            [10, 25, 23, 23, 20, 20, 21, 20, 21, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        ],
+        enemiesRequired: 1,
+        name: 'Eingangshalle',
+        type: 'default',
+        allowedEnemyTypes: ['GOBLIN'],
+        allowedItems: ['BOMB', 'GREEN_POISON']
+    }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             [10, 90, 10, 20, 30, 20, 30, 20, 20, 10],
@@ -91,21 +99,6 @@ export const MAPS = [
                 {x: 5, y: 3, collected: false, name: 'potion', type: 'BLUE_POTION'}
             ]
         }
-    }, {
-        layout: [
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 20, 20, 23, 20, 20, 20, 20, 98, 10],
-            [10, 90, 20, 20, 22, 20, 20, 21, 20, 10],
-            [10, 20, 21, 20, 20, 22, 20, 20, 23, 10],
-            [10, 21, 23, 21, 20, 20, 22, 21, 24, 10],
-            [10, 25, 23, 23, 20, 20, 21, 20, 21, 10],
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-        ],
-        enemiesRequired: 1,
-        name: 'Eingangshalle',
-        type: 'default',
-        allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['HEART', 'COIN']
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
@@ -222,9 +215,17 @@ export const ITEM_TYPES = {
         size: {width: 16, height: 16},
         frames: 1
     },
+    GREEN_POISON: {
+        name: 'greenPoison',
+        sprite: {x: SPRITE_SIZE * 20, y: SPRITE_SIZE * 21},
+        size: {width: 16, height: 16},
+        frames: 1,
+        damage: 1,
+        destroyable: true
+    },
     BOMB: {
         name: 'bomb',
-        sprite: {x: SPRITE_SIZE * 20, y: SPRITE_SIZE * 21},
+        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 20},
         size: {width: 16, height: 16},
         frames: 1
     }
@@ -392,21 +393,6 @@ export const ENEMY_CONFIG = {
     }
 };
 
-export const PLAYER_SPRITES = {
-    idle: [
-        {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 14},
-        {x: SPRITE_SIZE * 9, y: SPRITE_SIZE * 14},
-        {x: SPRITE_SIZE * 10, y: SPRITE_SIZE * 14},
-        {x: SPRITE_SIZE * 11, y: SPRITE_SIZE * 14},
-    ],
-    run: [
-        {x: SPRITE_SIZE * 12, y: SPRITE_SIZE * 14},
-        {x: SPRITE_SIZE * 13, y: SPRITE_SIZE * 14},
-        {x: SPRITE_SIZE * 14, y: SPRITE_SIZE * 14},
-        {x: SPRITE_SIZE * 15, y: SPRITE_SIZE * 14},
-    ]
-};
-
 export const NPC_SPRITES = {
     idle: [
         {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 8},
@@ -489,7 +475,6 @@ export const PLAYER_CONFIG = {
     }
 };
 
-export const SWORD_SPRITE = {x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 2};
 export const WEAPON_CONFIG = {
     MACE: {
         damage: 1,

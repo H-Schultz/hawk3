@@ -8,7 +8,7 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  playerPosition: {
+  player: {
     type: Object,
     required: true
   },
@@ -25,8 +25,8 @@ const props = defineProps({
 const emit = defineEmits(['startQuest', 'showStairs']);
 
 const isNearPlayer = computed(() => {
-  const dx = Math.abs(props.playerPosition.x - props.quest.npc.x);
-  const dy = Math.abs(props.playerPosition.y - props.quest.npc.y);
+  const dx = Math.abs(props.player.position.x - props.quest.npc.x);
+  const dy = Math.abs(props.player.position.y - props.quest.npc.y);
   const near = (dx <= 1 && dy <= 1);
   if (near && !props.quest.started) {
     emit('startQuest', props.quest);

@@ -6,10 +6,6 @@
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
 
   const props = defineProps({
-    playerDirection: {
-      type: String,
-      required: true
-    },
     player: {
       type: Object,
       required: true
@@ -21,8 +17,8 @@
       backgroundImage: `url(${dungeonSprite})`,
       backgroundPosition: `-${props.player.weapon.sprite.x * 4}px -${props.player.weapon.sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
-      transform: props.playerDirection === 'left' ? 'scaleX(-1)' : 'none',
-      transformOrigin: props.playerDirection === 'left' ? 'calc(100% - 32px) calc(100% - 16px)' : 'calc(100% - 32px) calc(100% - 16px)',
+      transform: props.player.direction === 'left' ? 'scaleX(-1)' : 'none',
+      transformOrigin: props.player.direction === 'left' ? 'calc(100% - 32px) calc(100% - 16px)' : 'calc(100% - 32px) calc(100% - 16px)',
     };
   };
 </script>
