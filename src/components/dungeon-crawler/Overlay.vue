@@ -4,7 +4,7 @@
       <div class="victory-content">
         <h2>You Win!</h2>
         <p>Congratulations!</p>
-        <p>Münzen gesammelt: {{ coins }}</p>
+        <p>Münzen gesammelt: {{ player.coins }}</p>
         <p>Drücke 'R' zum Neustarten</p>
       </div>
     </div>
@@ -12,7 +12,7 @@
     <div v-if="gameState === GAME_STATE.GAME_OVER" class="game-over-overlay">
       <div class="game-over-content">
         <h2>Game Over</h2>
-        <p>Münzen gesammelt: {{ coins }}</p>
+        <p>Münzen gesammelt: {{ player.coins }}</p>
         <p>Drücke 'R' zum Neustarten</p>
       </div>
     </div>
@@ -27,10 +27,10 @@
       type: String,
       required: true
     },
-    coins: {
-      type: Number,
+    player: {
+      type: Object,
       required: true
-    }
+    },
   });
 </script>
 

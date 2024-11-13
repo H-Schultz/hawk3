@@ -17,8 +17,10 @@
   const getType = computed(() => {
     if (props.item.type.includes('POISON')) {
       return 'poison';
+    } else if (props.item.config?.destroyable) {
+      return 'destroyable';
     }
-    return props.item.type.toLowerCase()
+    return props.item.type.toLowerCase();
   });
 
   const currentFrame = ref(0);
@@ -79,6 +81,10 @@
 
   .item.destroying {
     animation: destroyItem 0.4s ease-out forwards;
+  }
+
+  .item.destroyable:not(.collecting, .destroying) {
+    animation: none;
   }
 
   @keyframes itemFloat {

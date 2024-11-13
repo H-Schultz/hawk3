@@ -7,10 +7,6 @@
       type: Object,
       required: true
     },
-    coins: {
-      type: Number,
-      required: true
-    },
     defeatedEnemies: {
       type: Number,
       required: true
@@ -74,7 +70,7 @@
         backgroundImage: `url(${dungeonSprite})`,
         backgroundPosition: `-${ITEM_TYPES.COIN.sprite.x * 4}px -${ITEM_TYPES.COIN.sprite.y * 4}px`,
       }"/>
-      <span class="item-count">{{ props.coins }}</span>
+      <span class="item-count">{{ props.player.coins }}</span>
     </div>
   </div>
 </template>

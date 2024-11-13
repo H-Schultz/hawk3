@@ -74,6 +74,25 @@ export const MAPS = [
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 20, 20, 21, 22, 20, 20, 10, 90, 10],
+            [10, 30, 22, 20, 30, 20, 20, 10, 20, 10],
+            [10, 22, 20, 20, 20, 23, 20, 10, 21, 10],
+            [10, 20, 20, 23, 20, 20, 22, 98, 20, 10],
+            [10, 30, 20, 20, 30, 20, 23, 24, 25, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        ],
+        enemiesRequired: 1,
+        name: 'Orghalle',
+        type: 'boss',
+        allowedItems: ['BOMB'],
+        bossConfig: {
+            type: 'boss',
+            name: 'BOSS',
+            position: {x: 2, y: 4},
+        }
+    }, {
+        layout: [
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             [10, 90, 10, 20, 30, 20, 30, 20, 20, 10],
             [10, 98, 10, 30, 10, 10, 10, 22, 20, 10],
             [10, 21, 10, 20, 20, 30, 10, 20, 99, 10],
@@ -102,26 +121,6 @@ export const MAPS = [
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 20, 20, 21, 22, 20, 20, 10, 90, 10],
-            [10, 30, 22, 20, 30, 20, 20, 10, 20, 10],
-            [10, 22, 20, 20, 20, 23, 20, 10, 21, 10],
-            [10, 20, 20, 23, 20, 20, 22, 98, 20, 10],
-            [10, 30, 20, 20, 30, 20, 23, 24, 25, 10],
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-        ],
-        enemiesRequired: 1,
-        name: 'Orghalle',
-        type: 'boss',
-        allowedItems: [],
-        bossConfig: {
-            type: 'boss',
-            name: 'BOSS',
-            position: {x: 2, y: 4},
-        }
-    },
-    {
-        layout: [
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             [10, 98, 20, 21, 22, 20, 20, 20, 20, 10],
             [10, 20, 22, 20, 23, 20, 20, 22, 20, 10],
             [10, 20, 10, 20, 20, 23, 10, 10, 20, 10],
@@ -133,7 +132,7 @@ export const MAPS = [
         name: 'Schatzkammer',
         type: 'default',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN'],
-        allowedItems: ['HEART', 'COIN', 'GREEN_POISON']
+        allowedItems: ['RED_POTION', 'COIN', 'GREEN_POISON']
     },
     {
         layout: [
@@ -149,7 +148,7 @@ export const MAPS = [
         name: 'Kerker',
         type: 'default',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC'],
-        allowedItems: ['HEART', 'COIN']
+        allowedItems: ['RED_POTION', 'BOMB']
     },
     {
         layout: [
@@ -209,6 +208,12 @@ export const ITEM_TYPES = {
         frames: 4,
         frameOffset: SPRITE_SIZE / 2,
     },
+    RED_POTION: {
+        name: 'redPotion',
+        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 21},
+        size: {width: 16, height: 16},
+        frames: 1
+    },
     BLUE_POTION: {
         name: 'bluePotion',
         sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 21},
@@ -228,7 +233,15 @@ export const ITEM_TYPES = {
         sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 20},
         size: {width: 16, height: 16},
         frames: 1,
-        destroyable: false
+        destroyable: true
+    },
+    BOMB_BURN: {
+        name: 'bombBurn',
+        sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 20},
+        size: {width: 16, height: 16},
+        frames: 2,
+        frameOffset: SPRITE_SIZE,
+        destroyable: true
     }
 };
 
@@ -239,6 +252,7 @@ export const ENEMY_TYPES = {
         maxHealth: 3,
         damage: 1,
         intelligence: 0.2,
+        dropChance: 0.5,
         moveSpeed: 2000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
@@ -268,6 +282,7 @@ export const ENEMY_TYPES = {
         maxHealth: 2,
         damage: 0,
         intelligence: 0.5,
+        dropChance: 0.99,
         moveSpeed: 1000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
@@ -297,6 +312,7 @@ export const ENEMY_TYPES = {
         maxHealth: 5,
         damage: 1,
         intelligence: 0.8,
+        dropChance: 0.5,
         moveSpeed: 2500,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
@@ -326,6 +342,7 @@ export const ENEMY_TYPES = {
         maxHealth: 14,
         damage: 1,
         intelligence: 1,
+        dropChance: 1,
         moveSpeed: 2000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE * 2, y: SPRITE_SIZE * SPRITE_SCALE * 2},
         sprites: {
@@ -355,6 +372,7 @@ export const ENEMY_TYPES = {
         maxHealth: 20,
         damage: 2,
         intelligence: 1,
+        dropChance: 1,
         moveSpeed: 2000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE * 2, y: SPRITE_SIZE * SPRITE_SCALE * 2},
         sprites: {

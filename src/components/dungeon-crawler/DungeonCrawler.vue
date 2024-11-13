@@ -13,11 +13,11 @@ import GameUI from './GameUI.vue';
 import Overlay from './Overlay.vue';
 import Tile from './Tile.vue';
 import NPC from './NPC.vue';
+import Explosion from './Explosion.vue';
 
 let chargeTimer = null;
 
 const droppedItems = ref([]);
-const coins = ref(0);
 const gameState = ref(GAME_STATE.PLAYING);
 const defeatedEnemies = ref(0);
 const currentMapIndex = ref(0);
@@ -28,6 +28,7 @@ const router = useRouter();
 const activeQuest = ref(null);
 const questItems = ref([]);
 const traps = ref([]);
+const activeExplosions = ref([]);
 
 const player = ref({
   position: { x: 1, y: 1 },
@@ -42,6 +43,7 @@ const player = ref({
   isUnderAttack: false,
   hasExecutedWhirlwind: false,
   chargeStartTime: null,
+  coins: 0,
   bombs: 0,
   gameState
 });
@@ -172,9 +174,10 @@ const startQuest = (quest) => {
   }));
 };
 
-const dropItem = (position) => {
+const dropItem = (enemy) => {
+  if (droppedItems.value.some(item => isSamePosition(item.position, enemy.position))) return;
   const dropChance = Math.random();
-  if (dropChance > 0.99) return; // 30% Chance für einen Drop
+  if (dropChance > enemy.dropChance) return; // 30% Chance für einen Drop
 
   const itemTypes = currentMap.value.allowedItems || [];
   if (itemTypes.length === 0) return;
@@ -184,18 +187,19 @@ const dropItem = (position) => {
     id: Math.random().toString(36).substr(2, 9),
     type: randomItem,
     config: ITEM_TYPES[randomItem],
-    position: {...position},
+    position: {...enemy.position},
     collectAnimation: false
   });
 };
 
 // Funktion zum Einsammeln von Items
 const collectItem = (item) => {
+  if (item.dropped) return;
   item.collectAnimation = true;
   setTimeout(() => {
     if (item.type === 'COIN') {
-      coins.value++;
-    } else if (item.type === 'HEART') {
+      player.value.coins++;
+    } else if (item.type === 'RED_POTION') {
       player.value.health = Math.min(MAX_HEALTH, player.value.health + 2);
     } else if (item.type === 'GREEN_POISON') {
       player.value.health -= ITEM_TYPES.GREEN_POISON.damage;
@@ -278,7 +282,7 @@ const attackWithSword = () => {
 
       if (enemy.health <= 0) {
         defeatedEnemies.value++;
-        dropItem(enemy.position);
+        dropItem(enemy);
 
         // Prüfe ob genug Feinde besiegt wurden
         if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
@@ -349,7 +353,7 @@ const applyWhirlwindDamage = (surroundingPositions, oldDropItems) => {
 
         if (enemy.health <= 0) {
           defeatedEnemies.value++;
-          dropItem(enemy.position);
+          dropItem(enemy);
 
           if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
             showStairs();
@@ -724,7 +728,14 @@ const startNextLevel = () => {
 const restartGame = () => {
   gameState.value = GAME_STATE.PLAYING;
   player.value.health = MAX_HEALTH;
-  coins.value = 0;
+  player.value.bombs = 0;
+  player.value.coins = 0;
+  player.value.isAttacking = false;
+  player.value.isCharging = false;
+  player.value.isWhirlwindAttacking = false;
+  player.value.isUnderAttack = false;
+  player.value.hasExecutedWhirlwind = false;
+  player.value.chargeStartTime = null;
   loadMap(0);
 };
 
@@ -806,12 +817,118 @@ const initializeTrap = (x, y) => {
 const checkTrapDamage = (playerPosition) => {
   const trap = traps.value.find(trap => trap.x === playerPosition.x && trap.y === playerPosition.y);
   if (trap && trap.status === 'active') {
+    player.value.isUnderAttack = true;
     player.value.health -= 1;
     if (player.value.health <= 0) {
       gameState.value = GAME_STATE.GAME_OVER;
       player.value.health = 0;
     }
+
+    setTimeout(() => {
+      player.value.isUnderAttack = false;
+    }, 200);
   }
+};
+
+const placeBomb = () => {
+  if (player.value.bombs <= 0 || gameState.value !== GAME_STATE.PLAYING) return;
+
+  player.value.bombs--;
+  const bombPosition = {...player.value.position};
+  const bombId = Math.random().toString(36).substr(2, 9);
+
+  droppedItems.value.push({
+    id: bombId,
+    type: 'BOMB_BURN',
+    config: ITEM_TYPES.BOMB_BURN,
+    position: bombPosition,
+    collectAnimation: false,
+    dropped: true
+  });
+
+  // Füge einen visuellen Countdown-Effekt zur Bombe hinzu
+  setTimeout(() => {
+    explodeBomb(bombId, bombPosition);
+  }, 2000);
+};
+
+const explodeBomb = (bombId, bombPosition) => {
+  const bomb = droppedItems.value.find(item => item.id === bombId);
+  if (!bomb) return;
+
+  const explosionPositions = [
+    {x: -1, y: 0},
+    {x: 1, y: 0},
+    {x: 0, y: -1},
+    {x: 0, y: 1}
+  ];
+
+  const affectedPositions = [
+    bombPosition,
+    ...explosionPositions.map(pos => ({
+      x: bombPosition.x + pos.x,
+      y: bombPosition.y + pos.y
+    }))
+  ];
+
+  const explosionGroup = affectedPositions.map(pos => ({
+    id: `${bombId}-${pos.x}-${pos.y}`,
+    bombId,
+    position: pos
+  }));
+
+  activeExplosions.value = [
+    ...activeExplosions.value,
+    ...explosionGroup
+  ];
+
+  setTimeout(() => {
+    activeExplosions.value = activeExplosions.value.filter(
+        explosion => explosion.bombId !== bombId
+    );
+  }, 500);
+
+  enemies.value.forEach(enemy => {
+    if (enemy.health > 0 && affectedPositions.some(pos =>
+        enemy.position.x === pos.x &&
+        enemy.position.y === pos.y
+    )) {
+      enemy.health = 0;
+      defeatedEnemies.value++;
+      dropItem(enemy);
+    }
+  });
+
+  if (affectedPositions.some(pos =>
+      player.value.position.x === pos.x &&
+      player.value.position.y === pos.y
+  )) {
+    player.value.isUnderAttack = true;
+    player.value.health -= 1;
+    if (player.value.health <= 0) {
+      gameState.value = GAME_STATE.GAME_OVER;
+      player.value.health = 0;
+    }
+    setTimeout(() => {
+      player.value.isUnderAttack = false;
+    }, 200);
+  }
+
+  const destroyedItems = droppedItems.value.filter(item =>
+      item.config.destroyable &&
+      affectedPositions.some(pos =>
+          item.position.x === pos.x &&
+          item.position.y === pos.y
+      )
+  );
+
+  if (destroyedItems?.length > 0) {
+    destroyedItems.forEach(item => {
+      if (!item.destroyAnimation) destroyItem(item);
+    });
+  }
+
+  droppedItems.value = droppedItems.value.filter(item => item.id !== bombId);
 };
 
 const handleKeydown = (e) => {
@@ -839,6 +956,9 @@ const handleKeydown = (e) => {
       break;
     case 'e':
       startCharging();
+      break
+    case 'f':
+      placeBomb();
       break;
   }
 };
@@ -890,8 +1010,8 @@ watch(() => gameState.value, (newState) => {
     </header>
     <main class="main-content">
       <div class="game-container">
-        <GameUI :player="player" :coins="coins" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
-        <Overlay :game-state="gameState" :coins="coins"></Overlay>
+        <GameUI :player="player" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
+        <Overlay :game-state="gameState" :player="player"></Overlay>
         <div class="dungeon-container">
           <div
             v-for="(row, rowIndex) in dungeonMap"
@@ -915,6 +1035,12 @@ watch(() => gameState.value, (newState) => {
             :active-enemies-near-player="activeEnemiesNearPlayer"
           />
           <Item v-for="item in droppedItems" :key="item.id" :item="item" />
+          <Explosion
+            v-for="explosion in activeExplosions"
+            :key="explosion.id"
+            :position="explosion.position"
+            :bomb-id="explosion.bombId"
+          />
           <template
             v-if="currentMap.type === 'quest'"
           >
