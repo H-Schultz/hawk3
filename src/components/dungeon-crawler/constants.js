@@ -70,7 +70,7 @@ export const MAPS = [
         name: 'Eingangshalle',
         type: 'default',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['GREEN_POISON']
+        allowedItems: ['BOMB']
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
@@ -133,7 +133,7 @@ export const MAPS = [
         name: 'Schatzkammer',
         type: 'default',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN'],
-        allowedItems: ['HEART', 'COIN']
+        allowedItems: ['HEART', 'COIN', 'GREEN_POISON']
     },
     {
         layout: [
@@ -165,7 +165,7 @@ export const MAPS = [
         name: 'Thronsaal',
         type: 'default',
         allowedEnemyTypes: ['ORC'],
-        allowedItems: ['HEART', 'COIN']
+        allowedItems: ['GREEN_POISON']
     },
     {
         layout: [

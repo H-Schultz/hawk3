@@ -211,10 +211,11 @@ const collectItem = (item) => {
 };
 
 const destroyItem = (item) => {
-  item.collectAnimation = true;
+  const findItem = droppedItems.value.find(i => i.id === item.id);
+  if (findItem) findItem.destroyAnimation = true;
   setTimeout(() => {
     droppedItems.value = droppedItems.value.filter(i => i.id !== item.id);
-  }, 200);
+  }, 400);
 };
 
 const isValidMove = (position) => {
@@ -371,7 +372,9 @@ const applyWhirlwindDamage = (surroundingPositions, oldDropItems) => {
     return false;
   });
   if (destroyedItems?.length > 0) {
-    destroyedItems.forEach(item => destroyItem(item));
+    destroyedItems.forEach(item => {
+      if (!item.destroyAnimation) destroyItem(item);
+    });
   }
 };
 

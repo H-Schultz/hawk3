@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="['item', item.type.toLowerCase(), { collecting: item.collectAnimation }]"
+    :class="['item', getType, { collecting: item.collectAnimation, destroying: item.destroyAnimation }]"
     :style="itemStyle"
   />
 </template>
@@ -12,6 +12,13 @@
 
   const props = defineProps({
     item: Object
+  });
+
+  const getType = computed(() => {
+    if (props.item.type.includes('POISON')) {
+      return 'poison';
+    }
+    return props.item.type.toLowerCase()
   });
 
   const currentFrame = ref(0);
@@ -62,8 +69,16 @@
     animation: itemFloat 2s ease-in-out infinite;
   }
 
+  .item.poison {
+    animation: itemPoison 2s ease-in-out infinite;
+  }
+
   .item.collecting {
     animation: collectItem 0.4s ease-out forwards;
+  }
+
+  .item.destroying {
+    animation: destroyItem 0.4s ease-out forwards;
   }
 
   @keyframes itemFloat {
@@ -72,6 +87,15 @@
     }
     50% {
       margin-top: -8px;
+    }
+  }
+
+  @keyframes itemPoison {
+    0%, 100% {
+      filter: hue-rotate(0deg);
+    }
+    50% {
+      filter: hue-rotate(180deg);
     }
   }
 
@@ -87,6 +111,23 @@
     }
     100% {
       transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  @keyframes destroyItem {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+      z-index: 202;
+    }
+    70% {
+      transform: scale(1) translateY(8px);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.2) translateY(16px);
+      filter: saturate(1000%);
       opacity: 0;
     }
   }
