@@ -77,6 +77,14 @@
 
 <style scoped>
 
+.game-ui {
+  position: relative;
+  z-index: 105;
+  padding: 10px;
+  height: 60px;
+  background: #000;
+}
+
 .hearts-container {
   position: absolute;
   top: 0;
@@ -84,12 +92,6 @@
   display: flex;
   gap: 0;
   z-index: 10;
-}
-
-.game-ui {
-  position: relative;
-  z-index: 105;
-  padding: 10px;
 }
 
 .level-info {
@@ -109,7 +111,7 @@
 
 .items-container {
   position: absolute;
-  top: 10px;
+  top: 5px;
   right: 10px;
   display: flex;
   align-items: center;

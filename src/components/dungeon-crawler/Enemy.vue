@@ -48,6 +48,7 @@
       top: `${props.enemy.position.y * DISPLAY_SIZE}px`,
       width: `${props.enemy.spriteSize.x}px`,
       height: `${props.enemy.spriteSize.y}px`,
+      zIndex: 100 + props.enemy.position.y,
       transform: props.enemy.direction === 'left' ? 'scaleX(-1)' : 'none',
       opacity: props.enemy.health > 0 ? 1 : 0,
       filter: `grayscale(${grayscaleValue})
@@ -74,15 +75,10 @@
   .enemy {
     position: absolute;
     width: 64px;
-    height: 128px;
+    height: 96px;
     image-rendering: pixelated;
     background-repeat: no-repeat;
     transition: left 0.1s ease, top 0.1s ease, filter 0.2s ease;
-  }
-
-  .enemy {
-    width: 64px;
-    height: 96px;
     margin-top: -48px;
     z-index: 102;
   }

@@ -20,6 +20,11 @@ export const CHARGE_TIME = 2000;
 
 export const TILES = {
     10: {x: SPRITE_SIZE, y: SPRITE_SIZE},
+    11: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE},
+    12: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE},
+    17: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE, frames: 3, frameOffset: SPRITE_SIZE},
+    18: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 3, frames: 3, frameOffset: SPRITE_SIZE},
+    19: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 2},
     20: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
     21: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 5},
     22: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 4},
@@ -51,6 +56,8 @@ export const TILES = {
                 x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 12
             }
         }},
+    71: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 2, frames: 3, frameOffset: SPRITE_SIZE},
+    72: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 4, frames: 3, frameOffset: SPRITE_SIZE},
     80: {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 12},
     98: {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 12},
     99: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
@@ -58,38 +65,19 @@ export const TILES = {
 export const MAPS = [
      {
         layout: [
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 20, 20, 23, 20, 20, 20, 20, 98, 10],
-            [10, 90, 20, 20, 22, 20, 20, 21, 20, 10],
-            [10, 20, 21, 20, 20, 22, 20, 20, 23, 10],
-            [10, 21, 23, 21, 20, 20, 22, 21, 24, 10],
-            [10, 25, 23, 23, 20, 20, 21, 20, 21, 10],
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 11, 11, 11, 17, 18, 11, 11, 11, 12],
+            [10, 20, 20, 23, 71, 72, 30, 19, 98, 12],
+            [10, 90, 20, 20, 22, 20, 20, 10, 19, 12],
+            [10, 20, 21, 20, 20, 22, 20, 20, 23, 12],
+            [10, 21, 23, 21, 20, 20, 22, 21, 24, 12],
+            [10, 25, 23, 23, 20, 20, 21, 20, 21, 12],
+            [10, 11, 11, 11, 11, 11, 11, 11, 11, 12],
         ],
         enemiesRequired: 1,
         name: 'Eingangshalle',
         type: 'default',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['BOMB']
-    }, {
-        layout: [
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 20, 20, 21, 22, 20, 20, 10, 90, 10],
-            [10, 30, 22, 20, 30, 20, 20, 10, 20, 10],
-            [10, 22, 20, 20, 20, 23, 20, 10, 21, 10],
-            [10, 20, 20, 23, 20, 20, 22, 98, 20, 10],
-            [10, 30, 20, 20, 30, 20, 23, 24, 25, 10],
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-        ],
-        enemiesRequired: 1,
-        name: 'Orghalle',
-        type: 'boss',
-        allowedItems: ['BOMB'],
-        bossConfig: {
-            type: 'boss',
-            name: 'BOSS',
-            position: {x: 2, y: 4},
-        }
+        allowedItems: ['BOMB', 'GREEN_POISON']
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
@@ -117,6 +105,40 @@ export const MAPS = [
                 {x: 3, y: 2, collected: false, name: 'potion', type: 'BLUE_POTION'},
                 {x: 5, y: 3, collected: false, name: 'potion', type: 'BLUE_POTION'}
             ]
+        }
+    }, {
+        layout: [
+            [10, 11, 11, 11, 17, 18, 11, 11, 11, 12],
+            [10, 20, 20, 23, 71, 72, 30, 19, 98, 12],
+            [10, 90, 20, 20, 22, 20, 20, 10, 19, 12],
+            [10, 20, 21, 20, 20, 22, 20, 20, 23, 12],
+            [10, 21, 23, 21, 20, 20, 22, 21, 24, 12],
+            [10, 25, 23, 23, 20, 20, 21, 20, 21, 12],
+            [10, 11, 11, 11, 11, 11, 11, 11, 11, 12],
+        ],
+        enemiesRequired: 1,
+        name: 'Eingangshalle',
+        type: 'default',
+        allowedEnemyTypes: ['GOBLIN'],
+        allowedItems: ['BOMB', 'GREEN_POISON']
+    }, {
+        layout: [
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [10, 20, 20, 21, 22, 20, 20, 10, 90, 10],
+            [10, 30, 22, 20, 30, 20, 20, 10, 20, 10],
+            [10, 22, 20, 20, 20, 23, 20, 10, 21, 10],
+            [10, 20, 20, 23, 20, 20, 22, 98, 20, 10],
+            [10, 30, 20, 20, 30, 20, 23, 24, 25, 10],
+            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        ],
+        enemiesRequired: 1,
+        name: 'Orghalle',
+        type: 'boss',
+        allowedItems: ['BOMB'],
+        bossConfig: {
+            type: 'boss',
+            name: 'BOSS',
+            position: {x: 2, y: 4},
         }
     }, {
         layout: [

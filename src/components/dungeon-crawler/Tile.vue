@@ -36,6 +36,7 @@
     if (!position) return {};
 
     let sprite = TILES[tileType];
+    let frameX = sprite.x;
     if (props.tileObject?.status) {
       const maxFrames = TILES[tileType].sprites[props.tileObject.status].length;
       if (currentFrame.value >= maxFrames) {
@@ -43,13 +44,16 @@
         clearInterval(animationInterval);
       }
       sprite = TILES[tileType].sprites[props.tileObject.status][currentFrame.value];
+      frameX = sprite.x;
+    } else if (props.tileObject?.frames) {
+      frameX += currentFrame.value * sprite.frameOffset;
     }
 
     return {
       width: `${DISPLAY_SIZE}px`,
       height: `${DISPLAY_SIZE}px`,
       backgroundImage: `url(${dungeonSprite})`,
-      backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,
+      backgroundPosition: `-${frameX * 4}px -${sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
     };
   };
@@ -57,18 +61,33 @@
   const startAnimation = () => {
     if (animationInterval) clearInterval(animationInterval);
     if (!props.tileObject) return;
-    animationInterval = setInterval(() => {
-      if (!props.tileObject) {
-        clearInterval(animationInterval)
-        return;
-      }
-      const maxFrames = TILES[props.tile].sprites[props.tileObject.status].length;
-      if (currentFrame.value < maxFrames - 1) {
-        currentFrame.value += 1;
-      } else {
-        clearInterval(animationInterval);
-      }
-    }, ANIMATION_SPEED);
+
+    if (props.tileObject.frames) {
+      animationInterval = setInterval(() => {
+        if (!props.tileObject) {
+          clearInterval(animationInterval)
+          return;
+        }
+        if (currentFrame.value < props.tileObject.frames - 1) {
+          currentFrame.value += 1;
+        } else {
+          currentFrame.value = 0;
+        }
+      }, ANIMATION_SPEED);
+    } else {
+      animationInterval = setInterval(() => {
+        if (!props.tileObject) {
+          clearInterval(animationInterval)
+          return;
+        }
+        const maxFrames = TILES[props.tile].sprites[props.tileObject.status].length;
+        if (currentFrame.value < maxFrames - 1) {
+          currentFrame.value += 1;
+        } else {
+          clearInterval(animationInterval);
+        }
+      }, ANIMATION_SPEED);
+    }
   };
 
   if (props.tileObject) {
@@ -82,10 +101,10 @@
 </script>
 
 <style scoped>
-.tile {
-  width: 64px;
-  height: 64px;
-  image-rendering: pixelated;
-  background-repeat: no-repeat;
-}
+  .tile {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+  }
 </style>

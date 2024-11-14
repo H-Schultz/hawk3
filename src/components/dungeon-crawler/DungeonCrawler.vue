@@ -119,7 +119,6 @@ const loadMap = (mapIndex) => {
   }
 
   player.value.position = startPos;
-  console.log('Loaded map:', player.value.position);
   defeatedEnemies.value = 0;
   enemies.value = [];
   droppedItems.value = [];
@@ -227,7 +226,7 @@ const isValidMove = (position) => {
 
   if (!dungeonMap.value[y] ||
       dungeonMap.value[y][x] === undefined ||
-      dungeonMap.value[y][x] === 10 ||
+      (dungeonMap.value[y][x] >= 10 && dungeonMap.value[y][x] <= 19) ||
       dungeonMap.value[y][x] === 99) {
     return false;
   }
@@ -536,7 +535,7 @@ const isValidEnemyMove = (newPosition, currentEnemy) => {
   // Grundlegende Kartenvalidierung
   if (!dungeonMap.value[y] ||
       dungeonMap.value[y][x] === undefined ||
-      dungeonMap.value[y][x] === 10 ||
+      (dungeonMap.value[y][x] >= 10 && dungeonMap.value[y][x] <= 19) ||
       dungeonMap.value[y][x] === 99) {
     return false;
   }
@@ -782,6 +781,8 @@ const executeAttack = () => {
 const getTileObjects = (tile, rowIndex, tileIndex) => {
   if (tile === 30) {
     return traps.value.find(trap => trap.x === tileIndex && trap.y === rowIndex);
+  } else if (tile === 71 || tile === 72 || tile === 17 || tile === 18) {
+    return TILES[tile];
   }
   return null;
 };
@@ -832,7 +833,9 @@ const checkTrapDamage = (playerPosition) => {
 
 const placeBomb = () => {
   if (player.value.bombs <= 0 || gameState.value !== GAME_STATE.PLAYING) return;
-
+  if (droppedItems.value.some(item => item.type === 'BOMB_BURN' && isSamePosition(item.position, player.value.position))) {
+    return;
+  }
   player.value.bombs--;
   const bombPosition = {...player.value.position};
   const bombId = Math.random().toString(36).substr(2, 9);
@@ -913,6 +916,13 @@ const explodeBomb = (bombId, bombPosition) => {
       player.value.isUnderAttack = false;
     }, 200);
   }
+
+  affectedPositions.forEach(pos => {
+    if (dungeonMap.value[pos.y] &&
+        dungeonMap.value[pos.y][pos.x] === 19) {
+      dungeonMap.value[pos.y][pos.x] = 20;
+    }
+  });
 
   const destroyedItems = droppedItems.value.filter(item =>
       item.config.destroyable &&
@@ -1017,6 +1027,7 @@ watch(() => gameState.value, (newState) => {
             v-for="(row, rowIndex) in dungeonMap"
             :key="rowIndex"
             class="map-row"
+            :class="{ [`row--${rowIndex}`]: true }"
           >
             <Tile
               v-for="(tile, tileIndex) in row"

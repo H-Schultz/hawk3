@@ -36,6 +36,7 @@
       backgroundSize: '2048px 2048px',
       left: `${props.player.position.x * DISPLAY_SIZE}px`,
       top: `${props.player.position.y * DISPLAY_SIZE}px`,
+      zIndex: 100 + props.player.position.y,
       transform: props.player.direction === 'left' ? 'scaleX(-1)' : 'none',
       filter: props.player.isUnderAttack ? 'brightness(1.5) sepia(1) saturate(1000%) hue-rotate(0deg)' : 'none',
     };
@@ -63,7 +64,7 @@
     background-repeat: no-repeat;
     transition: left 0.1s ease, top 0.1s ease, filter 0.2s ease;
     margin-top: -72px;
-    z-index: 103;
+    z-index: 102;
     transform-origin: center;
   }
 </style>
