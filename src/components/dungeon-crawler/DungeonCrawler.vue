@@ -14,6 +14,7 @@ import Overlay from './Overlay.vue';
 import Tile from './Tile.vue';
 import NPC from './NPC.vue';
 import Explosion from './Explosion.vue';
+import Camera  from './Camera.vue';
 
 let chargeTimer = null;
 
@@ -35,8 +36,8 @@ const player = ref({
   health: MAX_HEALTH,
   direction: 'right',
   state: 'idle',
-  weapon: WEAPON_CONFIG.SWORD,
-  character: PLAYER_CONFIG.KNIGHT,
+  weapon: WEAPON_CONFIG.MACE,
+  character: PLAYER_CONFIG.DINO,
   isAttacking: false,
   isCharging: false,
   isWhirlwindAttacking: false,
@@ -781,7 +782,7 @@ const executeAttack = () => {
 const getTileObjects = (tile, rowIndex, tileIndex) => {
   if (tile === 30) {
     return traps.value.find(trap => trap.x === tileIndex && trap.y === rowIndex);
-  } else if (tile === 71 || tile === 72 || tile === 17 || tile === 18) {
+  } else {
     return TILES[tile];
   }
   return null;
@@ -941,6 +942,13 @@ const explodeBomb = (bombId, bombPosition) => {
   droppedItems.value = droppedItems.value.filter(item => item.id !== bombId);
 };
 
+const getEntityStyle = (position, getRelativePosition) => {
+  const pos = getRelativePosition(position.x, position.y);
+  return {
+    transform: `translate(${pos.x}px, ${pos.y}px)`
+  };
+};
+
 const handleKeydown = (e) => {
   if ((gameState.value === GAME_STATE.GAME_OVER || gameState.value === GAME_STATE.VICTORY) && e.key === 'r') {
     restartGame();
@@ -1014,66 +1022,74 @@ watch(() => gameState.value, (newState) => {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <header class="header">
-      <button class="back-button" @click="goBack">Back</button>
-    </header>
+  <div class="wrapper">
     <main class="main-content">
       <div class="game-container">
         <GameUI :player="player" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
         <Overlay :game-state="gameState" :player="player"></Overlay>
-        <div class="dungeon-container">
-          <div
-            v-for="(row, rowIndex) in dungeonMap"
-            :key="rowIndex"
-            class="map-row"
-            :class="{ [`row--${rowIndex}`]: true }"
-          >
-            <Tile
-              v-for="(tile, tileIndex) in row"
-              :key="`${rowIndex}-${tileIndex}`"
-              :tile="tile"
-              :tile-object="getTileObjects(tile, rowIndex, tileIndex)"
-            />
-          </div>
-          <Player
-            :player="player"
-          />
-          <Enemy
-            v-for="enemy in enemies"
-            :key="enemy.id"
-            :enemy="enemy"
-            :active-enemies-near-player="activeEnemiesNearPlayer"
-          />
-          <Item v-for="item in droppedItems" :key="item.id" :item="item" />
-          <Explosion
-            v-for="explosion in activeExplosions"
-            :key="explosion.id"
-            :position="explosion.position"
-            :bomb-id="explosion.bombId"
-          />
-          <template
-            v-if="currentMap.type === 'quest'"
-          >
-            <NPC
-              :quest="currentMap.quest"
-              :player="player"
-              @start-quest="startQuest"
-              @show-stairs="showStairs"
-            />
-            <Item
-              v-for="item in questItems"
-              :key="`${item.x}-${item.y}`"
-              :item="{position: {x: item.x, y: item.y}, name: item.name, type: item.type, collectAnimation: item.collected}"
-            />
+        <Camera
+          v-if="dungeonMap"
+          :player="player"
+          :dungeon-map="dungeonMap"
+        >
+          <template #default="{ getRelativePosition }">
+            <div class="dungeon-container">
+              <div v-for="(row, rowIndex) in dungeonMap" :key="rowIndex" class="map-row" :class="{ [`row--${rowIndex}`]: true }">
+                <Tile
+                  v-for="(tile, tileIndex) in row"
+                  :key="`${rowIndex}-${tileIndex}`"
+                  :tile="tile"
+                  :tile-object="getTileObjects(tile, rowIndex, tileIndex)"
+                />
+              </div>
+              <Player
+                  :player="player"
+              />
+              <Enemy
+                  v-for="enemy in enemies"
+                  :key="enemy.id"
+                  :enemy="enemy"
+                  :active-enemies-near-player="activeEnemiesNearPlayer"
+              />
+              <Item v-for="item in droppedItems" :key="item.id" :item="item" />
+              <Explosion
+                  v-for="explosion in activeExplosions"
+                  :key="explosion.id"
+                  :position="explosion.position"
+                  :bomb-id="explosion.bombId"
+              />
+              <template
+                  v-if="currentMap.type === 'quest'"
+              >
+                <NPC
+                    :quest="currentMap.quest"
+                    :player="player"
+                    @start-quest="startQuest"
+                    @show-stairs="showStairs"
+                />
+                <Item
+                    v-for="item in questItems"
+                    :key="`${item.x}-${item.y}`"
+                    :item="{position: {x: item.x, y: item.y}, name: item.name, type: item.type, collectAnimation: item.collected}"
+                />
+              </template>
+            </div>
           </template>
-        </div>
+        </Camera>
       </div>
     </main>
   </div>
 </template>
 
 <style scoped>
+  .wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #000;
+  }
+
   .game-container {
     position: relative;
     overflow: hidden;
@@ -1084,6 +1100,7 @@ watch(() => gameState.value, (newState) => {
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    background: #000;
     image-rendering: pixelated;
     -webkit-font-smoothing: none;
   }

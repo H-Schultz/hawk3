@@ -22,9 +22,12 @@ export const TILES = {
     10: {x: SPRITE_SIZE, y: SPRITE_SIZE},
     11: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE},
     12: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE},
+    14: {x: SPRITE_SIZE * 2, y: 0, zIndex: 200},
+    15: {x: SPRITE_SIZE * 4, y: 0, zIndex: 200},
+    16: {x: SPRITE_SIZE * 3, y: (SPRITE_SIZE * 10 + SPRITE_SIZE / 2), zIndex: 200},
     17: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE, frames: 3, frameOffset: SPRITE_SIZE},
     18: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 3, frames: 3, frameOffset: SPRITE_SIZE},
-    19: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 2},
+    19: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 3},
     20: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
     21: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 5},
     22: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 4},
@@ -56,6 +59,8 @@ export const TILES = {
                 x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 12
             }
         }},
+    40: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 14},
+    41: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 15},
     71: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 2, frames: 3, frameOffset: SPRITE_SIZE},
     72: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 4, frames: 3, frameOffset: SPRITE_SIZE},
     80: {x: SPRITE_SIZE * 5, y: SPRITE_SIZE * 12},
@@ -65,19 +70,28 @@ export const TILES = {
 export const MAPS = [
      {
         layout: [
-            [10, 11, 11, 11, 17, 18, 11, 11, 11, 12],
-            [10, 20, 20, 23, 71, 72, 30, 19, 98, 12],
-            [10, 90, 20, 20, 22, 20, 20, 10, 19, 12],
-            [10, 20, 21, 20, 20, 22, 20, 20, 23, 12],
-            [10, 21, 23, 21, 20, 20, 22, 21, 24, 12],
-            [10, 25, 23, 23, 20, 20, 21, 20, 21, 12],
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 12],
+            [14, 14, 14, 14, 15, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
+            [12, 11, 11, 11, 17, 18, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
+            [12, 20, 20, 23, 71, 72, 20, 23, 20, 23, 20, 23, 30, 19, 98, 10],
+            [12, 90, 20, 40, 40, 40, 22, 20, 22, 20, 22, 20, 20, 10, 19, 11],
+            [12, 20, 20, 10, 11, 12, 20, 22, 20, 22, 20, 22, 20, 20, 23, 10],
+            [12, 40, 40, 10, 20, 12, 40, 41, 40, 20, 20, 20, 22, 21, 24, 10],
+            [12, 11, 11, 12, 20, 10, 11, 18, 12, 20, 20, 20, 21, 20, 21, 10],
+            [12, 21, 23, 12, 20, 20, 20, 72, 20, 20, 20, 20, 22, 21, 22, 10],
+            [12, 25, 23, 12, 20, 20, 20, 20, 20, 20, 20, 20, 21, 20, 21, 10],
+            [12, 20, 23, 12, 20, 20, 40, 41, 40, 20, 20, 20, 20, 20, 21, 10],
+            [12, 20, 21, 20, 20, 20, 10, 17, 12, 20, 20, 20, 21, 20, 22, 10],
+            [12, 21, 23, 21, 20, 20, 21, 71, 22, 20, 20, 20, 21, 20, 21, 10],
+            [12, 23, 21, 23, 20, 20, 20, 20, 20, 20, 20, 20, 23, 20, 22, 10],
+            [12, 25, 20, 23, 20, 20, 20, 20, 20, 20, 20, 20, 21, 20, 21, 10],
+            [12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10],
+            [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
         ],
         enemiesRequired: 1,
         name: 'Eingangshalle',
         type: 'default',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['BOMB', 'GREEN_POISON']
+        allowedItems: ['BOMB', 'GREEN_POISON', 'RED_POTION']
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],

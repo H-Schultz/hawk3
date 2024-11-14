@@ -1,5 +1,7 @@
 <template>
-  <div class="tile" :style="getTileStyle(tile)" />
+  <div class="tile" :style="getTileStyle(tile)">
+    <div class="layer" v-if="props.tileObject?.layer" :style="getTileStyle(props.tileObject.layer)" />
+  </div>
 </template>
 
 <script setup>
@@ -52,6 +54,7 @@
     return {
       width: `${DISPLAY_SIZE}px`,
       height: `${DISPLAY_SIZE}px`,
+      zIndex: position.zIndex,
       backgroundImage: `url(${dungeonSprite})`,
       backgroundPosition: `-${frameX * 4}px -${sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
@@ -74,7 +77,7 @@
           currentFrame.value = 0;
         }
       }, ANIMATION_SPEED);
-    } else {
+    } else if (props.tileObject.status) {
       animationInterval = setInterval(() => {
         if (!props.tileObject) {
           clearInterval(animationInterval)
@@ -106,5 +109,12 @@
     height: 64px;
     image-rendering: pixelated;
     background-repeat: no-repeat;
+  }
+  .layer {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    background-repeat: no-repeat;
+    position: relative;
   }
 </style>
