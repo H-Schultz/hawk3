@@ -4,7 +4,7 @@ import {useRouter} from 'vue-router';
 import {
   GAME_STATE, MAPS,
   MAX_HEALTH, LEVEL_CONFIG, WHIRLWIND_DURATION, CHARGE_TIME,
-  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG, ITEM_TYPES
+  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG, ITEM_TYPES, MAX_MANA
 } from './constants.js';
 import Player from './Player.vue';
 import Enemy from './Enemy.vue';
@@ -15,6 +15,7 @@ import Tile from './Tile.vue';
 import NPC from './NPC.vue';
 import Explosion from './Explosion.vue';
 import Camera  from './Camera.vue';
+import LiquidIndicator from "./LiquidIndicator.vue";
 
 let chargeTimer = null;
 
@@ -34,6 +35,10 @@ const activeExplosions = ref([]);
 const player = ref({
   position: { x: 1, y: 1 },
   health: MAX_HEALTH,
+  maxHealth: MAX_HEALTH,
+  mana: MAX_MANA,
+  maxMana: MAX_MANA,
+  manaRegeneration: 10000,
   direction: 'right',
   state: 'idle',
   weapon: WEAPON_CONFIG.MACE,
@@ -199,8 +204,16 @@ const collectItem = (item) => {
   setTimeout(() => {
     if (item.type === 'COIN') {
       player.value.coins++;
+    } else if (item.type === 'HEART') {
+      player.value.maxHealth++;
+      player.value.health = Math.min(player.value.maxHealth, player.value.health + 1);
+    } else if (item.type === 'MANA') {
+      player.value.maxMana++;
+      player.value.mana = Math.min(player.value.maxMana, player.value.mana + 1);
+    } else if (item.type === 'BLUE_POTION') {
+      player.value.mana = Math.min(player.value.maxMana, player.value.mana + 1);
     } else if (item.type === 'RED_POTION') {
-      player.value.health = Math.min(MAX_HEALTH, player.value.health + 2);
+      player.value.health = Math.min(player.value.maxHealth, player.value.health + 1);
     } else if (item.type === 'GREEN_POISON') {
       player.value.health -= ITEM_TYPES.GREEN_POISON.damage;
       if (player.value.health <= 0) {
@@ -305,6 +318,7 @@ const attackWithSword = () => {
 const executeWhirlwindAttack = () => {
   const oldDropItems = JSON.parse(JSON.stringify(droppedItems.value));
   player.value.isWhirlwindAttacking = true;
+  player.value.mana = Math.max(0, player.value.mana - 1);
 
   const surroundingPositions = [
     {x: -1, y: 0}, // Links
@@ -627,7 +641,7 @@ const startCharging = () => {
     player.value.isCharging = true;
 
     chargeTimer = setTimeout(() => {
-      if (player.value.isCharging) {
+      if (player.value.isCharging && player.value.mana > 0) {
         executeWhirlwindAttack();
         player.value.isCharging = false;
         player.value.chargeStartTime = null;
@@ -942,11 +956,10 @@ const explodeBomb = (bombId, bombPosition) => {
   droppedItems.value = droppedItems.value.filter(item => item.id !== bombId);
 };
 
-const getEntityStyle = (position, getRelativePosition) => {
-  const pos = getRelativePosition(position.x, position.y);
-  return {
-    transform: `translate(${pos.x}px, ${pos.y}px)`
-  };
+const handleManaRegenerated = () => {
+  if (player.value.mana < player.value.maxMana) {
+    player.value.mana = Math.min(player.value.maxMana, player.value.mana + 1);
+  }
 };
 
 const handleKeydown = (e) => {
@@ -1025,7 +1038,13 @@ watch(() => gameState.value, (newState) => {
   <div class="wrapper">
     <main class="main-content">
       <div class="game-container">
-        <GameUI :player="player" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
+        <GameUI
+            :player="player"
+            :current-map="currentMap"
+            :defeated-enemies="defeatedEnemies"
+            :enemies="enemies"
+            @mana-regenerated="handleManaRegenerated"
+        ></GameUI>
         <Camera
           v-if="dungeonMap"
           :player="player"

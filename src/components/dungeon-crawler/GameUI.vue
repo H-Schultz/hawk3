@@ -1,6 +1,7 @@
 <script setup>
   import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite.png";
-  import {HEART_SPRITES, ITEM_TYPES} from "./constants.js";
+  import {ITEM_TYPES} from "./constants.js";
+  import LiquidIndicator from "./LiquidIndicator.vue";
 
   const props = defineProps({
     player: {
@@ -21,31 +22,36 @@
     }
   });
 
-  const getHeartSprite = (index) => {
-    const currentHealth = props.player.health;
-    const heartPosition = index * 2;
 
-    if (currentHealth >= heartPosition + 2) {
-      return HEART_SPRITES.FULL;
-    } else if (currentHealth > heartPosition) {
-      return HEART_SPRITES.HALF;
-    } else {
-      return HEART_SPRITES.EMPTY;
-    }
+  const emit = defineEmits(['manaRegenerated']);
+
+  const handleRegenerated = () => {
+    emit('manaRegenerated');
   };
 </script>
 
 <template>
   <div class="game-ui">
     <div class="hearts-container">
-      <div
-        v-for="i in 3"
-        :key="i"
-        class="heart"
-        :style="{
-          backgroundImage: `url(${dungeonSprite})`,
-          backgroundPosition: `-${getHeartSprite((i-1)).x}px -${getHeartSprite((i-1)).y}px`,
-        }"
+      <LiquidIndicator
+          :current-value="props.player.health"
+          :max-value="props.player.maxHealth"
+          type="health"
+          color-from="rgb(185, 28, 28)"
+          color-to="rgb(239, 68, 68)"
+          :player="props.player"
+          :show-value="true"
+      />
+      <LiquidIndicator
+          :current-value="props.player.mana"
+          :max-value="props.player.maxMana"
+          type="mana"
+          :regeneration-interval="props.player.manaRegeneration"
+          color-from="rgb(29, 78, 216)"
+          color-to="rgb(59, 130, 246)"
+          :player="props.player"
+          @regenerated="handleRegenerated"
+          :show-value="true"
       />
     </div>
     <div class="level-info">
@@ -89,11 +95,11 @@
 
 .hearts-container {
   position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  gap: 0;
+  top: 10px;
+  left: 10px;
   z-index: 10;
+  display: flex;
+  gap: 6px;
 }
 
 .level-info {

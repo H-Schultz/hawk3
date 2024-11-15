@@ -9,12 +9,8 @@ export const SPRITE_SIZE = 16;
 export const SPRITE_SCALE = 4;
 export const DISPLAY_SIZE = SPRITE_SIZE * SPRITE_SCALE;
 export const ANIMATION_SPEED = 150;
-export const HEART_SPRITES = {
-    FULL: {x: DISPLAY_SIZE * 18, y: DISPLAY_SIZE * 23},
-    HALF: {x: DISPLAY_SIZE * 19, y: DISPLAY_SIZE * 23},
-    EMPTY: {x: DISPLAY_SIZE * 20, y: DISPLAY_SIZE * 23}
-};
 export const MAX_HEALTH = 6;
+export const MAX_MANA = 2;
 export const WHIRLWIND_DURATION = 800;
 export const CHARGE_TIME = 2000;
 
@@ -68,7 +64,7 @@ export const TILES = {
     99: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4},
 };
 export const MAPS = [
-     {
+    {
         layout: [
             [14, 14, 14, 14, 15, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
             [12, 11, 11, 11, 17, 18, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
@@ -91,7 +87,7 @@ export const MAPS = [
         name: 'Eingangshalle',
         type: 'default',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['BOMB', 'GREEN_POISON', 'RED_POTION']
+        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION']
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
@@ -231,7 +227,13 @@ export const LEVEL_CONFIG = {
 export const ITEM_TYPES = {
     HEART: {
         name: 'heart',
-        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 23},
+        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 21},
+        size: {width: 16, height: 16},
+        frames: 1
+    },
+    MANA: {
+        name: 'mana',
+        sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 21},
         size: {width: 16, height: 16},
         frames: 1
     },
@@ -246,13 +248,13 @@ export const ITEM_TYPES = {
     },
     RED_POTION: {
         name: 'redPotion',
-        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 21},
+        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 22},
         size: {width: 16, height: 16},
         frames: 1
     },
     BLUE_POTION: {
         name: 'bluePotion',
-        sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 21},
+        sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 22},
         size: {width: 16, height: 16},
         frames: 1
     },
