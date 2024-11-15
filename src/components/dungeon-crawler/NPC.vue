@@ -92,13 +92,13 @@ onMounted(() => {
     background-repeat: no-repeat;
     transition: left 0.1s ease, top 0.1s ease, filter 0.2s ease;
     margin-top: -72px;
-    z-index: 103;
+    z-index: 100;
     transform-origin: center;
   }
 
   .npc__wrapper {
     position: absolute;
-    z-index: 102;
+    z-index: 200;
   }
 
   .dialog-box {

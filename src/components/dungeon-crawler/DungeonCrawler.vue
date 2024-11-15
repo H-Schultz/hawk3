@@ -399,19 +399,67 @@ const applyWhirlwindDamage = (surroundingPositions, oldDropItems) => {
 const findSpawnPosition = () => {
   const maxAttempts = 20;
   let attempts = 0;
+  const spawnRadius = 5; // Radius around player to spawn enemies
+
   while (attempts < maxAttempts) {
-    const x = Math.floor(Math.random() * dungeonMap.value[0].length);
-    const y = Math.floor(Math.random() * dungeonMap.value.length);
-    if ((dungeonMap.value[y][x] >= 20 && dungeonMap.value[y][x] <= 29) && // Kein Wandfeld
-        !enemies.value.some(e => e.health > 0 && e.position.x === x && e.position.y === y) && // Kein Feind
-        Math.abs(x - player.value.position.x) > 1 && // Nicht zu nah am Spieler (X-Achse)
-        Math.abs(y - player.value.position.y) > 1) { // Nicht zu nah am Spieler (Y-Achse)
+    // Generate random position within spawn radius of player
+    const offsetX = Math.floor(Math.random() * (spawnRadius * 2 + 1)) - spawnRadius;
+    const offsetY = Math.floor(Math.random() * (spawnRadius * 2 + 1)) - spawnRadius;
+
+    const x = player.value.position.x + offsetX;
+    const y = player.value.position.y + offsetY;
+
+    // Validate position
+    if (dungeonMap.value[y] && dungeonMap.value[y][x] !== undefined &&
+        (dungeonMap.value[y][x] >= 20 && dungeonMap.value[y][x] <= 29) &&
+        !enemies.value.some(e => e.health > 0 && e.position.x === x && e.position.y === y) &&
+        (Math.abs(offsetX) > 1 || Math.abs(offsetY) > 1)) { // Not too close to player
       return {x, y};
     }
     attempts++;
   }
-
   return null;
+};
+
+const despawnDistantEnemies = () => {
+  const maxDistance = 8; // Maximum distance before despawning
+
+  enemies.value = enemies.value.filter(enemy => {
+    if (enemy.health <= 0) return true; // Keep dead enemies
+
+    const dx = Math.abs(enemy.position.x - player.value.position.x);
+    const dy = Math.abs(enemy.position.y - player.value.position.y);
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > maxDistance) {
+      if (enemy.moveInterval) clearInterval(enemy.moveInterval);
+      return false;
+    }
+    return true;
+  });
+};
+
+let spawnInterval = null;
+const startSpawnSystem = () => {
+  if (currentMap.value.type === 'boss') return;
+
+  // Add regular despawn check
+  setInterval(despawnDistantEnemies, 1000);
+
+  const scheduleNextSpawn = () => {
+    const delay = Math.random() *
+        (SPAWN_CONFIG.maxInterval - SPAWN_CONFIG.minInterval) +
+        SPAWN_CONFIG.minInterval;
+
+    spawnInterval = setTimeout(() => {
+      if (enemies.value.filter(e => e.health > 0).length < SPAWN_CONFIG.maxEnemies) {
+        spawnEnemy();
+      }
+      scheduleNextSpawn();
+    }, delay);
+  };
+
+  setTimeout(scheduleNextSpawn, SPAWN_CONFIG.initialDelay);
 };
 
 const spawnEnemy = () => {
@@ -751,28 +799,6 @@ const restartGame = () => {
   player.value.hasExecutedWhirlwind = false;
   player.value.chargeStartTime = null;
   loadMap(0);
-};
-
-let spawnInterval = null;
-const startSpawnSystem = () => {
-  if (currentMap.value.type === 'boss') {
-    return;
-  }
-
-  const scheduleNextSpawn = () => {
-    const delay = Math.random() *
-        (SPAWN_CONFIG.maxInterval - SPAWN_CONFIG.minInterval) +
-        SPAWN_CONFIG.minInterval;
-
-    spawnInterval = setTimeout(() => {
-      spawnEnemy();
-      scheduleNextSpawn();
-    }, delay);
-  };
-
-  setTimeout(() => {
-    scheduleNextSpawn();
-  }, SPAWN_CONFIG.initialDelay);
 };
 
 const executeAttack = () => {

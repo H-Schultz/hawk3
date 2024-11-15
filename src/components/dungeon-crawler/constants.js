@@ -66,9 +66,44 @@ export const TILES = {
 export const MAPS = [
     {
         layout: [
+            [14, 14, 14, 14, 15, 14, 14, 14, 14, 14],
+            [12, 11, 11, 11, 18, 11, 11, 11, 11, 11],
+            [12, 20, 20, 20, 72, 20, 20, 20, 20, 10],
+            [12, 90, 20, 20, 20, 22, 20, 21, 20, 10],
+            [12, 98, 20, 21, 20, 20, 20, 20, 99, 10],
+            [12, 98, 20, 21, 20, 20, 20, 30, 23, 10],
+            [12, 25, 20, 10, 19, 12, 23, 21, 24, 10],
+            [12, 40, 40, 12, 40, 12, 40, 40, 40, 10],
+            [11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
+        ],
+        completed: false,
+        name: 'Vorhalle',
+        allowedEnemyTypes: [],
+        type: 'quest',
+        quest: [
+            {
+                npc: {x: 5, y: 3},
+                description: [
+                    'Hallo! Ich erkläre dir kurz das Spiel!',
+                    'Du kannst dich mit den Pfeiltasten bewegen.',
+                    'Du kannst mit der Taste E kämpfen. Drückst du die Taste kurz, machst du einen kurzen Schlag',
+                    'Drückst du die Taste länger, machst du einen starken Schlag.',
+                    'Du verlierst beim längeren Schlag Mana. Mana kannst du durch blaue Tränke auffüllen.',
+                    'Alle 10 Sekunden füllt sich dein Mana automatisch auf.',
+                ],
+                goal: 1,
+                type: 'BLUE_POTION',
+                successMessage: 'Gut gemacht! Du hast alle Getränke gefunden!',
+                spots: [
+                    {x: 5, y: 5, collected: false, name: 'potion', type: 'BLUE_POTION'},
+                ]
+            }
+        ]
+    }, {
+        layout: [
             [14, 14, 14, 14, 15, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
             [12, 11, 11, 11, 17, 18, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
-            [12, 20, 20, 23, 71, 72, 20, 23, 20, 23, 20, 23, 30, 19, 98, 10],
+            [12, 20, 20, 23, 71, 72, 20, 23, 20, 23, 20, 23, 30, 24, 98, 10],
             [12, 90, 20, 40, 40, 40, 22, 20, 22, 20, 22, 20, 20, 10, 19, 11],
             [12, 20, 20, 10, 11, 12, 20, 22, 20, 22, 20, 22, 20, 20, 23, 10],
             [12, 40, 40, 10, 20, 12, 40, 41, 40, 20, 20, 20, 22, 21, 24, 10],
@@ -85,9 +120,9 @@ export const MAPS = [
         ],
         enemiesRequired: 1,
         name: 'Eingangshalle',
-        type: 'default',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION']
+        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION'],
+        type: 'default'
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
@@ -100,8 +135,8 @@ export const MAPS = [
         ],
         completed: false,
         name: 'Vorhalle',
-        type: 'quest',
         allowedEnemyTypes: [],
+        type: 'quest',
         quest: {
             npc: {x: 8, y: 3},
             description: 'Sammle 4 blaue Getränke!',

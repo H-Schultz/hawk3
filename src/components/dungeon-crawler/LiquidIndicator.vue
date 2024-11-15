@@ -61,6 +61,9 @@
     width: `${props.size}px`,
     height: `${props.size}px`
   }));
+  const textStyle = computed(() => ({
+    top: `${50 - percentage.value / 2}%`
+  }));
   const liquidStyle = computed(() => ({
     height: `${percentage.value}%`,
     background: `linear-gradient(to top, ${props.colorFrom}, ${props.colorTo})`
@@ -119,7 +122,7 @@
         <div class="bubble bubble-2" :style="bubbleStyle2"></div>
       </div>
     </div>
-    <div v-if="showValue" class="value-text">
+    <div v-if="showValue" class="value-text" :style="textStyle">
       <span>{{ value }}</span>
     </div>
   </div>
@@ -210,6 +213,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 50%;
   }
 
   .value-text span {

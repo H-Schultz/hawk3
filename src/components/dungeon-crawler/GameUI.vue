@@ -22,7 +22,6 @@
     }
   });
 
-
   const emit = defineEmits(['manaRegenerated']);
 
   const handleRegenerated = () => {
@@ -87,7 +86,7 @@
   position: absolute;
   z-index: 500;
   padding: 10px;
-  height: 60px;
+  height: 100%;
   width: 100%;
   top: 0;
   left: 0;
@@ -95,11 +94,13 @@
 
 .hearts-container {
   position: absolute;
-  top: 10px;
+  bottom: 10px;
   left: 10px;
   z-index: 10;
   display: flex;
-  gap: 6px;
+  gap: 10px;
+  width: calc(100% - 20px);
+  justify-content: space-between;
 }
 
 .level-info {
