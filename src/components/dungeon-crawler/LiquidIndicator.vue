@@ -28,7 +28,7 @@
     },
     player: {
       type: Object,
-      required: true
+      required: false
     },
     type: {
       type: String,
@@ -131,6 +131,7 @@
 <style scoped>
   .liquid-indicator {
     position: relative;
+    min-width: 64px;
   }
 
   .border-container {
@@ -162,6 +163,8 @@
     border-radius: 50%;
     overflow: hidden;
     background-color: rgba(17, 24, 39, 0.1);
+    width: 56px;
+    height: 56px;
   }
 
   .liquid {

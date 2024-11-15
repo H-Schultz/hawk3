@@ -68,34 +68,73 @@ export const MAPS = [
         layout: [
             [14, 14, 14, 14, 15, 14, 14, 14, 14, 14],
             [12, 11, 11, 11, 18, 11, 11, 11, 11, 11],
-            [12, 20, 20, 20, 72, 20, 20, 20, 20, 10],
+            [12, 20, 20, 99, 72, 23, 20, 20, 20, 10],
             [12, 90, 20, 20, 20, 22, 20, 21, 20, 10],
-            [12, 98, 20, 21, 20, 20, 20, 20, 99, 10],
-            [12, 98, 20, 21, 20, 20, 20, 30, 23, 10],
-            [12, 25, 20, 10, 19, 12, 23, 21, 24, 10],
-            [12, 40, 40, 12, 40, 12, 40, 40, 40, 10],
+            [12, 98, 20, 21, 20, 20, 20, 20, 21, 10],
+            [12, 21, 20, 20, 21, 20, 20, 30, 23, 10],
+            [12, 25, 20, 20, 21, 22, 10, 11, 11, 11],
+            [12, 40, 40, 40, 40, 40, 19, 40, 40, 10],
             [11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
         ],
         completed: false,
         name: 'Vorhalle',
         allowedEnemyTypes: [],
         type: 'quest',
-        quest: [
+        quests: [
             {
-                npc: {x: 5, y: 3},
+                npc: {x: 3, y: 2},
                 description: [
                     'Hallo! Ich erkläre dir kurz das Spiel!',
                     'Du kannst dich mit den Pfeiltasten bewegen.',
-                    'Du kannst mit der Taste E kämpfen. Drückst du die Taste kurz, machst du einen kurzen Schlag',
-                    'Drückst du die Taste länger, machst du einen starken Schlag.',
-                    'Du verlierst beim längeren Schlag Mana. Mana kannst du durch blaue Tränke auffüllen.',
-                    'Alle 10 Sekunden füllt sich dein Mana automatisch auf.',
+                    'Du kannst mit der Taste E kämpfen. Drückst du die Taste kurz, machst du einen kurzen Schlag.',
+                    'Du trifft nur das Feld vor dir.',
+                    'Drückst du die Taste länger, machst du einen starken rundum Schlag.',
+                    'Du triffst alle Felder um dich herum.',
+                    'Du verlierst dabei aber Mana.',
+                    'Mana kannst du durch blaue Tränke wieder auffüllen.',
+                    'Aber alle 10 Sekunden füllt sich dein Mana automatisch um ein Mana auf.',
+                    'Versuche es einmal und sammel dabei 3 blauen Tränke ein!',
                 ],
-                goal: 1,
+                goal: 3,
                 type: 'BLUE_POTION',
                 successMessage: 'Gut gemacht! Du hast alle Getränke gefunden!',
                 spots: [
                     {x: 5, y: 5, collected: false, name: 'potion', type: 'BLUE_POTION'},
+                    {x: 6, y: 3, collected: false, name: 'potion', type: 'BLUE_POTION'},
+                    {x: 8, y: 4, collected: false, name: 'potion', type: 'BLUE_POTION'},
+                ]
+            }, {
+                npc: {x: 3, y: 2},
+                description: [
+                    'Vieleicht hast du die Falle betreten und hast ein wenig Leben verloren.',
+                    'Feinde können dir auch Schaden zufügen.',
+                    'Du kannst Leben durch rote Tränke wieder auffüllen.',
+                    'Versuche es einmal und betrete die Falle.',
+                    'Und Töte den Feind!',
+                    'Fülle dein Leben wieder auf und sammel dabei 3 rote Tränke ein!',
+                ],
+                goal: 3,
+                type: 'RED_POTION',
+                successMessage: 'Gut gemacht! Du hast alle Getränke gefunden!',
+                spots: [
+                    {x: 8, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
+                    {x: 5, y: 5, collected: false, name: 'potion', type: 'RED_POTION'},
+                    {x: 6, y: 3, collected: false, name: 'potion', type: 'RED_POTION'},
+                    {x: 8, y: 4, collected: false, name: 'potion', type: 'RED_POTION'},
+                ]
+            }, {
+                npc: {x: 3, y: 2},
+                description: [
+                    'Bomben können dir helfen, Feinde zu besiegen.',
+                    'Fülle dein Leben wieder auf und sammel dabei 3 rote Tränke ein!',
+                ],
+                goal: 3,
+                type: 'BOMB',
+                successMessage: 'Gut gemacht! Du hast alle Getränke gefunden!',
+                spots: [
+                    {x: 8, y: 3, collected: false, name: 'potion', type: 'BOMB'},
+                    {x: 5, y: 5, collected: false, name: 'potion', type: 'BOMB'},
+                    {x: 6, y: 3, collected: false, name: 'potion', type: 'BOMB'},
                 ]
             }
         ]

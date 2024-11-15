@@ -15,7 +15,6 @@ import Tile from './Tile.vue';
 import NPC from './NPC.vue';
 import Explosion from './Explosion.vue';
 import Camera  from './Camera.vue';
-import LiquidIndicator from "./LiquidIndicator.vue";
 
 let chargeTimer = null;
 
@@ -31,6 +30,7 @@ const activeQuest = ref(null);
 const questItems = ref([]);
 const traps = ref([]);
 const activeExplosions = ref([]);
+const activeQuestIndex = ref(0);
 
 const player = ref({
   position: { x: 1, y: 1 },
@@ -130,38 +130,12 @@ const loadMap = (mapIndex) => {
   droppedItems.value = [];
 
   if (mapData.type === 'quest') {
-    activeQuest.value = mapData.quest;
+    // Setze nur die Quest-Referenz, aber starte sie noch nicht
+    activeQuest.value = mapData.quests[0];
     activeQuest.value.started = false;
     activeQuest.value.completed = false;
     activeQuest.value.count = 0;
-  }
-
-  if (mapData.type === 'boss' && mapData.bossConfig) {
-    const bossConfig = mapData.bossConfig;
-    const bossType = ENEMY_TYPES[bossConfig.name];
-
-    const boss = {
-      id: nextEnemyId++,
-      type: bossConfig.type,
-      name: bossConfig.name,
-      position: {...bossConfig.position},
-      direction: 'left',
-      state: 'idle',
-      frame: 0,
-      health: bossType.maxHealth,
-      maxHealth: bossType.maxHealth,
-      spriteSize: bossType.spriteSize,
-      canAttack: true,
-      isPreparingAttack: false,
-      isUnderAttack: false,
-      moveInterval: null
-    };
-
-    enemies.value = [boss];
-    startEnemyMovement(boss);
-  } else {
-    if (spawnInterval) clearTimeout(spawnInterval);
-    startSpawnSystem();
+    questItems.value = [];
   }
 
   return true;
@@ -169,20 +143,120 @@ const loadMap = (mapIndex) => {
 
 const startQuest = (quest) => {
   if (quest.completed || quest.started) return;
+
+  /* / Setze den Status der vorherigen Quest zurück falls vorhanden
+  if (activeQuestIndex.value > 0) {
+    const prevQuest = currentMap.value.quests[activeQuestIndex.value - 1];
+    if (prevQuest) {
+      prevQuest.started = false;
+      prevQuest.isReady = false;
+      prevQuest.count = 0;
+      activeQuestIndex.value++;
+    }
+  } else {
+    activeQuestIndex.value = 1;
+  }*/
+
   activeQuest.value = quest;
   activeQuest.value.started = true;
   activeQuest.value.count = 0;
   activeQuest.value.completed = false;
-  questItems.value = quest.spots.map(spot => ({
-    ...spot,
-    collected: false
-  }));
+  activeQuest.value.isReady = false;
+
+  // Initialisiere Quest-Items
+  questItems.value = quest.spots
+      .filter(spot => spot.name === 'potion')
+      .map(spot => ({
+        ...spot,
+        collected: false
+      }));
+
+  // Initialisiere Quest-spezifische Feinde
+  const questEnemies = quest.spots
+      .filter(spot => spot.name === 'enemy')
+      .map(spot => ({
+        id: nextEnemyId++,
+        type: 'default',
+        name: spot.type,
+        position: { x: spot.x, y: spot.y },
+        direction: 'left',
+        state: 'idle',
+        frame: 0,
+        health: ENEMY_TYPES[spot.type].maxHealth,
+        maxHealth: ENEMY_TYPES[spot.type].maxHealth,
+        spriteSize: ENEMY_TYPES[spot.type].spriteSize,
+        canAttack: true,
+        isPreparingAttack: false,
+        isUnderAttack: false,
+        moveInterval: null,
+        isQuestEnemy: true
+      }));
+
+  // Füge die Quest-Feinde dem enemies Array hinzu
+  enemies.value = [
+    ...enemies.value,
+    ...questEnemies
+  ];
+
+  // Starte die Bewegung für die neuen Quest-Feinde
+  questEnemies.forEach(enemy => startEnemyMovement(enemy));
+};
+
+const isNearNPC = (quest) => {
+  if (!quest?.npc) return false;
+  const dx = Math.abs(player.value.position.x - quest.npc.x);
+  const dy = Math.abs(player.value.position.y - quest.npc.y);
+  return (dx <= 1 && dy <= 1);
+};
+
+const checkQuestProgress = () => {
+  if (!activeQuest.value || !activeQuest.value.started) return;
+
+  let progress = 0;
+
+  if (activeQuest.value.type === 'RED_POTION' || activeQuest.value.type === 'BLUE_POTION') {
+    // Zähle gesammelte Tränke
+    progress = questItems.value.filter(item => item.collected).length;
+  }
+
+  // Prüfe auch besiegte Quest-Feinde
+  const defeatedQuestEnemies = enemies.value
+      .filter(enemy => enemy.isQuestEnemy && enemy.health <= 0)
+      .length;
+
+  activeQuest.value.count = progress;
+
+  // Prüfe ob alle Bedingungen erfüllt sind
+  const allItemsCollected = progress >= activeQuest.value.goal;
+  const allEnemiesDefeated = defeatedQuestEnemies === activeQuest.value.spots.filter(spot => spot.name === 'enemy').length;
+
+  // Speichere den Fortschritt
+  activeQuest.value.isReady = allItemsCollected && allEnemiesDefeated;
+
+  // Setze completed nur wenn alle Bedingungen erfüllt sind UND Spieler beim NPC ist
+  if (activeQuest.value.isReady && isNearNPC(activeQuest.value)) {
+    activeQuest.value.completed = true;
+
+    // Optional: Hier könnte man eine Belohnung geben oder andere Aktionen ausführen
+
+    // Prüfe ob alle Quests abgeschlossen sind
+    const allQuestsCompleted = currentMap.value.quests.every(quest => quest.completed);
+    if (allQuestsCompleted) {
+      showStairs();
+    }
+  }
 };
 
 const dropItem = (enemy) => {
   if (droppedItems.value.some(item => isSamePosition(item.position, enemy.position))) return;
+
+  if (enemy.isQuestEnemy) {
+    checkQuestProgress();
+    return;
+  }
+
   const dropChance = Math.random();
-  if (dropChance > enemy.dropChance) return; // 30% Chance für einen Drop
+  if (dropChance > enemy.dropChance) return;
 
   const itemTypes = currentMap.value.allowedItems || [];
   if (itemTypes.length === 0) return;
@@ -727,17 +801,8 @@ const movePlayer = (dx, dy) => {
 
       if (questItem) {
         questItem.collected = true;
-
-        // Prüfe ob Quest abgeschlossen
-        const collectedCount = questItems.value.filter(i => i.collected).length;
-        activeQuest.value.count = collectedCount;
-        if (collectedCount >= activeQuest.value.goal) {
-          activeQuest.value.completed = true;
-          // Belohnung geben
-          if (activeQuest.value.gift === 'sword') {
-            // Implementiere Belohnungslogik
-          }
-        }
+        collectItem(questItem);
+        checkQuestProgress();
       }
     }
 
@@ -745,8 +810,6 @@ const movePlayer = (dx, dy) => {
       startNextLevel();
       return;
     }
-
-    player.value.position = newPosition;
 
     const itemAtPosition = droppedItems.value.find(item =>
         !item.collectAnimation &&
@@ -761,6 +824,13 @@ const movePlayer = (dx, dy) => {
 };
 
 const showStairs = () => {
+  // Prüfe ob alle Quests abgeschlossen sind
+  const allQuestsCompleted = currentMap.value.quests.every(quest => quest.completed);
+
+  if (!allQuestsCompleted) {
+    return; // Zeige Treppe nur an wenn alle Quests abgeschlossen sind
+  }
+
   isStairActive.value = true;
   const layout = currentMap.value.layout;
 
@@ -1106,15 +1176,20 @@ watch(() => gameState.value, (newState) => {
                   v-if="currentMap.type === 'quest'"
               >
                 <NPC
-                    :quest="currentMap.quest"
+                    :quests="currentMap.quests"
                     :player="player"
                     @start-quest="startQuest"
                     @show-stairs="showStairs"
                 />
                 <Item
-                    v-for="item in questItems"
+                    v-for="item in questItems.filter(item => item.name === 'potion')"
                     :key="`${item.x}-${item.y}`"
-                    :item="{position: {x: item.x, y: item.y}, name: item.name, type: item.type, collectAnimation: item.collected}"
+                    :item="{
+                      position: {x: item.x, y: item.y},
+                      name: item.name,
+                      type: item.type,
+                      collectAnimation: item.collected
+                    }"
                 />
               </template>
             </div>

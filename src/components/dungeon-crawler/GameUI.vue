@@ -1,32 +1,122 @@
 <script setup>
-  import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite.png";
-  import {ITEM_TYPES} from "./constants.js";
-  import LiquidIndicator from "./LiquidIndicator.vue";
+import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite.png";
+import {ITEM_TYPES} from "./constants.js";
+import LiquidIndicator from "./LiquidIndicator.vue";
+import {computed, watch} from 'vue';
 
-  const props = defineProps({
-    player: {
-      type: Object,
-      required: true
-    },
-    defeatedEnemies: {
-      type: Number,
-      required: true
-    },
-    currentMap: {
-      type: Object,
-      required: true
-    },
-    enemies: {
-      type: Array,
-      required: true
-    }
-  });
+const props = defineProps({
+  player: {
+    type: Object,
+    required: true
+  },
+  defeatedEnemies: {
+    type: Number,
+    required: true
+  },
+  currentMap: {
+    type: Object,
+    required: true
+  },
+  enemies: {
+    type: Array,
+    required: true
+  }
+});
 
-  const emit = defineEmits(['manaRegenerated']);
+const emit = defineEmits(['manaRegenerated']);
 
-  const handleRegenerated = () => {
-    emit('manaRegenerated');
+const handleRegenerated = () => {
+  emit('manaRegenerated');
+};
+
+const activeQuestIndex = computed(() => {
+  if (!props.currentMap?.quests) return -1;
+  return props.currentMap.quests.findIndex(quest => !quest.completed);
+});
+
+const activeQuest = computed(() => {
+  if (activeQuestIndex.value === -1) return null;
+  return props.currentMap?.quests?.[activeQuestIndex.value];
+});
+
+// Berechne den Quest-Fortschritt
+const questProgress = computed(() => {
+  if (!props.currentMap?.type === 'quest' || !activeQuest.value?.started) {
+    return {
+      current: 0,
+      max: 0
+    };
+  }
+
+  let current = activeQuest.value.count || 0;
+  let max = activeQuest.value.goal || 0;
+
+  // Füge Feind-Fortschritt hinzu falls vorhanden
+  const questEnemies = activeQuest.value.spots.filter(spot => spot.name === 'enemy');
+  if (questEnemies.length > 0) {
+    const defeatedQuestEnemies = props.enemies
+        .filter(enemy => enemy.isQuestEnemy && enemy.health <= 0)
+        .length;
+    current += defeatedQuestEnemies;
+    max += questEnemies.length;
+  }
+
+  return {
+    current,
+    max
   };
+});
+
+const isNearNPC = () => {
+  if (!activeQuest.value?.npc) return false;
+  const dx = Math.abs(props.player.position.x - activeQuest.value.npc.x);
+  const dy = Math.abs(props.player.position.y - activeQuest.value.npc.y);
+  return (dx <= 1 && dy <= 1);
+};
+
+// Berechne den Quest-Text
+const questText = computed(() => {
+  if (!activeQuest.value?.started) return '';
+
+  if (activeQuest.value.isReady && !activeQuest.value.completed) {
+    return `Quest ${activeQuestIndex.value + 1} bereit - Sprich mit dem NPC!`;
+  }
+
+  return `Quest ${activeQuestIndex.value + 1}: ${questProgress.value.current}/${questProgress.value.max}`;
+});
+
+// Prüfe ob der Fortschrittsbalken angezeigt werden soll
+const showQuestProgress = computed(() => {
+  if (!props.currentMap?.type === 'quest' || !activeQuest.value?.started) return false;
+
+  // Verstecke wenn Quest abgeschlossen und Spieler beim NPC
+  if (activeQuest.value.isReady && isNearNPC(activeQuest.value)) {
+    return false;
+  }
+
+  return questProgress.value.max > 0;
+});
+
+const progressColors = computed(() => {
+  if (activeQuest.value?.isReady) {
+    return {
+      from: 'rgb(21, 128, 61)',  // Dunkelgrün für fertige Quest
+      to: 'rgb(34, 197, 94)'     // Hellgrün für fertige Quest
+    };
+  }
+  return {
+    from: 'rgb(147, 51, 234)',   // Standard Lila
+    to: 'rgb(168, 85, 247)'
+  };
+});
+
+const questProgressStyle = computed(() => {
+  return {
+    opacity: showQuestProgress.value ? 1 : 0,
+    transform: showQuestProgress.value ? 'translateY(0)' : 'translateY(-20px)',
+    transition: 'opacity 0.3s ease, transform 0.3s ease'
+  };
+});
 </script>
 
 <template>
@@ -54,16 +144,25 @@
       />
     </div>
     <div class="level-info">
-      <span>{{ props.currentMap?.name }}</span>
-      <span v-if="props.currentMap?.type === 'default'">
-        Enemies: {{ props.defeatedEnemies }}/{{ props.currentMap?.enemiesRequired }}
-      </span>
-      <span v-if="props.currentMap?.type === 'boss'">
-        Boss Health: {{ props.enemies[0]?.health }}/{{ props.enemies[0]?.maxHealth }}
-      </span>
-      <span v-if="props.currentMap?.type === 'quest' && props.currentMap?.quest.started">
-        Quest Items: {{ props.currentMap?.quest.count }}/{{ props.currentMap?.quest.goal }}
-      </span>
+      <div v-if="props.currentMap?.type === 'default'" class="quest-progress">
+        <span class="quest-text">Enemies: {{ props.defeatedEnemies }}/{{ props.currentMap?.enemiesRequired }}</span>
+      </div>
+      <div v-else-if="props.currentMap?.type === 'boss'" class="quest-progress">
+        <span class="quest-text">Boss Health: {{ props.enemies[0]?.health }}/{{ props.enemies[0]?.maxHealth }}</span>
+      </div>
+      <div v-else-if="showQuestProgress" class="quest-progress" :style="questProgressStyle">
+        <LiquidIndicator
+            :current-value="questProgress.current"
+            :max-value="questProgress.max"
+            type="quest"
+            :color-from="progressColors.from"
+            :color-to="progressColors.to"
+            :show-value="false"
+            :width="200"
+        />
+        <span class="quest-text">{{ questText }}</span>
+      </div>
+      <div v-else class="level-name">{{ props.currentMap?.name }}</div>
     </div>
     <div class="items-container">
       <div class="bomb-icon" :style="{
@@ -81,7 +180,6 @@
 </template>
 
 <style scoped>
-
 .game-ui {
   position: absolute;
   z-index: 500;
@@ -106,16 +204,29 @@
 .level-info {
   position: absolute;
   top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 5px 15px;
-  border-radius: 15px;
+  left: 10px;
+  z-index: 10;
   display: flex;
-  gap: 20px;
+  gap: 10px;
+  width: calc(100% - 20px);
+  justify-content: space-between;
   font-size: 18px;
   font-weight: bold;
+  align-items: center;
+  color: white;
+}
+
+.level-name {
+  color: white;
+  font-size: 18px;
+  font-weight: normal;
+  padding: 4px 8px;
+}
+
+.quest-text {
+  color: white;
+  font-size: 18px;
+  font-weight: normal;
 }
 
 .items-container {
@@ -146,12 +257,16 @@
   font-weight: bold;
 }
 
-.heart {
-  width: 64px;
-  height: 64px;
-  image-rendering: pixelated;
-  background-repeat: no-repeat;
-  background-size: 2048px 2048px;
+.quest-progress {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: all 0.3s ease;
 }
 
+.quest-progress.completed {
+  background: rgba(21, 128, 61, 0.1);
+  padding: 5px 10px;
+  border-radius: 10px;
+}
 </style>
