@@ -90,6 +90,16 @@ defineExpose({ getRelativePosition });
     border: 4px solid #fff;
   }
 
+  .camera-viewport::after {
+    content: '';
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 400;
+    box-shadow: inset 0 0 20px 20px rgba(0, 0, 0, 0.5);
+  }
+
   .game-world {
     position: absolute;
     top: 0;

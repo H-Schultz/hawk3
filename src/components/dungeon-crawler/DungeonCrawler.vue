@@ -1026,7 +1026,6 @@ watch(() => gameState.value, (newState) => {
     <main class="main-content">
       <div class="game-container">
         <GameUI :player="player" :current-map="currentMap" :defeated-enemies="defeatedEnemies" :enemies="enemies"></GameUI>
-        <Overlay :game-state="gameState" :player="player"></Overlay>
         <Camera
           v-if="dungeonMap"
           :player="player"
@@ -1076,6 +1075,7 @@ watch(() => gameState.value, (newState) => {
             </div>
           </template>
         </Camera>
+        <Overlay :game-state="gameState" :player="player"></Overlay>
       </div>
     </main>
   </div>

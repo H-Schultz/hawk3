@@ -36,17 +36,18 @@
 
 <style scoped>
 
-.game-over-overlay {
-  position: fixed;
+.game-over-overlay,
+.victory-overlay {
+  position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 500;
 }
 
 .game-over-content {
@@ -66,19 +67,6 @@
 .game-over-content p {
   font-size: 18px;
   margin: 10px 0;
-}
-
-.victory-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
 }
 
 .victory-content {

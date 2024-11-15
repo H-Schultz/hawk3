@@ -78,11 +78,13 @@
 <style scoped>
 
 .game-ui {
-  position: relative;
-  z-index: 105;
+  position: absolute;
+  z-index: 500;
   padding: 10px;
   height: 60px;
-  background: #000;
+  width: 100%;
+  top: 0;
+  left: 0;
 }
 
 .hearts-container {
