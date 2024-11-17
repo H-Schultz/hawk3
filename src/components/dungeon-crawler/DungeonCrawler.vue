@@ -26,11 +26,10 @@ const currentMap = ref([]);
 const isStairActive = ref(false);
 const dungeonMap = ref(null);
 const router = useRouter();
-const activeQuest = ref(null);
+const activeQuest = ref(0);
 const questItems = ref([]);
 const traps = ref([]);
 const activeExplosions = ref([]);
-const activeQuestIndex = ref(0);
 
 const player = ref({
   position: { x: 1, y: 1 },
@@ -130,11 +129,11 @@ const loadMap = (mapIndex) => {
   droppedItems.value = [];
 
   if (mapData.type === 'quest') {
-    // Setze nur die Quest-Referenz, aber starte sie noch nicht
     activeQuest.value = mapData.quests[0];
     activeQuest.value.started = false;
     activeQuest.value.completed = false;
     activeQuest.value.count = 0;
+    activeQuest.value.isReady = false;
     questItems.value = [];
   }
 
@@ -143,20 +142,6 @@ const loadMap = (mapIndex) => {
 
 const startQuest = (quest) => {
   if (quest.completed || quest.started) return;
-
-  /* / Setze den Status der vorherigen Quest zurück falls vorhanden
-  if (activeQuestIndex.value > 0) {
-    const prevQuest = currentMap.value.quests[activeQuestIndex.value - 1];
-    if (prevQuest) {
-      prevQuest.started = false;
-      prevQuest.isReady = false;
-      prevQuest.count = 0;
-      activeQuestIndex.value++;
-    }
-  } else {
-    activeQuestIndex.value = 1;
-  }*/
-
   activeQuest.value = quest;
   activeQuest.value.started = true;
   activeQuest.value.count = 0;
@@ -165,7 +150,7 @@ const startQuest = (quest) => {
 
   // Initialisiere Quest-Items
   questItems.value = quest.spots
-      .filter(spot => spot.name === 'potion')
+      .filter(spot => spot.name === 'item')
       .map(spot => ({
         ...spot,
         collected: false
@@ -212,23 +197,24 @@ const isNearNPC = (quest) => {
 const checkQuestProgress = () => {
   if (!activeQuest.value || !activeQuest.value.started) return;
 
-  let progress = 0;
+  // Zähle gesammelte Tränke
+  let progress = questItems.value.filter(item => item.collected).length;
 
-  if (activeQuest.value.type === 'RED_POTION' || activeQuest.value.type === 'BLUE_POTION') {
-    // Zähle gesammelte Tränke
-    progress = questItems.value.filter(item => item.collected).length;
+  // Hat Quest auch Feinde?
+  let defeatedQuestEnemies = 0;
+  let questEnemies = activeQuest.value.spots.filter(spot => spot.name === 'enemy');
+  if (questEnemies.length > 0) {
+    // Prüfe auch besiegte Quest-Feinde
+    defeatedQuestEnemies = enemies.value
+        .filter(enemy => enemy.isQuestEnemy && enemy.health <= 0)
+        .length;
   }
-
-  // Prüfe auch besiegte Quest-Feinde
-  const defeatedQuestEnemies = enemies.value
-      .filter(enemy => enemy.isQuestEnemy && enemy.health <= 0)
-      .length;
 
   activeQuest.value.count = progress;
 
   // Prüfe ob alle Bedingungen erfüllt sind
-  const allItemsCollected = progress >= activeQuest.value.goal;
-  const allEnemiesDefeated = defeatedQuestEnemies === activeQuest.value.spots.filter(spot => spot.name === 'enemy').length;
+  const allEnemiesDefeated = defeatedQuestEnemies >= questEnemies.length;
+  const allItemsCollected = progress + defeatedQuestEnemies >= activeQuest.value.goal;
 
   // Speichere den Fortschritt
   activeQuest.value.isReady = allItemsCollected && allEnemiesDefeated;
@@ -526,7 +512,7 @@ const startSpawnSystem = () => {
         SPAWN_CONFIG.minInterval;
 
     spawnInterval = setTimeout(() => {
-      if (enemies.value.filter(e => e.health > 0).length < SPAWN_CONFIG.maxEnemies) {
+      if (enemies.value.filter(e => e.health > 0).length < currentMap.value.maxEnemies) {
         spawnEnemy();
       }
       scheduleNextSpawn();
@@ -824,11 +810,11 @@ const movePlayer = (dx, dy) => {
 };
 
 const showStairs = () => {
-  // Prüfe ob alle Quests abgeschlossen sind
-  const allQuestsCompleted = currentMap.value.quests.every(quest => quest.completed);
-
-  if (!allQuestsCompleted) {
-    return; // Zeige Treppe nur an wenn alle Quests abgeschlossen sind
+  if (currentMap.value.quests?.length > 0) {
+    const allQuestsCompleted = currentMap.value.quests.every(quest => quest.completed);
+    if (!allQuestsCompleted) {
+      return;
+    }
   }
 
   isStairActive.value = true;
@@ -868,6 +854,18 @@ const restartGame = () => {
   player.value.isUnderAttack = false;
   player.value.hasExecutedWhirlwind = false;
   player.value.chargeStartTime = null;
+  player.value.mana = MAX_MANA;
+  player.value.maxMana = MAX_MANA;
+  player.value.maxHealth = MAX_HEALTH;
+
+  if (currentMap.value?.quests) {
+    currentMap.value.quests.forEach(quest => {
+      quest.started = false;
+      quest.completed = false;
+      quest.count = 0;
+      quest.isReady = false;
+    });
+  }
   loadMap(0);
 };
 
@@ -1178,11 +1176,12 @@ watch(() => gameState.value, (newState) => {
                 <NPC
                     :quests="currentMap.quests"
                     :player="player"
+                    :should-reset="gameState === GAME_STATE.GAME_OVER"
                     @start-quest="startQuest"
                     @show-stairs="showStairs"
                 />
                 <Item
-                    v-for="item in questItems.filter(item => item.name === 'potion')"
+                    v-for="item in questItems.filter(item => item.name === 'item')"
                     :key="`${item.x}-${item.y}`"
                     :item="{
                       position: {x: item.x, y: item.y},

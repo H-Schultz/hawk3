@@ -9,7 +9,7 @@ export const SPRITE_SIZE = 16;
 export const SPRITE_SCALE = 4;
 export const DISPLAY_SIZE = SPRITE_SIZE * SPRITE_SCALE;
 export const ANIMATION_SPEED = 150;
-export const MAX_HEALTH = 6;
+export const MAX_HEALTH = 2;
 export const MAX_MANA = 2;
 export const WHIRLWIND_DURATION = 800;
 export const CHARGE_TIME = 2000;
@@ -66,9 +66,63 @@ export const TILES = {
 export const MAPS = [
     {
         layout: [
-            [14, 14, 14, 14, 15, 14, 14, 14, 14, 14],
-            [12, 11, 11, 11, 18, 11, 11, 11, 11, 11],
-            [12, 20, 20, 99, 72, 23, 20, 20, 20, 10],
+            [14, 14, 14, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14],
+            [12, 11, 11, 11, 11, 11, 11, 18, 11, 11, 11, 11, 11, 11, 11],
+            [12, 20, 20, 99, 22, 21, 20, 72, 20, 20, 20, 20, 20, 20, 10],
+            [12, 90, 20, 20, 23, 22, 20, 21, 20, 20, 20, 20, 20, 20, 10],
+            [12, 98, 20, 21, 20, 20, 20, 20, 21, 20, 21, 20, 21, 20, 10],
+            [12, 21, 20, 20, 21, 20, 21, 20, 20, 20, 20, 22, 20, 23, 10],
+            [12, 22, 23, 20, 21, 20, 20, 20, 20, 24, 25, 20, 20, 23, 10],
+            [12, 20, 20, 20, 22, 20, 20, 21, 20, 20, 22, 20, 23, 21, 10],
+            [12, 20, 22, 20, 20, 20, 23, 22, 20, 20, 20, 21, 20, 22, 10],
+            [12, 21, 20, 23, 22, 21, 20, 20, 20, 20, 20, 20, 20, 23, 10],
+            [12, 25, 20, 22, 21, 22, 23, 21, 20, 20, 21, 20, 20, 24, 11],
+            [12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10],
+            [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
+        ],
+        completed: false,
+        name: 'Vorhalle',
+        allowedEnemyTypes: ['GOBLIN'],
+        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION'],
+        maxEnemies: 1,
+        type: 'quest',
+        quests: [
+            {
+                npc: {x: 3, y: 2},
+                description: [
+                    'Hallo!',
+                    'Sammel 3 Bomben ein!',
+                ],
+                goal: 3,
+                type: 'BOMB',
+                successMessage: 'Gut gemacht! Die Treppe ist jetzt frei!',
+                spots: [
+                    {x: 5, y: 5, collected: false, name: 'item', type: 'BOMB'},
+                    {x: 6, y: 3, collected: false, name: 'item', type: 'BOMB'},
+                    {x: 8, y: 4, collected: false, name: 'item', type: 'BOMB'},
+                ]
+            }
+        ]
+    },{
+        layout: [
+            [10, 11, 11, 11, 17, 18, 11, 11, 11, 12],
+            [10, 20, 20, 23, 71, 72, 30, 19, 98, 12],
+            [10, 90, 20, 20, 22, 20, 20, 10, 19, 12],
+            [10, 20, 21, 20, 20, 22, 20, 20, 23, 12],
+            [10, 21, 23, 21, 20, 20, 22, 21, 24, 12],
+            [10, 25, 23, 23, 20, 20, 21, 20, 21, 12],
+            [10, 11, 11, 11, 11, 11, 11, 11, 11, 12],
+        ],
+        enemiesRequired: 1,
+        name: 'Eingangshalle',
+        type: 'default',
+        allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC'],
+        allowedItems: ['BOMB', 'GREEN_POISON']
+    }, {
+        layout: [
+            [14, 14, 14, 14, 15, 15, 14, 14, 14, 14],
+            [12, 11, 11, 11, 18, 18, 11, 11, 11, 11],
+            [12, 20, 20, 99, 72, 72, 20, 20, 20, 10],
             [12, 90, 20, 20, 20, 22, 20, 21, 20, 10],
             [12, 98, 20, 21, 20, 20, 20, 20, 21, 10],
             [12, 21, 20, 20, 21, 20, 20, 30, 23, 10],
@@ -84,61 +138,20 @@ export const MAPS = [
             {
                 npc: {x: 3, y: 2},
                 description: [
-                    'Hallo! Ich erkläre dir kurz das Spiel!',
-                    'Du kannst dich mit den Pfeiltasten bewegen.',
-                    'Du kannst mit der Taste E kämpfen. Drückst du die Taste kurz, machst du einen kurzen Schlag.',
-                    'Du trifft nur das Feld vor dir.',
-                    'Drückst du die Taste länger, machst du einen starken rundum Schlag.',
-                    'Du triffst alle Felder um dich herum.',
-                    'Du verlierst dabei aber Mana.',
-                    'Mana kannst du durch blaue Tränke wieder auffüllen.',
-                    'Aber alle 10 Sekunden füllt sich dein Mana automatisch um ein Mana auf.',
-                    'Versuche es einmal und sammel dabei 3 blauen Tränke ein!',
+                    'Hallo!',
+                    'Sammel 3 blaue Tränke ein!',
                 ],
                 goal: 3,
                 type: 'BLUE_POTION',
-                successMessage: 'Gut gemacht! Du hast alle Getränke gefunden!',
+                successMessage: 'Gut gemacht!',
                 spots: [
-                    {x: 5, y: 5, collected: false, name: 'potion', type: 'BLUE_POTION'},
-                    {x: 6, y: 3, collected: false, name: 'potion', type: 'BLUE_POTION'},
-                    {x: 8, y: 4, collected: false, name: 'potion', type: 'BLUE_POTION'},
-                ]
-            }, {
-                npc: {x: 3, y: 2},
-                description: [
-                    'Vieleicht hast du die Falle betreten und hast ein wenig Leben verloren.',
-                    'Feinde können dir auch Schaden zufügen.',
-                    'Du kannst Leben durch rote Tränke wieder auffüllen.',
-                    'Versuche es einmal und betrete die Falle.',
-                    'Und Töte den Feind!',
-                    'Fülle dein Leben wieder auf und sammel dabei 3 rote Tränke ein!',
-                ],
-                goal: 3,
-                type: 'RED_POTION',
-                successMessage: 'Gut gemacht! Du hast alle Getränke gefunden!',
-                spots: [
-                    {x: 8, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
-                    {x: 5, y: 5, collected: false, name: 'potion', type: 'RED_POTION'},
-                    {x: 6, y: 3, collected: false, name: 'potion', type: 'RED_POTION'},
-                    {x: 8, y: 4, collected: false, name: 'potion', type: 'RED_POTION'},
-                ]
-            }, {
-                npc: {x: 3, y: 2},
-                description: [
-                    'Bomben können dir helfen, Feinde zu besiegen.',
-                    'Fülle dein Leben wieder auf und sammel dabei 3 rote Tränke ein!',
-                ],
-                goal: 3,
-                type: 'BOMB',
-                successMessage: 'Gut gemacht! Du hast alle Getränke gefunden!',
-                spots: [
-                    {x: 8, y: 3, collected: false, name: 'potion', type: 'BOMB'},
-                    {x: 5, y: 5, collected: false, name: 'potion', type: 'BOMB'},
-                    {x: 6, y: 3, collected: false, name: 'potion', type: 'BOMB'},
+                    {x: 5, y: 5, collected: false, name: 'item', type: 'BLUE_POTION'},
+                    {x: 6, y: 3, collected: false, name: 'item', type: 'BLUE_POTION'},
+                    {x: 8, y: 4, collected: false, name: 'item', type: 'BLUE_POTION'},
                 ]
             }
         ]
-    }, {
+    },{
         layout: [
             [14, 14, 14, 14, 15, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
             [12, 11, 11, 11, 17, 18, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
@@ -164,6 +177,92 @@ export const MAPS = [
         type: 'default'
     }, {
         layout: [
+            [14, 14, 14, 14, 15, 14, 14, 14, 14, 14],
+            [12, 11, 11, 11, 18, 11, 11, 11, 11, 11],
+            [12, 20, 20, 99, 72, 23, 20, 20, 20, 10],
+            [12, 90, 20, 20, 20, 22, 20, 21, 20, 10],
+            [12, 98, 20, 21, 20, 20, 20, 20, 21, 10],
+            [12, 21, 20, 20, 21, 20, 20, 30, 23, 10],
+            [12, 25, 20, 20, 21, 22, 10, 11, 11, 11],
+            [12, 40, 40, 40, 40, 40, 19, 40, 40, 10],
+            [11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
+        ],
+        completed: false,
+        name: 'Vorhalle',
+        allowedEnemyTypes: [],
+        type: 'quest',
+        quests: [
+            {
+                npc: {x: 3, y: 2},
+                description: [
+                    'Hallo! Ich erkläre dir kurz das Spiel!',
+                    // 'Du kannst dich mit den Pfeiltasten bewegen.',
+                    // 'Du kannst mit der Taste E kämpfen. Drückst du die Taste kurz, machst du einen kurzen Schlag.',
+                    // 'Du trifft nur das Feld vor dir.',
+                    // 'Drückst du die Taste länger, machst du einen starken rundum Schlag.',
+                    // 'Du triffst alle Felder um dich herum.',
+                    // 'Du verlierst dabei aber Mana.',
+                    // 'Mana kannst du durch blaue Tränke wieder auffüllen.',
+                    // 'Aber alle 10 Sekunden füllt sich dein Mana automatisch um ein Mana auf.',
+                    '1 Versuche es einmal und sammel dabei 3 blauen Tränke ein!',
+                ],
+                goal: 3,
+                type: 'BLUE_POTION',
+                successMessage: 'Gut gemacht! 1',
+                spots: [
+                    {x: 5, y: 5, collected: false, name: 'item', type: 'BLUE_POTION'},
+                    {x: 6, y: 3, collected: false, name: 'item', type: 'BLUE_POTION'},
+                    {x: 8, y: 4, collected: false, name: 'item', type: 'BLUE_POTION'},
+                ]
+            }, {
+                npc: {x: 3, y: 2},
+                description: [
+                    'Vieleicht hast du die Falle betreten und hast ein wenig Leben verloren.',
+                    // 'Feinde können dir auch Schaden zufügen.',
+                    // 'Du kannst Leben durch rote Tränke wieder auffüllen.',
+                    // 'Töte den Feind und sammel dabei 3 rote Tränke ein!',
+                    '2 Bla',
+                ],
+                goal: 3,
+                type: 'RED_POTION',
+                successMessage: 'Gut gemacht! 2',
+                spots: [
+                    {x: 8, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
+                    {x: 5, y: 5, collected: false, name: 'enemy', type: 'SKELETON'},
+                    {x: 6, y: 3, collected: false, name: 'item', type: 'RED_POTION'},
+                ]
+            }, {
+                npc: {x: 3, y: 2},
+                description: [
+                    'Bomben können dir helfen, Feinde zu besiegen.',
+                    '3 BOMBEN',
+                ],
+                goal: 3,
+                type: 'BOMB',
+                successMessage: 'Gut gemacht! 3',
+                spots: [
+                    {x: 8, y: 3, collected: false, name: 'item', type: 'BOMB'},
+                    {x: 5, y: 5, collected: false, name: 'item', type: 'BOMB'},
+                    {x: 6, y: 3, collected: false, name: 'item', type: 'BOMB'},
+                ]
+            }, {
+                npc: {x: 3, y: 2},
+                description: [
+                    'Letzte.',
+                    '4 Fülle dein Leben wieder auf und sammel dabei 3 rote Tränke ein!',
+                ],
+                goal: 3,
+                type: 'RED_POTION',
+                successMessage: 'Gut gemacht! 4',
+                spots: [
+                    {x: 8, y: 3, collected: false, name: 'item', type: 'HEART'},
+                    {x: 5, y: 5, collected: false, name: 'item', type: 'MANA'},
+                    {x: 6, y: 3, collected: false, name: 'item', type: 'HEART'},
+                ]
+            }
+        ]
+    }, {
+        layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             [10, 90, 10, 20, 30, 20, 30, 20, 20, 10],
             [10, 98, 10, 30, 10, 10, 10, 22, 20, 10],
@@ -176,7 +275,7 @@ export const MAPS = [
         name: 'Vorhalle',
         allowedEnemyTypes: [],
         type: 'quest',
-        quest: {
+        quests: [{
             npc: {x: 8, y: 3},
             description: 'Sammle 4 blaue Getränke!',
             goal: 4,
@@ -189,22 +288,7 @@ export const MAPS = [
                 {x: 3, y: 2, collected: false, name: 'potion', type: 'BLUE_POTION'},
                 {x: 5, y: 3, collected: false, name: 'potion', type: 'BLUE_POTION'}
             ]
-        }
-    }, {
-        layout: [
-            [10, 11, 11, 11, 17, 18, 11, 11, 11, 12],
-            [10, 20, 20, 23, 71, 72, 30, 19, 98, 12],
-            [10, 90, 20, 20, 22, 20, 20, 10, 19, 12],
-            [10, 20, 21, 20, 20, 22, 20, 20, 23, 12],
-            [10, 21, 23, 21, 20, 20, 22, 21, 24, 12],
-            [10, 25, 23, 23, 20, 20, 21, 20, 21, 12],
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 12],
-        ],
-        enemiesRequired: 1,
-        name: 'Eingangshalle',
-        type: 'default',
-        allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['BOMB', 'GREEN_POISON']
+        }]
     }, {
         layout: [
             [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],

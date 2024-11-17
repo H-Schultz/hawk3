@@ -68,12 +68,17 @@
     height: `${percentage.value}%`,
     background: `linear-gradient(to top, ${props.colorFrom}, ${props.colorTo})`
   }));
-  const borderGradientStyle = computed(() => ({
-    background: `conic-gradient(
-      ${props.colorTo} ${regenerationProgress.value * 3.6}deg,
-      rgba(255, 255, 255, 1) ${regenerationProgress.value * 3.6}deg
-    )`
-  }));
+  const borderGradientStyle = computed(() => {
+    if (regenerationProgress.value > 0) {
+      return {
+        background: `conic-gradient(
+        ${props.colorTo} ${regenerationProgress.value * 3.6}deg,
+        rgba(0, 0, 0, 1) ${regenerationProgress.value * 3.6}deg
+      )`
+      };
+    }
+    return {};
+  });
 
   watch(() => props.currentValue, (newValue) => {
     value.value = newValue;
@@ -139,14 +144,15 @@
     inset: 0;
     border-radius: 50%;
     background-color: rgba(243, 244, 246, 0.1);
+    border: 4px solid rgba(243, 244, 246, 1);
+    backdrop-filter: blur(2px);
   }
 
   .glass-container {
     position: absolute;
     inset: 4px;
     border-radius: 50%;
-    background-color: rgb(0 0 0);
-    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.1);
   }
 
   .shine-effect {
@@ -154,17 +160,19 @@
     inset: 4px;
     border-radius: 50%;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
-    clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
   }
 
   .liquid-container {
     position: absolute;
-    inset: 4px;
     border-radius: 50%;
     overflow: hidden;
     background-color: rgba(17, 24, 39, 0.1);
-    width: 56px;
-    height: 56px;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    border: 6px solid transparent;
   }
 
   .liquid {
@@ -227,11 +235,16 @@
   }
 
   @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
+    0% {
+      transform: translateY(2px);
+      opacity: 0;
     }
     50% {
-      transform: translateY(-5px);
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-10px);
     }
   }
 </style>

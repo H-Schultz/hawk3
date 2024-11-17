@@ -79,7 +79,7 @@
       }, ANIMATION_SPEED);
     } else if (props.tileObject.status) {
       animationInterval = setInterval(() => {
-        if (!props.tileObject) {
+        if (!props.tileObject || !props.tileObject.status) {
           clearInterval(animationInterval)
           return;
         }
@@ -99,7 +99,6 @@
 
   onUnmounted(() => {
     clearInterval(animationInterval);
-    console.log('Tile destroyed', props.tile);
   });
 </script>
 

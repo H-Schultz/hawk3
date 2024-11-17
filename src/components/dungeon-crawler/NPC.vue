@@ -19,6 +19,10 @@ const props = defineProps({
   direction: {
     type: String,
     default: 'left',
+  },
+  shouldReset: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -51,6 +55,26 @@ const isNearPlayer = computed(() => {
   return near;
 });
 
+watch(() => props.shouldReset, (shouldReset) => {
+  if (shouldReset) {
+    activeQuestIndex.value = 0;
+    currentTextIndex.value = 0;
+    hasShownAllText.value = false;
+    showDialog.value = false;
+    currentQuest.value.completed = false;
+  }
+});
+
+// watch quests
+watch(() => props.quests, (newQuests) => {
+  if (newQuests.length > 0) {
+    activeQuestIndex.value = 0;
+    currentTextIndex.value = 0;
+    hasShownAllText.value = false;
+    showDialog.value = false;
+  }
+});
+
 watch(() => currentTextIndex.value, (newValue) => {
   if (Array.isArray(currentQuest.value?.description) &&
       newValue === currentQuest.value.description.length - 1) {
@@ -73,7 +97,7 @@ watch(shouldStartQuest, (shouldStart) => {
 
 watch(() => currentQuest.value?.completed, (isCompleted) => {
   if (isCompleted) {
-    emit('showStairs', currentQuest.value);
+    emit('showStairs', activeQuestIndex.value);
     if (activeQuestIndex.value < props.quests.length - 1) {
       activeQuestIndex.value++;
       currentTextIndex.value = 0;
@@ -91,15 +115,12 @@ watch(isNearPlayer, (near) => {
 const handleQuestTransition = () => {
   if (currentQuest.value.isReady && isNearPlayer.value) {
     currentQuest.value.completed = true;
-
-    // Warte kurz bevor die nächste Quest startet
-    setTimeout(() => {
-      if (activeQuestIndex.value < props.quests.length - 1) {
-        activeQuestIndex.value++;
-        currentTextIndex.value = 0;
-        hasShownAllText.value = false;
-      }
-    }, 500);
+    if (activeQuestIndex.value < props.quests.length - 1) {
+      activeQuestIndex.value++;
+      currentTextIndex.value = 0;
+      hasShownAllText.value = false;
+      console.log('e', activeQuestIndex.value);
+    }
   }
 };
 

@@ -58,7 +58,7 @@ const questProgress = computed(() => {
         .filter(enemy => enemy.isQuestEnemy && enemy.health <= 0)
         .length;
     current += defeatedQuestEnemies;
-    max += questEnemies.length;
+    // max += questEnemies.length;
   }
 
   return {
