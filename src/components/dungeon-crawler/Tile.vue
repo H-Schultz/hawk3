@@ -1,13 +1,12 @@
 <template>
-  <div class="tile" :style="getTileStyle(tile)">
-    <div class="layer" v-if="props.tileObject?.layer" :style="getTileStyle(props.tileObject.layer)" />
-  </div>
+  <div class="tile" :style="getTileStyle(tile)" />
+  <div v-if="props.tileObject?.layer" class="tile tile--layer" :style="getLayerStyle()" />
 </template>
 
 <script setup>
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
   import { TILES, DISPLAY_SIZE, ANIMATION_SPEED } from './constants.js';
-  import { ref, onUnmounted, watch } from "vue";
+  import { ref, onUnmounted, onMounted } from "vue";
 
   const props = defineProps({
     tile: {
@@ -17,21 +16,15 @@
     tileObject: {
       type: Object,
       required: false
+    },
+    tilePosition: {
+      type: Object,
+      required: false
     }
   });
 
-  const currentFrame = ref(0);
-  let animationInterval;
-
-  watch(
-    () => props.tileObject?.status,
-    (newStatus) => {
-      if (newStatus) {
-        currentFrame.value = 0;
-        startAnimation();
-      }
-    }
-  );
+  const frameCounter = ref(0);
+  let globalAnimationInterval;
 
   const getTileStyle = (tileType) => {
     const position = TILES[tileType];
@@ -39,77 +32,81 @@
 
     let sprite = TILES[tileType];
     let frameX = sprite.x;
+    let zIndex = 100 + props.tilePosition.y;
+    if (position?.zIndex && !props.tileObject?.layer) {
+      zIndex += position.zIndex;
+    }
+
     if (props.tileObject?.status) {
       const maxFrames = TILES[tileType].sprites[props.tileObject.status].length;
-      if (currentFrame.value >= maxFrames) {
-        currentFrame.value = maxFrames - 1;
-        clearInterval(animationInterval);
-      }
-      sprite = TILES[tileType].sprites[props.tileObject.status][currentFrame.value];
+      const frame = Math.min(frameCounter.value, maxFrames - 1);
+      sprite = TILES[tileType].sprites[props.tileObject.status][frame];
       frameX = sprite.x;
     } else if (props.tileObject?.frames) {
-      frameX += currentFrame.value * sprite.frameOffset;
+      frameX += (frameCounter.value % props.tileObject.frames) * sprite.frameOffset;
     }
 
     return {
       width: `${DISPLAY_SIZE}px`,
       height: `${DISPLAY_SIZE}px`,
-      zIndex: position.zIndex,
+      zIndex: zIndex,
       backgroundImage: `url(${dungeonSprite})`,
       backgroundPosition: `-${frameX * 4}px -${sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
     };
   };
 
-  const startAnimation = () => {
-    if (animationInterval) clearInterval(animationInterval);
-    if (!props.tileObject) return;
+  const getLayerStyle = () => {
+    const tileType = props.tileObject.layer;
+    const position = TILES[tileType];
+    if (!position) return {};
 
-    if (props.tileObject.frames) {
-      animationInterval = setInterval(() => {
-        if (!props.tileObject) {
-          clearInterval(animationInterval)
-          return;
-        }
-        if (currentFrame.value < props.tileObject.frames - 1) {
-          currentFrame.value += 1;
-        } else {
-          currentFrame.value = 0;
-        }
-      }, ANIMATION_SPEED);
-    } else if (props.tileObject.status) {
-      animationInterval = setInterval(() => {
-        if (!props.tileObject || !props.tileObject.status) {
-          clearInterval(animationInterval)
-          return;
-        }
-        const maxFrames = TILES[props.tile].sprites[props.tileObject.status].length;
-        if (currentFrame.value < maxFrames - 1) {
-          currentFrame.value += 1;
-        } else {
-          clearInterval(animationInterval);
-        }
-      }, ANIMATION_SPEED);
+    let sprite = TILES[tileType];
+    let frameX = sprite.x;
+    let zIndex = 100 + props.tilePosition.y;
+    if (props.tileObject?.zIndex) {
+      zIndex += props.tileObject.zIndex;
     }
+
+    if (props.tileObject?.status) {
+      const maxFrames = TILES[tileType].sprites[props.tileObject.status].length;
+      const frame = Math.min(frameCounter.value, maxFrames - 1);
+      sprite = TILES[tileType].sprites[props.tileObject.status][frame];
+      frameX = sprite.x;
+    } else if (props.tileObject?.frames) {
+      frameX += (frameCounter.value % props.tileObject.frames) * sprite.frameOffset;
+    }
+
+    return {
+      width: `${DISPLAY_SIZE}px`,
+      height: `${DISPLAY_SIZE}px`,
+      left: `-${DISPLAY_SIZE}px`,
+      marginRight: `-${DISPLAY_SIZE}px`,
+      zIndex: zIndex,
+      backgroundImage: `url(${dungeonSprite})`,
+      backgroundPosition: `-${frameX * 4}px -${sprite.y * 4}px`,
+      backgroundSize: '2048px 2048px',
+    };
   };
 
-  if (props.tileObject) {
-    startAnimation();
-  }
+  onMounted(() => {
+    if (props.tileObject && !globalAnimationInterval) {
+      globalAnimationInterval = setInterval(() => {
+        frameCounter.value++;
+      }, ANIMATION_SPEED);
+    }
+  });
 
   onUnmounted(() => {
-    clearInterval(animationInterval);
+    if (globalAnimationInterval && !document.querySelector('.tile')) {
+      clearInterval(globalAnimationInterval);
+      globalAnimationInterval = null;
+    }
   });
 </script>
 
 <style scoped>
   .tile {
-    width: 64px;
-    height: 64px;
-    image-rendering: pixelated;
-    background-repeat: no-repeat;
-  }
-  .layer {
     width: 64px;
     height: 64px;
     image-rendering: pixelated;

@@ -119,7 +119,6 @@ const handleQuestTransition = () => {
       activeQuestIndex.value++;
       currentTextIndex.value = 0;
       hasShownAllText.value = false;
-      console.log('e', activeQuestIndex.value);
     }
   }
 };
@@ -187,13 +186,14 @@ onUnmounted(() => {
         v-if="index === activeQuestIndex"
         class="npc__wrapper"
         :style="{
-        left: `${quest.npc.x * DISPLAY_SIZE}px`,
-        top: `${quest.npc.y * DISPLAY_SIZE}px`
-      }"
+          left: `${quest.npc.x * DISPLAY_SIZE}px`,
+          top: `${quest.npc.y * DISPLAY_SIZE}px`,
+          zIndex: 100 + quest.npc.y
+        }"
     >
       <div
-          class="npc"
-          :style="playerStyle"
+        class="npc"
+        :style="playerStyle"
       />
       <div v-if="isNearPlayer && showDialog" class="dialog-box">
         <p>{{ currentMessage }}</p>
@@ -223,19 +223,19 @@ onUnmounted(() => {
 
 .npc__wrapper {
   position: absolute;
-  z-index: 200;
+  z-index: 100;
 }
 
 .dialog-box {
   position: absolute;
-  top: -80px;
+  top: -100px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 15px;
   border-radius: 5px;
-  width: 300px;
+  width: 340px;
   z-index: 100;
   display: flex;
   flex-direction: column;

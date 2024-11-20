@@ -53,6 +53,7 @@
       backgroundImage: `url(${dungeonSprite})`,
       backgroundPosition: `-${frameX * 4}px -${sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
+      zIndex: 100 + props.item.position.y,
       left: `${props.item.position.x * DISPLAY_SIZE + (DISPLAY_SIZE - itemType.size.width * 4) / 2}px`,
       top: `${props.item.position.y * DISPLAY_SIZE + (DISPLAY_SIZE - itemType.size.height * 4) / 2}px`,
       width: `${itemType.size.width * 4}px`,

@@ -137,6 +137,31 @@ const loadMap = (mapIndex) => {
     questItems.value = [];
   }
 
+  if (mapData.type === 'boss' && mapData.bossConfig) {
+    const bossConfig = mapData.bossConfig;
+    const bossType = ENEMY_TYPES[bossConfig.name];
+
+    const boss = {
+      id: nextEnemyId++,
+      type: bossConfig.type,
+      name: bossConfig.name,
+      position: {...bossConfig.position},
+      direction: 'left',
+      state: 'idle',
+      frame: 0,
+      health: bossType.maxHealth,
+      maxHealth: bossType.maxHealth,
+      spriteSize: bossType.spriteSize,
+      canAttack: true,
+      isPreparingAttack: false,
+      isUnderAttack: false,
+      moveInterval: null
+    };
+
+    enemies.value = [boss];
+    startEnemyMovement(boss);
+  }
+
   return true;
 };
 
@@ -300,8 +325,7 @@ const isValidMove = (position) => {
 
   if (!dungeonMap.value[y] ||
       dungeonMap.value[y][x] === undefined ||
-      (dungeonMap.value[y][x] >= 10 && dungeonMap.value[y][x] <= 19) ||
-      dungeonMap.value[y][x] === 99) {
+      (dungeonMap.value[y][x] >= 10 && dungeonMap.value[y][x] <= 19)) {
     return false;
   }
 
@@ -527,7 +551,7 @@ const spawnEnemy = () => {
     return;
   }
 
-  if (enemies.value.filter(e => e.health > 0).length >= SPAWN_CONFIG.maxEnemies) {
+  if (enemies.value.filter(e => e.health > 0).length >= currentMap.value.maxEnemies) {
     return;
   }
 
@@ -658,8 +682,7 @@ const isValidEnemyMove = (newPosition, currentEnemy) => {
   // Grundlegende Kartenvalidierung
   if (!dungeonMap.value[y] ||
       dungeonMap.value[y][x] === undefined ||
-      (dungeonMap.value[y][x] >= 10 && dungeonMap.value[y][x] <= 19) ||
-      dungeonMap.value[y][x] === 99) {
+      (dungeonMap.value[y][x] >= 10 && dungeonMap.value[y][x] <= 19)) {
     return false;
   }
 
@@ -867,6 +890,7 @@ const restartGame = () => {
     });
   }
   loadMap(0);
+  startSpawnSystem();
 };
 
 const executeAttack = () => {
@@ -1150,6 +1174,7 @@ watch(() => gameState.value, (newState) => {
                 <Tile
                   v-for="(tile, tileIndex) in row"
                   :key="`${rowIndex}-${tileIndex}`"
+                  :tile-position="{ x: tileIndex, y: rowIndex }"
                   :tile="tile"
                   :tile-object="getTileObjects(tile, rowIndex, tileIndex)"
                 />

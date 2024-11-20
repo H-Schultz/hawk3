@@ -34,6 +34,7 @@
     top: 0;
     transition: transform 0.1s ease, opacity 0.1s ease;
     opacity: 0;
+    z-index: 200;
   }
 
   .player.attacking .sword {
@@ -54,8 +55,11 @@
 
   @keyframes swordChargeWhirlwind {
     0% {
-      opacity: 1;
+      opacity: 0;
       transform: translateY(0) rotate(0deg);
+    }
+    10% {
+      opacity: 1;
     }
     100% {
       opacity: 1;
@@ -75,14 +79,18 @@
   }
 
   @keyframes swordSwing {
+    0% {
+      opacity: 1;
+      transform: rotate(0deg);
+    }
     10% {
       opacity: 1;
-      transform: rotate(-10deg);
+      transform: rotate(-30deg);
     }
     30% {
       transform: rotate(90deg);
     }
-    70% {
+    80% {
       opacity: 1;
       transform: rotate(10deg);
     }

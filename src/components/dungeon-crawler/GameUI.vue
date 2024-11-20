@@ -79,7 +79,7 @@ const questText = computed(() => {
   if (!activeQuest.value?.started) return '';
 
   if (activeQuest.value.isReady && !activeQuest.value.completed) {
-    return `Quest ${activeQuestIndex.value + 1} bereit - Sprich mit dem NPC!`;
+    return `Quest ${activeQuestIndex.value + 1} abgeschlossen - Sprich mit dem Zauberer!`;
   }
 
   return `Quest ${activeQuestIndex.value + 1}: ${questProgress.value.current}/${questProgress.value.max}`;
