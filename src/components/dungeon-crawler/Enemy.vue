@@ -18,7 +18,7 @@
   import {computed, onMounted, ref} from 'vue';
   import HealthBar from './HealthBar.vue';
   import {ANIMATION_SPEED, DISPLAY_SIZE, ENEMY_TYPES} from "./constants.js";
-  import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite.png";
+  import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite-v2.png";
 
   const props = defineProps({
     enemy: {

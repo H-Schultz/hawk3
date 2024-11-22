@@ -1,5 +1,5 @@
 <script setup>
-import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite.png";
+import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite-v2.png";
 import {ITEM_TYPES} from "./constants.js";
 import LiquidIndicator from "./LiquidIndicator.vue";
 import {computed, watch} from 'vue';
@@ -170,6 +170,11 @@ const questProgressStyle = computed(() => {
         backgroundPosition: `-${ITEM_TYPES.BOMB.sprite.x * 4}px -${ITEM_TYPES.BOMB.sprite.y * 4}px`,
       }"/>
       <span class="item-count">{{ props.player.bombs }}</span>
+      <div class="key-icon" :style="{
+        backgroundImage: `url(${dungeonSprite})`,
+        backgroundPosition: `-${ITEM_TYPES.RED_KEY.sprite.x * 4}px -${ITEM_TYPES.RED_KEY.sprite.y * 4}px`,
+      }"/>
+      <span class="item-count">{{ props.player.keys }}</span>
       <div class="coin-icon" :style="{
         backgroundImage: `url(${dungeonSprite})`,
         backgroundPosition: `-${ITEM_TYPES.COIN.sprite.x * 4}px -${ITEM_TYPES.COIN.sprite.y * 4}px`,
@@ -243,6 +248,7 @@ const questProgressStyle = computed(() => {
 }
 
 .bomb-icon,
+.key-icon,
 .coin-icon {
   width: 32px;
   height: 32px;

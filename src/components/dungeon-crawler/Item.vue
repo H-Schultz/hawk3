@@ -1,13 +1,13 @@
 <template>
   <div
-    :class="['item', getType, { collecting: item.collectAnimation, destroying: item.destroyAnimation }]"
+    :class="['item', getType, { floating: item.config.floating, collecting: item.collectAnimation, destroying: item.destroyAnimation }]"
     :style="itemStyle"
   />
 </template>
 
 <script setup>
   import { computed, ref, onMounted, onUnmounted } from 'vue';
-  import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
+  import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite-v2.png';
   import { ITEM_TYPES, DISPLAY_SIZE } from './constants.js';
 
   const props = defineProps({
@@ -42,11 +42,16 @@
 
   const itemStyle = computed(() => {
     const itemType = ITEM_TYPES[props.item.type];
-    const sprite = itemType.sprite;
+    let sprite = itemType.sprite;
     let frameX = sprite.x;
 
     if (itemType.frames > 1) {
       frameX += currentFrame.value * itemType.frameOffset;
+    }
+
+    if (itemType.sprites && props.item.state) {
+      frameX = itemType.sprites[props.item.state][currentFrame.value].x;
+      sprite = itemType.sprites[props.item.state][currentFrame.value];
     }
 
     return {
@@ -69,6 +74,9 @@
     background-repeat: no-repeat;
     transition: margin-top 0.2s ease;
     z-index: 101;
+  }
+
+  .item.floating {
     animation: itemFloat 2s ease-in-out infinite;
   }
 

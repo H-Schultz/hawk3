@@ -49,6 +49,7 @@ const player = ref({
   hasExecutedWhirlwind: false,
   chargeStartTime: null,
   coins: 0,
+  keys: 0,
   bombs: 0,
   gameState
 });
@@ -127,6 +128,7 @@ const loadMap = (mapIndex) => {
   defeatedEnemies.value = 0;
   enemies.value = [];
   droppedItems.value = [];
+  initChestItems();
 
   if (mapData.type === 'quest') {
     activeQuest.value = mapData.quests[0];
@@ -282,6 +284,17 @@ const dropItem = (enemy) => {
   });
 };
 
+const initChestItems = () => {
+  const chestSpots = currentMap.value.chests || [];
+  droppedItems.value = chestSpots.map(spot => ({
+    id: Math.random().toString(36).substr(2, 9),
+    type: spot.type,
+    config: ITEM_TYPES[spot.type],
+    position: {x: spot.x, y: spot.y},
+    state: 'closed',
+  }));
+};
+
 // Funktion zum Einsammeln von Items
 const collectItem = (item) => {
   if (item.dropped) return;
@@ -289,6 +302,8 @@ const collectItem = (item) => {
   setTimeout(() => {
     if (item.type === 'COIN') {
       player.value.coins++;
+    } else if (item.type === 'RED_KEY') {
+      player.value.keys++;
     } else if (item.type === 'HEART') {
       player.value.maxHealth++;
       player.value.health = Math.min(player.value.maxHealth, player.value.health + 1);
@@ -336,6 +351,21 @@ const isValidMove = (position) => {
       enemy.position.y === position.y
   )) {
     return false;
+  }
+
+  if (droppedItems.value.some(item =>
+      item.config.barrier &&
+      item.position.x === position.x &&
+      item.position.y === position.y
+  )) {
+    return false;
+  }
+
+  if (activeQuest.value) {
+    const npc = activeQuest.value.npc;
+    if (npc && npc.x === position.x && npc.y === position.y) {
+      return false;
+    }
   }
 
   return true;
@@ -830,6 +860,8 @@ const movePlayer = (dx, dy) => {
       collectItem(itemAtPosition);
     }
   }
+
+  checkKeyMovement();
 };
 
 const showStairs = () => {
@@ -871,6 +903,7 @@ const restartGame = () => {
   player.value.health = MAX_HEALTH;
   player.value.bombs = 0;
   player.value.coins = 0;
+  player.value.keys = 0;
   player.value.isAttacking = false;
   player.value.isCharging = false;
   player.value.isWhirlwindAttacking = false;
@@ -1074,6 +1107,40 @@ const explodeBomb = (bombId, bombPosition) => {
   droppedItems.value = droppedItems.value.filter(item => item.id !== bombId);
 };
 
+const dropGift = () => {
+  if (!activeQuest.value) return;
+  const positionX = activeQuest.value.npc.x + (activeQuest.value.npc.direction === 'left' ? -1 : 1);
+
+  droppedItems.value.push({
+    id: Math.random().toString(36).substr(2, 9),
+    type: activeQuest.value.gift,
+    config: ITEM_TYPES[activeQuest.value.gift],
+    position: {x: positionX, y: activeQuest.value.npc.y},
+    collectAnimation: false
+  });
+};
+
+const checkKeyMovement = () => {
+  if (player.value.keys <= 0 || gameState.value !== GAME_STATE.PLAYING) return;
+
+  const keyPosition = getAttackPosition();
+  const door = dungeonMap.value[keyPosition.y][keyPosition.x] === 13;
+  if (door) {
+    dungeonMap.value[keyPosition.y][keyPosition.x] = 20;
+    player.value.keys--;
+  }
+
+  const chest = droppedItems.value.find(item =>
+      item.type.includes('CHEST') &&
+      item.position.x === keyPosition.x &&
+      item.position.y === keyPosition.y
+  );
+  if (chest && chest.state === 'closed') {
+    chest.state = 'opened';
+    player.value.keys--;
+  }
+};
+
 const handleManaRegenerated = () => {
   if (player.value.mana < player.value.maxMana) {
     player.value.mana = Math.min(player.value.maxMana, player.value.mana + 1);
@@ -1105,7 +1172,7 @@ const handleKeydown = (e) => {
       break;
     case 'e':
       startCharging();
-      break
+      break;
     case 'f':
       placeBomb();
       break;
@@ -1204,6 +1271,7 @@ watch(() => gameState.value, (newState) => {
                     :should-reset="gameState === GAME_STATE.GAME_OVER"
                     @start-quest="startQuest"
                     @show-stairs="showStairs"
+                    @drop-gift="dropGift"
                 />
                 <Item
                     v-for="item in questItems.filter(item => item.name === 'item')"
@@ -1212,6 +1280,7 @@ watch(() => gameState.value, (newState) => {
                       position: {x: item.x, y: item.y},
                       name: item.name,
                       type: item.type,
+                      config: ITEM_TYPES[item.type],
                       collectAnimation: item.collected
                     }"
                 />

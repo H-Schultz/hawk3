@@ -18,11 +18,12 @@ export const TILES = {
     10: {x: SPRITE_SIZE, y: SPRITE_SIZE, zIndex: 2}, // Mauer Rechts
     11: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE, zIndex: 0}, // Mauer Oben/Unten
     12: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE, zIndex: 0}, // Mauer Links
+    13: {x: 0, y: SPRITE_SIZE * 3, zIndex: 0}, // Mauer mit Schlüsselloch
     14: {x: SPRITE_SIZE * 2, y: 0, zIndex: 1}, // Schmale Mauer Oben
     15: {x: SPRITE_SIZE * 4, y: 0, zIndex: 1}, // Schmale Mauer Oben Verziert
     17: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE, zIndex: 1, frames: 3, frameOffset: SPRITE_SIZE}, // rote Tränke Mitte
     18: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 3, zIndex: 1, frames: 3, frameOffset: SPRITE_SIZE}, // blaue Tränke Mitte
-    19: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 3, zIndex: 1}, // Brüchige zerstöbare Mauer
+    19: {x: 0, y: SPRITE_SIZE * 2, zIndex: 1}, // Brüchige zerstöbare Mauer
     20: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, zIndex: 0}, // Boden blank
     21: {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 5}, // Boden mit wenig Rissen
     22: {x: SPRITE_SIZE * 3, y: SPRITE_SIZE * 4}, // Boden mit wenig Rissen
@@ -72,7 +73,7 @@ export const MAPS = [
             [ 0, 12, 21, 20, 21, 22, 20, 20, 30, 23, 10, 0],
             [ 0, 12, 25, 20, 22, 21, 22, 10, 11, 11, 11, 0],
             [ 0, 12, 20, 40, 41, 40, 20, 19, 20, 20, 10, 0],
-            [ 0, 12, 20, 10, 18, 12, 20, 19, 20, 20, 10, 0],
+            [ 0, 12, 20, 10, 18, 12, 20, 13, 20, 20, 10, 0],
             [ 0, 12, 20, 20, 72, 20, 20, 19, 20, 20, 10, 0],
             [ 0, 12, 40, 40, 40, 40, 40, 19, 40, 40, 10, 0],
             [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
@@ -80,11 +81,14 @@ export const MAPS = [
         name: 'Verlassener Eingang',
         type: 'quest',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION', 'BOMB'],
-        maxEnemies: 2,
+        allowedItems: ['RED_KEY'],
+        maxEnemies: 1,
+        chests: [
+            {x: 5, y: 4, type: 'CHEST_GOLD'}
+        ],
         quests: [
             {
-                npc: {x: 4, y: 2},
+                npc: {x: 4, y: 2, direction: 'right'},
                 description: [
                     'Willkommen mutiger Held!',
                     'Der alte Dungeon wurde von dunklen Mächten überrannt.',
@@ -95,6 +99,7 @@ export const MAPS = [
                 goal: 3,
                 type: 'RED_POTION',
                 successMessage: 'Ausgezeichnet! Du bist bereit für deine Mission.',
+                gift: 'RED_KEY',
                 spots: [
                     {x: 5, y: 5, collected: false, name: 'item', type: 'RED_POTION'},
                     {x: 8, y: 4, collected: false, name: 'item', type: 'RED_POTION'},
@@ -376,13 +381,15 @@ export const ITEM_TYPES = {
         name: 'heart',
         sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 21},
         size: {width: 16, height: 16},
-        frames: 1
+        frames: 1,
+        floating: true,
     },
     MANA: {
         name: 'mana',
         sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 21},
         size: {width: 16, height: 16},
-        frames: 1
+        frames: 1,
+        floating: true,
     },
     COIN: {
         name: 'coin',
@@ -392,18 +399,21 @@ export const ITEM_TYPES = {
         size: {width: 8, height: 9},
         frames: 4,
         frameOffset: SPRITE_SIZE / 2,
+        floating: false,
     },
     RED_POTION: {
         name: 'redPotion',
         sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 22},
         size: {width: 16, height: 16},
-        frames: 1
+        frames: 1,
+        floating: true,
     },
     BLUE_POTION: {
         name: 'bluePotion',
         sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 22},
         size: {width: 16, height: 16},
-        frames: 1
+        frames: 1,
+        floating: true,
     },
     GREEN_POISON: {
         name: 'greenPoison',
@@ -411,13 +421,41 @@ export const ITEM_TYPES = {
         size: {width: 16, height: 16},
         frames: 1,
         damage: 1,
+        floating: false,
         destroyable: true
+    },
+    RED_KEY: {
+        name: 'redKey',
+        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 18},
+        size: {width: 16, height: 16},
+        frames: 1,
+        floating: false,
+        destroyable: false
+    },
+    CHEST_GOLD: {
+        name: 'CHEST_GOLD',
+        sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 25},
+        sprites: {
+            closed: [
+                {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 26},
+            ],
+            opened: [
+                {x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 26},
+            ],
+        },
+        state: 'opened',
+        size: {width: 16, height: 16},
+        frames: 1,
+        destroyable: false,
+        floating: false,
+        barrier: true
     },
     BOMB: {
         name: 'bomb',
         sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 20},
         size: {width: 16, height: 16},
         frames: 1,
+        floating: false,
         destroyable: true
     },
     BOMB_BURN: {
@@ -426,6 +464,7 @@ export const ITEM_TYPES = {
         size: {width: 16, height: 16},
         frames: 2,
         frameOffset: SPRITE_SIZE,
+        floating: false,
         destroyable: true
     }
 };

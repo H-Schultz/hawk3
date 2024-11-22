@@ -14,7 +14,7 @@
 
 <script setup>
   import {computed, onMounted, ref} from 'vue';
-  import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
+  import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite-v2.png';
   import {DISPLAY_SIZE, ANIMATION_SPEED} from './constants.js';
   import Sword from './Sword.vue';
 

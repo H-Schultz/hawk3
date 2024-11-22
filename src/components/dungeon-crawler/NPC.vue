@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onMounted, ref, onUnmounted, watch} from 'vue';
 import {NPC_SPRITES, DISPLAY_SIZE, ANIMATION_SPEED} from './constants.js';
-import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite.png";
+import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite-v2.png";
 
 const props = defineProps({
   quests: {
@@ -16,17 +16,13 @@ const props = defineProps({
     type: String,
     default: 'idle',
   },
-  direction: {
-    type: String,
-    default: 'left',
-  },
   shouldReset: {
     type: Boolean,
     default: false
   }
 });
 
-const emit = defineEmits(['startQuest', 'showStairs']);
+const emit = defineEmits(['startQuest', 'showStairs', 'dropGift']);
 
 const currentTextIndex = ref(0);
 const activeQuestIndex = ref(0);
@@ -98,6 +94,7 @@ watch(shouldStartQuest, (shouldStart) => {
 watch(() => currentQuest.value?.completed, (isCompleted) => {
   if (isCompleted) {
     emit('showStairs', activeQuestIndex.value);
+    emit('dropGift');
     if (activeQuestIndex.value < props.quests.length - 1) {
       activeQuestIndex.value++;
       currentTextIndex.value = 0;
@@ -151,7 +148,7 @@ const playerStyle = computed(() => {
     backgroundImage: `url(${dungeonSprite})`,
     backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,
     backgroundSize: '2048px 2048px',
-    transform: props.direction === 'left' ? 'scaleX(-1)' : 'none',
+    transform: currentQuest.value.npc.direction === 'left' ? 'scaleX(-1)' : 'none',
   };
 });
 

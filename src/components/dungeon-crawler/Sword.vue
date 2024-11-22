@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-  import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite.png';
+  import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite-v2.png';
 
   const props = defineProps({
     player: {
