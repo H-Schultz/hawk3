@@ -43,15 +43,15 @@
   const itemStyle = computed(() => {
     const itemType = ITEM_TYPES[props.item.type];
     let sprite = itemType.sprite;
-    let frameX = sprite.x;
+    let frameX = sprite?.x;
 
     if (itemType.frames > 1) {
       frameX += currentFrame.value * itemType.frameOffset;
     }
 
-    if (itemType.sprites && props.item.state) {
-      frameX = itemType.sprites[props.item.state][currentFrame.value].x;
-      sprite = itemType.sprites[props.item.state][currentFrame.value];
+    if (props.item.state) {
+      frameX = itemType.sprite[props.item.state][currentFrame.value].x;
+      sprite = itemType.sprite[props.item.state][currentFrame.value];
     }
 
     return {

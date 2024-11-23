@@ -144,11 +144,29 @@ const questProgressStyle = computed(() => {
       />
     </div>
     <div class="level-info">
-      <div v-if="props.currentMap?.type === 'default'" class="quest-progress">
-        <span class="quest-text">Enemies: {{ props.defeatedEnemies }}/{{ props.currentMap?.enemiesRequired }}</span>
+      <div v-if="props.currentMap?.type === 'combat'" class="quest-progress">
+        <LiquidIndicator
+            :current-value="props.defeatedEnemies"
+            :max-value="props.currentMap?.enemiesRequired"
+            type="enemies"
+            :color-from="'rgb(147, 51, 234)'"
+            :color-to="'rgb(168, 85, 247)'"
+            :show-value="false"
+            :width="200"
+          />
+        <span class="quest-text">Combat</span>
       </div>
       <div v-else-if="props.currentMap?.type === 'boss'" class="quest-progress">
-        <span class="quest-text">Boss Health: {{ props.enemies[0]?.health }}/{{ props.enemies[0]?.maxHealth }}</span>
+        <LiquidIndicator
+            :current-value="props.enemies[0]?.health"
+            :max-value="props.enemies[0]?.maxHealth"
+            type="boss"
+            :color-from="'rgb(100,40,0)'"
+            :color-to="'rgb(200,80,0)'"
+            :show-value="false"
+            :width="200"
+        />
+        <span class="quest-text">Boss Health</span>
       </div>
       <div v-else-if="showQuestProgress" class="quest-progress" :style="questProgressStyle">
         <LiquidIndicator

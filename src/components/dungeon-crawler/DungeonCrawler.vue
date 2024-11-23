@@ -539,7 +539,7 @@ const despawnDistantEnemies = () => {
   const maxDistance = 8; // Maximum distance before despawning
 
   enemies.value = enemies.value.filter(enemy => {
-    if (enemy.health <= 0) return true; // Keep dead enemies
+    if (enemy.health <= 0 || enemy.isQuestEnemy) return true;
 
     const dx = Math.abs(enemy.position.x - player.value.position.x);
     const dy = Math.abs(enemy.position.y - player.value.position.y);
@@ -733,6 +733,23 @@ const isValidEnemyMove = (newPosition, currentEnemy) => {
       isSamePosition(newPosition, enemy.position)
   )) {
     return false;
+  }
+
+  // keine Kiste
+  if (droppedItems.value.some(item =>
+      item.config.barrier &&
+      item.position.x === x &&
+      item.position.y === y
+  )) {
+    return false;
+  }
+
+  // kein NPC
+  if (activeQuest.value) {
+    const npc = activeQuest.value.npc;
+    if (npc && npc.x === x && npc.y === y) {
+      return false;
+    }
   }
 
   return true;
@@ -1138,6 +1155,61 @@ const checkKeyMovement = () => {
   if (chest && chest.state === 'closed') {
     chest.state = 'opened';
     player.value.keys--;
+    setTimeout(() => {
+      chest.state = 'empty';
+    }, 1000);
+
+    if (chest.type === 'CHEST_GOLD') {
+      const directions = [
+        {dx: -1, dy: -1},
+        {dx: 1, dy: -1},
+        {dx: -1, dy: 1},
+        {dx: 1, dy: 1},
+        {dx: 0, dy: -1},
+        {dx: 0, dy: 1},
+        {dx: -1, dy: 0},
+        {dx: 1, dy: 0}
+      ];
+
+      const maxItems = directions.length;
+      const coins = Math.min(Math.floor(Math.random() * 3) + 1, maxItems);
+      const otherItems = Math.min(Math.floor(Math.random() * 4) + 1, maxItems - coins);
+
+      for (let i = 0; i < coins; i++) {
+        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+        directions.splice(directions.indexOf(randomDirection), 1);
+        const itemPosition = {
+          x: keyPosition.x + randomDirection.dx,
+          y: keyPosition.y + randomDirection.dy
+        };
+
+        droppedItems.value.push({
+          id: Math.random().toString(36).substr(2, 9),
+          type: 'COIN',
+          config: ITEM_TYPES.COIN,
+          position: itemPosition,
+          collectAnimation: false
+        });
+      }
+
+      for (let i = 0; i < otherItems; i++) {
+        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+        directions.splice(directions.indexOf(randomDirection), 1);
+        const itemPosition = {
+          x: keyPosition.x + randomDirection.dx,
+          y: keyPosition.y + randomDirection.dy
+        };
+
+        const randomItem = Math.random() < 0.5 ? 'HEART' : 'MANA';
+        droppedItems.value.push({
+          id: Math.random().toString(36).substr(2, 9),
+          type: randomItem,
+          config: ITEM_TYPES[randomItem],
+          position: itemPosition,
+          collectAnimation: false
+        });
+      }
+    }
   }
 };
 

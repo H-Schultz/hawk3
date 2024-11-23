@@ -64,299 +64,241 @@ export const TILES = {
 };
 export const MAPS = [
     {
+        // Level 1: Quest: Einführung
         layout: [
-            [ 0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 0],
-            [ 0, 12, 11, 11, 11, 17, 11, 11, 11, 11, 11, 0],
-            [ 0, 12, 20, 20, 21, 71, 23, 20, 20, 20, 10, 0],
-            [ 0, 12, 90, 20, 20, 20, 22, 20, 21, 20, 10, 0],
-            [ 0, 12, 98, 22, 20, 20, 20, 20, 20, 21, 10, 0],
-            [ 0, 12, 21, 20, 21, 22, 20, 20, 30, 23, 10, 0],
-            [ 0, 12, 25, 20, 22, 21, 22, 10, 11, 11, 11, 0],
-            [ 0, 12, 20, 40, 41, 40, 20, 19, 20, 20, 10, 0],
-            [ 0, 12, 20, 10, 18, 12, 20, 13, 20, 20, 10, 0],
-            [ 0, 12, 20, 20, 72, 20, 20, 19, 20, 20, 10, 0],
-            [ 0, 12, 40, 40, 40, 40, 40, 19, 40, 40, 10, 0],
-            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
+            [ 0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 0],
+            [ 0, 10, 11, 11, 11, 17, 11, 11, 11, 11, 11, 11, 10, 0],
+            [ 0, 12, 90, 20, 21, 71, 20, 23, 20, 21, 20, 20, 10, 0],
+            [ 0, 12, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
+            [ 0, 12, 20, 30, 20, 19, 20, 20, 19, 20, 30, 98, 10, 0],
+            [ 0, 12, 21, 20, 19, 20, 30, 20, 20, 19, 20, 23, 10, 0],
+            [ 0, 12, 20, 19, 20, 23, 20, 21, 19, 20, 20, 20, 10, 0],
+            [ 0, 12, 20, 20, 20, 20, 20, 20, 20, 20, 40, 40, 10, 0],
+            [ 0, 12, 40, 40, 41, 40, 23, 40, 40, 21, 10, 11, 10, 0],
+            [ 0, 12, 10, 10, 18, 11, 19, 11, 11, 23, 13, 21, 11, 0],
+            [ 0, 12, 22, 20, 72, 20, 19, 20, 11, 11, 11, 20, 10, 0],
+            [ 0, 12, 20, 21, 20, 20, 19, 20, 20, 20, 20, 20, 10, 0],
+            [ 0, 12, 40, 40, 40, 40, 12, 40, 40, 40, 40, 40, 10, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
         ],
-        name: 'Verlassener Eingang',
+        name: 'Düstere Höhle',
         type: 'quest',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['RED_KEY'],
-        maxEnemies: 1,
+        allowedItems: ['RED_KEY', 'BOMB', 'HEART', 'MANA'],
+        maxEnemies: 2,
         chests: [
-            {x: 5, y: 4, type: 'CHEST_GOLD'}
+            { x: 10, y: 6, type: 'CHEST_GOLD' },
+            { x: 4, y: 11, type: 'CHEST_GOLD' }
         ],
         quests: [
             {
-                npc: {x: 4, y: 2, direction: 'right'},
+                npc: {x: 6, y: 2, direction: 'left'},
                 description: [
-                    'Willkommen mutiger Held!',
-                    'Der alte Dungeon wurde von dunklen Mächten überrannt.',
-                    'Wir brauchen deine Hilfe, um das alte Heiligtum zurückzuerobern.',
-                    'Aber sei vorsichtig, mit jedem Level werden die Gegner stärker.',
-                    'Sammle zunächst diese Ausrüstung für deine Reise.'
+                    'Willkommen, tapferer Abenteurer!',
+                    'Diese düstere Höhle birgt viele Geheimnisse und Gefahren.',
+                    'Ich werde dir die Grundlagen des Spiels erklären.',
+                    'Bewege dich mit den Pfeiltasten oder WASD.',
+                    'Drücke E, um anzugreifen. Halte E gedrückt für einen starken Rundumschlag.',
+                    'Drücke F, um Bomben zu legen. Vorsicht, sie können dir auch schaden.',
+                    'Sammle rote Tränke, um deine Gesundheit wiederherzustellen.',
+                    'Sammle blaue Tränke, um dein Mana aufzufüllen.',
+                    'Vermeide Fallen und besiege Feinde, um voranzukommen.',
+                    'Sammle die 6 Gegenstände, um diese Quest abzuschließen.'
                 ],
                 goal: 3,
                 type: 'RED_POTION',
-                successMessage: 'Ausgezeichnet! Du bist bereit für deine Mission.',
                 gift: 'RED_KEY',
+                successMessage: 'Gut gemacht! Du bist bereit für die nächste Herausforderung.',
                 spots: [
-                    {x: 5, y: 5, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 8, y: 4, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 6, y: 3, collected: false, name: 'item', type: 'RED_POTION'}
+                    {x: 3, y: 3, collected: false, name: 'item', type: 'RED_POTION'},
+                    {x: 5, y: 5, collected: false, name: 'item', type: 'HEART'},
+                    {x: 7, y: 6, collected: false, name: 'item', type: 'BOMB'},
+                    {x: 9, y: 7, collected: false, name: 'item', type: 'RED_KEY'},
+                    {x: 7, y: 7, collected: false, name: 'item', type: 'MANA'}
                 ]
             }
         ]
     }, {
+        // Level 2: Quest: Die verlorenen Münzen des alten Königreichs
         layout: [
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10],
-            [12, 90, 20, 21, 20, 20, 23, 20, 21, 20, 22, 20, 20, 10],
-            [12, 20, 30, 20, 19, 20, 20, 19, 20, 30, 20, 19, 20, 10],
-            [12, 21, 20, 19, 20, 30, 20, 20, 19, 20, 19, 20, 23, 10],
-            [12, 20, 19, 20, 23, 20, 21, 19, 20, 20, 20, 30, 20, 10],
-            [12, 23, 20, 30, 20, 20, 20, 20, 30, 19, 20, 20, 98, 10],
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10]
+            [ 0, 14, 14, 14, 14, 15, 14, 14, 15, 14, 14, 14, 14, 14, 15, 14, 14, 14, 0],
+            [ 0, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 12, 0],
+            [ 0, 10, 90, 20, 21, 20, 20, 20, 30, 20, 20, 20, 20, 23, 20, 20, 20, 12, 0],
+            [ 0, 10, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 12, 0],
+            [ 0, 10, 21, 20, 11, 11, 17, 11, 11, 20, 11, 11, 11, 11, 11, 20, 23, 12, 0],
+            [ 0, 10, 20, 20, 11, 20, 71, 21, 11, 30, 11, 25, 20, 20, 19, 20, 20, 12, 0],
+            [ 0, 10, 30, 20, 13, 23, 20, 22, 11, 20, 19, 23, 20, 23, 13, 20, 30, 12, 0],
+            [ 0, 10, 20, 20, 11, 25, 20, 24, 11, 20, 11, 21, 20, 20, 19, 20, 20, 12, 0],
+            [ 0, 10, 23, 20, 11, 11, 11, 11, 11, 30, 11, 11, 11, 11, 11, 20, 21, 12, 0],
+            [ 0, 10, 20, 20, 12, 20, 20, 20, 20, 20, 22, 20, 30, 20, 12, 20, 20, 12, 0],
+            [ 0, 10, 30, 20, 12, 30, 23, 30, 20, 20, 20, 21, 20, 20, 12, 20, 30, 12, 0],
+            [ 0, 10, 20, 20, 12, 20, 20, 20, 20, 98, 20, 20, 30, 20, 12, 20, 20, 12, 0],
+            [ 0, 10, 21, 20, 11, 11, 11, 11, 11, 18, 11, 11, 11, 11, 11, 20, 22, 12, 0],
+            [ 0, 10, 20, 20, 20, 20, 20, 21, 20, 72, 20, 20, 20, 20, 20, 20, 23, 12, 0],
+            [ 0, 10, 25, 20, 19, 23, 20, 20, 30, 20, 20, 20, 20, 19, 20, 21, 24, 12, 0],
+            [ 0, 10, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 12, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
         ],
-        name: 'Goblin Höhlen',
-        type: 'combat',
-        allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION', 'BOMB'],
-        maxEnemies: 4,
-        enemiesRequired: 8
-    },{
-        layout: [
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 10],
-            [12, 90, 20, 21, 30, 20, 21, 20, 20, 10],
-            [12, 20, 19, 20, 20, 19, 20, 19, 20, 10],
-            [12, 21, 20, 30, 20, 20, 30, 20, 21, 10],
-            [12, 20, 19, 20, 21, 19, 20, 19, 20, 10],
-            [12, 22, 20, 30, 20, 20, 30, 20, 22, 10],
-            [12, 20, 19, 20, 19, 19, 20, 19, 20, 10],
-            [12, 21, 20, 21, 20, 20, 21, 98, 23, 10],
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 10]
-        ],
-        name: 'Skelett Krypta',
-        type: 'combat',
-        allowedEnemyTypes: ['SKELETON'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION'],
-        maxEnemies: 5,
-        enemiesRequired: 10
-    },
-    // Level 4: Schatzsuche
-    {
-        layout: [
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10],
-            [12, 90, 20, 19, 20, 21, 20, 19, 20, 20, 20, 10],
-            [12, 20, 19, 20, 19, 20, 19, 20, 19, 20, 23, 10],
-            [12, 21, 20, 30, 20, 30, 20, 30, 20, 19, 20, 10],
-            [12, 20, 19, 20, 19, 20, 19, 20, 19, 20, 21, 10],
-            [12, 23, 20, 30, 20, 30, 20, 30, 20, 19, 20, 10],
-            [12, 20, 19, 20, 19, 20, 19, 20, 19, 20, 98, 10],
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10]
-        ],
-        name: 'Verlorene Schatzkammer',
+        name: 'Die Schatzkammer',
         type: 'quest',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION', 'COIN'],
+        allowedItems: ['RED_KEY', 'BOMB'],
         maxEnemies: 3,
+        chests: [
+            { x: 6, y: 6, type: 'CHEST_GOLD' },
+            { x: 12, y: 6, type: 'CHEST_GOLD' },
+            { x: 6, y: 10, type: 'CHEST_GOLD' }
+        ],
         quests: [
             {
-                npc: {x: 5, y: 3},
+                npc: {x: 5, y: 2, direction: 'left'},
                 description: [
-                    'In dieser Kammer liegen die alten Schätze des Dungeons.',
-                    'Sammle 10 Münzen, aber pass auf die Wächter auf!',
-                    'Die Münzen werden uns helfen, den Dungeon wieder aufzubauen.'
+                    'Ah, ein mutiger Abenteurer! Genau was ich brauche.',
+                    'Diese Katakomben bergen ein dunkles Geheimnis...',
+                    'Vor langer Zeit wurde hier der Königsschatz versteckt,',
+                    'aber Goblins und Skelette haben die goldenen Münzen gestohlen.',
+                    'Die magischen Münzen sind über die ganze Kammer verstreut.',
+                    'Finde alle 10 Münzen, und ich werde dir den Weg zum Endboss zeigen!',
+                    'Aber sei vorsichtig: Die Fallen sind tödlich,',
+                    'und die verschlossenen Türen benötigen spezielle Schlüssel.',
+                    'Die Schatztruhen könnten nützliche Gegenstände enthalten.',
+                    'Möge das Glück mit dir sein, tapferer Held!'
                 ],
                 goal: 10,
                 type: 'COIN',
-                successMessage: 'Hervorragend! Diese Schätze werden uns sehr helfen!',
+                gift: 'RED_KEY',
+                successMessage: 'Unglaublich! Du hast alle Münzen gefunden! Hier ist der Schlüssel zur Bosshalle.',
                 spots: [
-                    {x: 3, y: 2, collected: false, name: 'item', type: 'COIN'},
-                    {x: 5, y: 2, collected: false, name: 'item', type: 'COIN'},
-                    {x: 7, y: 2, collected: false, name: 'item', type: 'COIN'},
-                    {x: 3, y: 4, collected: false, name: 'item', type: 'COIN'},
-                    {x: 5, y: 4, collected: false, name: 'item', type: 'COIN'},
-                    {x: 7, y: 4, collected: false, name: 'item', type: 'COIN'},
-                    {x: 3, y: 6, collected: false, name: 'item', type: 'COIN'},
-                    {x: 5, y: 6, collected: false, name: 'item', type: 'COIN'},
+                    {x: 8, y: 2, collected: false, name: 'item', type: 'COIN'},
+                    {x: 13, y: 2, collected: false, name: 'item', type: 'COIN'},
                     {x: 7, y: 6, collected: false, name: 'item', type: 'COIN'},
-                    {x: 9, y: 4, collected: false, name: 'item', type: 'COIN'},
-                    {x: 4, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
-                    {x: 6, y: 5, collected: false, name: 'enemy', type: 'GOBLIN'}
-                ]
-            }
-        ]
-    },
-    // Level 5: Ork Festung
-    {
-        layout: [
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10],
-            [12, 90, 20, 21, 20, 30, 20, 30, 20, 21, 20, 20, 20, 10],
-            [12, 20, 19, 20, 19, 20, 19, 20, 19, 20, 19, 20, 23, 10],
-            [12, 21, 20, 30, 20, 30, 20, 30, 20, 30, 20, 19, 20, 10],
-            [12, 20, 19, 20, 19, 20, 19, 20, 19, 20, 19, 20, 21, 10],
-            [12, 23, 20, 30, 20, 30, 20, 30, 20, 30, 20, 19, 20, 10],
-            [12, 20, 19, 20, 19, 20, 19, 20, 19, 20, 19, 20, 98, 10],
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10]
-        ],
-        name: 'Ork Festung',
-        type: 'combat',
-        allowedEnemyTypes: ['ORC'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION', 'BOMB'],
-        maxEnemies: 4,
-        enemiesRequired: 6
-    },
-    // Level 6: Fallenhalle
-    {
-        layout: [
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10],
-            [12, 90, 20, 30, 20, 21, 20, 30, 20, 20, 10],
-            [12, 20, 30, 20, 30, 20, 30, 20, 30, 20, 10],
-            [12, 30, 20, 30, 20, 30, 20, 30, 20, 30, 10],
-            [12, 20, 30, 20, 30, 20, 30, 20, 30, 20, 10],
-            [12, 30, 20, 30, 20, 30, 20, 30, 20, 98, 10],
-            [10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10]
-        ],
-        name: 'Fallenhalle',
-        type: 'quest',
-        allowedEnemyTypes: ['SKELETON', 'ORC'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION'],
-        maxEnemies: 2,
-        quests: [
-            {
-                npc: {x: 2, y: 2},
-                description: [
-                    'Diese Halle ist voller tödlicher Fallen!',
-                    'Finde einen sicheren Weg durch die Fallen.',
-                    'Sammle die heiligen Schlüssel, um weiterzukommen.'
-                ],
-                goal: 4,
-                type: 'COIN',
-                successMessage: 'Du hast es geschafft! Der Weg zum Endgegner ist nun frei!',
-                spots: [
-                    {x: 4, y: 2, collected: false, name: 'item', type: 'COIN'},
-                    {x: 7, y: 2, collected: false, name: 'item', type: 'COIN'},
-                    {x: 4, y: 4, collected: false, name: 'item', type: 'COIN'},
-                    {x: 7, y: 4, collected: false, name: 'item', type: 'COIN'}
-                ]
-            }
-        ]
-    },
-    /*
-    {
-        layout: [
-            [ 0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 0],
-            [ 0, 12, 11, 11, 11, 17, 11, 11, 11, 11, 11, 0],
-            [ 0, 12, 20, 20, 21, 71, 23, 20, 20, 20, 10, 0],
-            [ 0, 12, 90, 20, 20, 20, 22, 20, 21, 20, 10, 0],
-            [ 0, 12, 98, 22, 20, 20, 20, 20, 20, 21, 10, 0],
-            [ 0, 12, 21, 20, 21, 22, 20, 20, 30, 23, 10, 0],
-            [ 0, 12, 25, 20, 22, 21, 22, 10, 11, 11, 11, 0],
-            [ 0, 12, 20, 40, 41, 40, 20, 19, 20, 20, 10, 0],
-            [ 0, 12, 20, 10, 18, 12, 20, 19, 20, 20, 10, 0],
-            [ 0, 12, 20, 20, 72, 20, 20, 19, 20, 20, 10, 0],
-            [ 0, 12, 40, 40, 40, 40, 40, 19, 40, 40, 10, 0],
-            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
-            [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0]
-        ],
-        completed: false,
-        name: 'Vorhalle',
-        allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['HEART', 'MANA', 'RED_POTION', 'BLUE_POTION', 'BOMB'],
-        maxEnemies: 0,
-        type: 'quest',
-        quests: [
-            {
-                npc: {x: 4, y: 2},
-                description: [
-                    'Hallo! Ich erkläre dir kurz das Spiel!',
-                    'Du kannst dich mit den Pfeiltasten bewegen.',
-                    'Du kannst mit der Taste E kämpfen. Drückst du die Taste kurz, machst du einen kurzen Schlag.',
-                    'Du trifft nur das Feld vor dir.',
-                    'Drückst du die Taste länger, machst du einen starken rundum Schlag.',
-                    'Du triffst alle Felder um dich herum.',
-                    'Du verlierst dabei aber Mana.',
-                    'Mana kannst du durch blaue Tränke wieder auffüllen.',
-                    'Aber alle 10 Sekunden füllt sich dein Mana automatisch um ein Mana auf.',
-                    'Versuche es einmal und sammel dabei 3 blauen Tränke ein!',
-                ],
-                goal: 3,
-                type: 'BLUE_POTION',
-                successMessage: 'Gut gemacht!',
-                spots: [
-                    {x: 5, y: 5, collected: false, name: 'item', type: 'BLUE_POTION'},
-                    {x: 6, y: 3, collected: false, name: 'item', type: 'BLUE_POTION'},
-                    {x: 8, y: 4, collected: false, name: 'item', type: 'BLUE_POTION'},
-                ]
-            }, {
-                npc: {x: 4, y: 2},
-                description: [
-                    'Feinde können dir auch Schaden zufügen.',
-                    'Du kannst Leben durch rote Tränke wieder auffüllen.',
-                    'Töte die Feind und ...',
-                    'Sammel 3 rote Tränke ein!',
-                ],
-                goal: 5,
-                type: 'RED_POTION',
-                successMessage: 'Gut gemacht!',
-                spots: [
-                    {x: 8, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
-                    {x: 5, y: 5, collected: false, name: 'enemy', type: 'SKELETON'},
-                    {x: 6, y: 3, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 7, y: 2, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 6, y: 4, collected: false, name: 'item', type: 'RED_POTION'},
-                ]
-            }, {
-                npc: {x: 4, y: 2},
-                description: [
-                    'Bomben können dir helfen, Feinde zu besiegen.',
-                    'Aber du kannst auch brüchige Mauern damit zerstören.',
-                    'Legst du eine Bombe, kannst du davon auch Schaden bekommen.',
-                    'Bombem kannst du aber auch zerstörem wenn du auf sie schlägst.',
-                    'Sammel 3 Bomben'
-                ],
-                goal: 3,
-                type: 'BOMB',
-                successMessage: 'Gut gemacht!',
-                spots: [
-                    {x: 8, y: 3, collected: false, name: 'item', type: 'BOMB'},
-                    {x: 5, y: 5, collected: false, name: 'item', type: 'BOMB'},
-                    {x: 6, y: 3, collected: false, name: 'item', type: 'BOMB'},
-                ]
-            }, {
-                npc: {x: 4, y: 2},
-                description: [
-                    'Achtung es gibt auch Fallen!',
-                    'Diese können dir Schaden zufügen.',
-                    'Es gibt auch Items die du nicht einsammel solltest.',
-                    'Du kannst sie aber auch zerstören.',
-                    'Teste beides einmal',
-                    'Sammel 3 Tränke ein!',
-                ],
-                goal: 3,
-                type: 'GREEN_POISON',
-                successMessage: 'Gut gemacht! Die Treppe ist jetzt frei!',
-                spots: [
-                    {x: 8, y: 3, collected: false, name: 'item', type: 'GREEN_POISON'},
-                    {x: 5, y: 5, collected: false, name: 'item', type: 'GREEN_POISON'},
-                    {x: 6, y: 3, collected: false, name: 'item', type: 'GREEN_POISON'},
-                    {x: 9, y: 3, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 6, y: 5, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 7, y: 3, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 3, y: 4, collected: false, name: 'item', type: 'RED_POTION'},
-                    {x: 4, y: 4, collected: false, name: 'item', type: 'RED_POTION'},
+                    {x: 13, y: 6, collected: false, name: 'item', type: 'COIN'},
+                    {x: 3, y: 9, collected: false, name: 'item', type: 'COIN'},
+                    {x: 8, y: 9, collected: false, name: 'item', type: 'COIN'},
+                    {x: 13, y: 9, collected: false, name: 'item', type: 'COIN'},
+                    {x: 5, y: 14, collected: false, name: 'item', type: 'COIN'},
+                    {x: 8, y: 14, collected: false, name: 'item', type: 'COIN'},
+                    {x: 12, y: 14, collected: false, name: 'item', type: 'COIN'}
                 ]
             }
         ]
     }, {
         layout: [
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            [10, 90, 30, 21, 22, 20, 30, 20, 20, 10],
-            [10, 30, 22, 20, 23, 30, 10, 10, 20, 10],
-            [10, 20, 10, 30, 20, 23, 10, 20, 20, 10],
-            [10, 20, 30, 23, 30, 20, 30, 20, 10, 10],
-            [10, 23, 20, 20, 22, 30, 10, 22, 98, 10],
-            [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+            [ 0, 15, 14, 15, 14, 15, 14, 15, 14, 15, 14, 15, 0],
+            [ 0, 11, 11, 17, 11, 11, 11, 11, 11, 17, 11, 11, 0],
+            [ 0, 12, 90, 71, 21, 21, 20, 21, 20, 71, 20, 10, 0],
+            [ 0, 12, 20, 30, 20, 20, 20, 20, 21, 30, 20, 10, 0],
+            [ 0, 12, 21, 20, 20, 30, 23, 30, 20, 21, 21, 10, 0],
+            [ 0, 12, 20, 20, 30, 19, 20, 19, 30, 20, 23, 10, 0],
+            [ 0, 12, 23, 20, 20, 20, 30, 20, 20, 20, 98, 10, 0],
+            [ 0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
+        ],
+        enemiesRequired: 20,
+        name: 'Kriegerhalle',
+        type: 'combat',
+        allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC'],
+        allowedItems: ['BOMB', 'COIN', 'MANA', 'HEART'],
+        maxEnemies: 7
+    }, {
+        layout: [
+            [ 0, 15, 14, 15, 14, 15, 14, 15, 14, 15, 14, 15, 0],
+            [ 0, 11, 11, 17, 11, 11, 11, 11, 11, 17, 11, 11, 0],
+            [ 0, 12, 90, 71, 21, 21, 20, 21, 20, 71, 20, 10, 0],
+            [ 0, 12, 20, 30, 20, 20, 20, 20, 21, 30, 20, 10, 0],
+            [ 0, 12, 21, 20, 20, 30, 23, 30, 20, 21, 21, 10, 0],
+            [ 0, 12, 20, 20, 30, 19, 20, 19, 30, 20, 23, 10, 0],
+            [ 0, 12, 23, 20, 20, 20, 30, 20, 20, 20, 98, 10, 0],
+            [ 0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
+        ],
+        enemiesRequired: 1,
+        name: 'Kriegerhalle',
+        type: 'boss',
+        allowedItems: ['RED_KEY'],
+        chests: [
+            { x: 6, y: 3, type: 'CHEST_GOLD' },
+        ],
+        bossConfig: {
+            type: 'boss',
+            name: 'BOSS',
+            position: {x: 6, y: 6},
+        }
+    }, {
+        // Level 3: Die Prüfung des Kriegers
+        layout: [
+            [ 0, 14, 14, 14, 14, 15, 14, 14, 15, 14, 14, 14, 14, 14, 15, 14, 14, 14, 0],
+            [ 0, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 12, 0],
+            [ 0, 10, 20, 20, 21, 20, 20, 20, 30, 20, 20, 20, 20, 23, 20, 20, 90, 12, 0],
+            [ 0, 10, 40, 40, 40, 40, 41, 40, 40, 20, 40, 40, 41, 40, 40, 30, 20, 12, 0],
+            [ 0, 10, 11, 11, 11, 11, 18, 11, 11, 20, 11, 11, 17, 11, 11, 21, 22, 12, 0],
+            [ 0, 10, 20, 20, 20, 20, 72, 20, 11, 30, 11, 20, 71, 20, 19, 20, 20, 12, 0],
+            [ 0, 10, 30, 20, 11, 23, 20, 22, 11, 20, 11, 23, 20, 23, 13, 20, 30, 12, 0],
+            [ 0, 10, 20, 20, 11, 25, 20, 24, 11, 20, 11, 21, 20, 20, 19, 20, 20, 12, 0],
+            [ 0, 10, 23, 11, 11, 11, 11, 11, 11, 30, 11, 11, 11, 11, 11, 23, 24, 12, 0],
+            [ 0, 10, 20, 21, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 12, 0],
+            [ 0, 10, 30, 11, 11, 11, 11, 11, 20, 98, 11, 11, 11, 11, 11, 20, 30, 12, 0],
+            [ 0, 10, 20, 20, 30, 20, 23, 11, 20, 20, 11, 22, 20, 24, 11, 20, 20, 12, 0],
+            [ 0, 10, 21, 13, 20, 20, 20, 11, 20, 20, 11, 21, 20, 20, 11, 20, 22, 12, 0],
+            [ 0, 10, 20, 11, 21, 20, 30, 13, 20, 20, 23, 20, 20, 20, 13, 20, 23, 12, 0],
+            [ 0, 10, 25, 11, 11, 11, 11, 11, 11, 19, 11, 11, 11, 11, 11, 20, 24, 12, 0],
+            [ 0, 10, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 12, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
+        ],
+        name: 'Die Kriegerkammer',
+        type: 'quest',
+        allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC'],
+        allowedItems: ['RED_KEY', 'BOMB', 'GREEN_POISON', 'RED_POTION', 'BLUE_POTION'],
+        maxEnemies: 5,
+        chests: [
+            { x: 6, y: 6, type: 'CHEST_GOLD' },
+            { x: 12, y: 6, type: 'CHEST_GOLD' },
+            { x: 5, y: 12, type: 'CHEST_GOLD' },
+            { x: 12, y: 12, type: 'CHEST_GOLD' }
+        ],
+        quests: [
+            {
+                npc: {x: 14, y: 2, direction: 'right'},
+                description: [
+                    'Halt, Krieger! Du suchst also den Weg zum Endboss?',
+                    'Aber bist du auch würdig genug für diese Herausforderung?',
+                    'In dieser Kammer warten acht mächtige Gegner auf dich.',
+                    'Zwei Skelettkrieger, die seit Jahrhunderten hier wachen,',
+                    'drei gerissene Goblins, die ihre Opfer hinterrücks angreifen,',
+                    'und drei brutale Orks, die alles zermalmen, was sich ihnen in den Weg stellt.',
+                    'Bezwinge sie alle, und ich werde dich als würdig erachten.',
+                    'Die Schatztruhen enthalten Tränke - du wirst sie brauchen.',
+                    'Und vergiss nicht: Die verschlossenen Türen können nur',
+                    'mit dem richtigen Schlüssel geöffnet werden.',
+                    'Zeige mir, dass du ein wahrer Held bist!'
+                ],
+                goal: 8,
+                type: 'ENEMY',
+                gift: 'RED_KEY',
+                successMessage: 'Beeindruckend! Du bist wahrlich ein Meister des Kampfes! Hier ist der Schlüssel zur Bosshalle.',
+                spots: [
+                    {x: 8, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
+                    {x: 13, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
+                    {x: 3, y: 6, collected: false, name: 'enemy', type: 'GOBLIN'},
+                    {x: 8, y: 6, collected: false, name: 'enemy', type: 'ORC'},
+                    {x: 13, y: 6, collected: false, name: 'enemy', type: 'GOBLIN'},
+                    {x: 8, y: 11, collected: false, name: 'enemy', type: 'ORC'},
+                    {x: 3, y: 13, collected: false, name: 'enemy', type: 'GOBLIN'},
+                    {x: 13, y: 13, collected: false, name: 'enemy', type: 'ORC'}
+                ]
+            }
+        ]
+    }, {
+        layout: [
+            [ 0, 15, 14, 15, 14, 15, 14, 15, 14, 15, 14, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
+            [ 0, 12, 90, 30, 21, 22, 20, 30, 20, 20, 10, 0],
+            [ 0, 12, 30, 22, 20, 23, 30, 11, 19, 20, 10, 0],
+            [ 0, 12, 20, 19, 30, 20, 23, 19, 20, 20, 10, 0],
+            [ 0, 12, 20, 30, 23, 30, 20, 30, 20, 10, 11, 0],
+            [ 0, 12, 23, 20, 20, 22, 30, 11, 22, 98, 10, 0],
+            [ 0, 12, 40, 40, 40, 40, 40, 19, 40, 40, 11, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
         ],
         enemiesRequired: 1,
         name: 'Bosshalle',
@@ -368,8 +310,6 @@ export const MAPS = [
             position: {x: 5, y: 3},
         }
     }
-
-     */
 ];
 
 export const LEVEL_CONFIG = {
@@ -434,13 +374,32 @@ export const ITEM_TYPES = {
     },
     CHEST_GOLD: {
         name: 'CHEST_GOLD',
-        sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 25},
-        sprites: {
+        sprite: {
             closed: [
                 {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 26},
             ],
             opened: [
                 {x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 26},
+            ],
+            empty: [
+                {x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 25},
+            ],
+        },
+        state: 'closed',
+        size: {width: 16, height: 16},
+        frames: 1,
+        destroyable: false,
+        floating: false,
+        barrier: true
+    },
+    CHEST_EMPTY: {
+        name: 'CHEST_EMPTY',
+        sprite: {
+            closed: [
+                {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 25},
+            ],
+            opened: [
+                {x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 25},
             ],
         },
         state: 'opened',
@@ -476,7 +435,7 @@ export const ENEMY_TYPES = {
         maxHealth: 3,
         damage: 1,
         intelligence: 0.2,
-        dropChance: 0.5,
+        dropChance: 0.9,
         moveSpeed: 2000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
@@ -506,7 +465,7 @@ export const ENEMY_TYPES = {
         maxHealth: 2,
         damage: 1,
         intelligence: 0.5,
-        dropChance: 0.99,
+        dropChance: 0.6,
         moveSpeed: 1000,
         spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
         sprites: {
