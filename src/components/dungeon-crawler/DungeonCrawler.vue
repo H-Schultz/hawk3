@@ -137,6 +137,8 @@ const loadMap = (mapIndex) => {
     activeQuest.value.count = 0;
     activeQuest.value.isReady = false;
     questItems.value = [];
+  } else {
+    activeQuest.value = null;
   }
 
   if (mapData.type === 'boss' && mapData.bossConfig) {
@@ -904,43 +906,31 @@ const showStairs = () => {
 };
 
 const startNextLevel = () => {
-  const nextMapIndex = currentMapIndex.value + 1;
+  const gameContainer = document.querySelector('.game-container');
+  gameContainer.classList.add('flip-out');
 
-  if (nextMapIndex < MAPS.length) {
-    if (loadMap(nextMapIndex)) {
-      player.value.health = Math.min(MAX_HEALTH, player.value.health + LEVEL_CONFIG.healthBonus);
+  setTimeout(() => {
+    const nextMapIndex = currentMapIndex.value + 1;
+
+    if (nextMapIndex < MAPS.length) {
+      if (loadMap(nextMapIndex)) {
+        player.value.health = Math.min(MAX_HEALTH, player.value.health + LEVEL_CONFIG.healthBonus);
+      }
+    } else {
+      gameState.value = GAME_STATE.VICTORY;
     }
-  } else {
-    gameState.value = GAME_STATE.VICTORY;
-  }
+
+    setTimeout(() => {
+      gameContainer.classList.remove('flip-out');
+      gameContainer.classList.add('flip-in');
+
+      gameContainer.classList.remove('flip-in');
+    }, 300);
+  }, 300);
 };
 
 const restartGame = () => {
-  gameState.value = GAME_STATE.PLAYING;
-  player.value.health = MAX_HEALTH;
-  player.value.bombs = 0;
-  player.value.coins = 0;
-  player.value.keys = 0;
-  player.value.isAttacking = false;
-  player.value.isCharging = false;
-  player.value.isWhirlwindAttacking = false;
-  player.value.isUnderAttack = false;
-  player.value.hasExecutedWhirlwind = false;
-  player.value.chargeStartTime = null;
-  player.value.mana = MAX_MANA;
-  player.value.maxMana = MAX_MANA;
-  player.value.maxHealth = MAX_HEALTH;
-
-  if (currentMap.value?.quests) {
-    currentMap.value.quests.forEach(quest => {
-      quest.started = false;
-      quest.completed = false;
-      quest.count = 0;
-      quest.isReady = false;
-    });
-  }
-  loadMap(0);
-  startSpawnSystem();
+  location.reload();
 };
 
 const executeAttack = () => {
@@ -1338,6 +1328,7 @@ watch(() => gameState.value, (newState) => {
                   v-if="currentMap.type === 'quest'"
               >
                 <NPC
+                    v-if="activeQuest"
                     :quests="currentMap.quests"
                     :player="player"
                     :should-reset="gameState === GAME_STATE.GAME_OVER"
@@ -1378,6 +1369,7 @@ watch(() => gameState.value, (newState) => {
   .game-container {
     position: relative;
     overflow: hidden;
+    transition: opacity 0.3s;
   }
 
   .dungeon-container {
@@ -1392,5 +1384,13 @@ watch(() => gameState.value, (newState) => {
 
   .map-row {
     display: flex;
+  }
+
+  .flip-out {
+    opacity: 0;
+  }
+
+  .flip-in {
+    opacity: 1;
   }
 </style>
