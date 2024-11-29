@@ -5,6 +5,7 @@
       'attacking': player.isAttacking,
       'charging': player.isCharging,
       'whirlwindAttacking': player.isWhirlwindAttacking,
+      'player--choose': gameState === GAME_STATE.CHOOSE,
     }"
     :style="playerStyle"
   >
@@ -15,12 +16,16 @@
 <script setup>
   import {computed, onMounted, ref} from 'vue';
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite-v2.png';
-  import {DISPLAY_SIZE, ANIMATION_SPEED} from './constants.js';
+  import {DISPLAY_SIZE, ANIMATION_SPEED, GAME_STATE} from './constants.js';
   import Sword from './Sword.vue';
 
   const props = defineProps({
     player: {
       type: Object,
+      required: true
+    },
+    gameState: {
+      type: String,
       required: true
     }
   });

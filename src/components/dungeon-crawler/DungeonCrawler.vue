@@ -860,8 +860,8 @@ const movePlayer = (dx, dy) => {
       if (questItem) {
         questItem.collected = true;
         collectItem(questItem);
-        checkQuestProgress();
       }
+      checkQuestProgress();
     }
 
     if (dungeonMap.value[newPosition.y][newPosition.x] === 98) {
@@ -1203,6 +1203,24 @@ const checkKeyMovement = () => {
   }
 };
 
+const changeCharacter = (data) => {
+  if (data.character && PLAYER_CONFIG[data.character]) {
+    gameState.value = GAME_STATE.CHOOSE;
+    player.value.character = PLAYER_CONFIG[data.character];
+  } else if (data.weapon && WEAPON_CONFIG[data.weapon]) {
+    gameState.value = GAME_STATE.CHOOSE;
+    player.value.weapon = WEAPON_CONFIG[data.weapon];
+  }
+};
+
+const changeMoving = (data) => {
+  if (data.stopMoving) {
+    gameState.value = GAME_STATE.CHOOSE;
+  } else {
+    gameState.value = GAME_STATE.PLAYING;
+  }
+};
+
 const handleManaRegenerated = () => {
   if (player.value.mana < player.value.maxMana) {
     player.value.mana = Math.min(player.value.maxMana, player.value.mana + 1);
@@ -1212,6 +1230,10 @@ const handleManaRegenerated = () => {
 const handleKeydown = (e) => {
   if ((gameState.value === GAME_STATE.GAME_OVER || gameState.value === GAME_STATE.VICTORY) && e.key === 'r') {
     restartGame();
+    return;
+  }
+
+  if (gameState.value === GAME_STATE.CHOOSE) {
     return;
   }
 
@@ -1310,6 +1332,7 @@ watch(() => gameState.value, (newState) => {
               </div>
               <Player
                   :player="player"
+                  :game-state="gameState"
               />
               <Enemy
                   v-for="enemy in enemies"
@@ -1335,6 +1358,8 @@ watch(() => gameState.value, (newState) => {
                     @start-quest="startQuest"
                     @show-stairs="showStairs"
                     @drop-gift="dropGift"
+                    @change-character="changeCharacter"
+                    @change-moving="changeMoving"
                 />
                 <Item
                     v-for="item in questItems.filter(item => item.name === 'item')"

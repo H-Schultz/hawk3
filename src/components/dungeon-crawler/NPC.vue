@@ -1,6 +1,6 @@
 <script setup>
-import {computed, onMounted, ref, onUnmounted, watch} from 'vue';
-import {NPC_SPRITES, DISPLAY_SIZE, ANIMATION_SPEED} from './constants.js';
+import { computed, onMounted, ref, onUnmounted, watch } from 'vue';
+import { NPC_SPRITES, DISPLAY_SIZE, ANIMATION_SPEED } from './constants.js';
 import dungeonSprite from "../../assets/dungeon-crawler/dungeon-sprite-v2.png";
 
 const props = defineProps({
@@ -22,12 +22,13 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['startQuest', 'showStairs', 'dropGift']);
+const emit = defineEmits(['startQuest', 'showStairs', 'dropGift', 'changeMoving', 'changeCharacter']);
 
 const currentTextIndex = ref(0);
 const activeQuestIndex = ref(0);
 const showDialog = ref(false);
 const hasShownAllText = ref(false);
+const selectedCharacterIndex = ref(0);
 
 const currentQuest = computed(() => props.quests[activeQuestIndex.value]);
 
@@ -109,6 +110,10 @@ watch(isNearPlayer, (near) => {
   }
 });
 
+const checkChangeMoving = () => {
+  emit('changeMoving', { quest: currentQuest, stopMoving: showDialog.value && (currentMessage.value === 'chooseCharacter' || currentMessage.value === 'chooseWeapon') });
+};
+
 const handleQuestTransition = () => {
   if (currentQuest.value.isReady && isNearPlayer.value) {
     currentQuest.value.completed = true;
@@ -117,6 +122,17 @@ const handleQuestTransition = () => {
       currentTextIndex.value = 0;
       hasShownAllText.value = false;
     }
+  }
+};
+
+const weapons = ['SWORD', 'MACE', 'AXE', 'SPEAR'];
+const characters = ['DINO', 'KNIGHT', 'HUNTER_MAN', 'HUNTER_WOMAN'];
+const changeCharacter = (index) => {
+  selectedCharacterIndex.value = index;
+  if (currentMessage.value === 'chooseCharacter') {
+    emit('changeCharacter', { quest: currentQuest, character: characters[index] });
+  } else if (currentMessage.value === 'chooseWeapon') {
+    emit('changeCharacter', { quest: currentQuest, weapon: weapons[index] });
   }
 };
 
@@ -155,6 +171,18 @@ const playerStyle = computed(() => {
 const handleKeyPress = (event) => {
   if (event.code === 'Space' && isNearPlayer.value && hasMoreText.value) {
     currentTextIndex.value++;
+    checkChangeMoving();
+  } else if (showDialog.value && (currentMessage.value === 'chooseCharacter' || currentMessage.value === 'chooseWeapon')) {
+    checkChangeMoving();
+    const length = currentMessage.value === 'chooseCharacter' ? characters.length : weapons.length;
+    console.log('length', length);
+    if (event.code === 'ArrowUp') {
+      selectedCharacterIndex.value = (selectedCharacterIndex.value - 1 + length) % length;
+      changeCharacter(selectedCharacterIndex.value);
+    } else if (event.code === 'ArrowDown') {
+      selectedCharacterIndex.value = (selectedCharacterIndex.value + 1) % length;
+      changeCharacter(selectedCharacterIndex.value);
+    }
   }
 };
 
@@ -193,7 +221,37 @@ onUnmounted(() => {
         :style="playerStyle"
       />
       <div v-if="isNearPlayer && showDialog" class="dialog-box">
-        <p>{{ currentMessage }}</p>
+        <div v-if="currentMessage === 'chooseCharacter'" class="character-selection">
+          <div class="character-selection">
+            <h3>Wähle deinen Charakter:</h3>
+            <ul>
+              <li
+                v-for="(character, index) in characters"
+                :key="character"
+                :class="{ selected: index === selectedCharacterIndex }"
+              >
+                {{ character }}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div v-else-if="currentMessage === 'chooseWeapon'" class="character-selection">
+          <div class="character-selection">
+            <h3>Wähle deine Waffe:</h3>
+            <ul>
+              <li
+                v-for="(weapon, index) in weapons"
+                :key="weapon"
+                :class="{ selected: index === selectedCharacterIndex }"
+              >
+                {{ weapon }}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div v-else>
+          <p>{{ currentMessage }}</p>
+        </div>
         <span v-if="hasMoreText" class="continue-hint">
           [Leertaste] für weiter...
         </span>
@@ -243,5 +301,26 @@ onUnmounted(() => {
   font-size: 0.8em;
   color: #aaa;
   text-align: right;
+}
+
+.character-selection {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.character-selection li {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  display: none;
+}
+
+.character-selection li.selected {
+  background: #666;
+  display: block;
 }
 </style>

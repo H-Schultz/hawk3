@@ -37,6 +37,11 @@
     z-index: 200;
   }
 
+  .player--choose .sword {
+    opacity: 1;
+    transform: translate(-50px, 40px) !important;
+  }
+
   .player.attacking .sword {
     animation: swordSwing 0.4s ease-in-out;
   }

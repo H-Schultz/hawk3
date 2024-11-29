@@ -1,4 +1,5 @@
 export const GAME_STATE = {
+    CHOOSE: 'choose',
     PLAYING: 'playing',
     GAME_OVER: 'game_over',
     LEVEL_COMPLETE: 'level_complete',
@@ -64,6 +65,41 @@ export const TILES = {
 };
 export const MAPS = [
     {
+        // Level 0: Choose character and weapon
+        layout: [
+            [ 0, 14, 14, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 0],
+            [ 0, 10, 11, 11, 11, 11, 11, 17, 11, 11, 11, 11, 10, 0],
+            [ 0, 12, 21, 20, 21, 22, 20, 71, 20, 21, 20, 20, 10, 0],
+            [ 0, 12, 90, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
+            [ 0, 12, 21, 20, 20, 20, 22, 20, 20, 20, 20, 23, 10, 0],
+            [ 0, 12, 98, 20, 20, 23, 20, 21, 20, 20, 20, 20, 10, 0],
+            [ 0, 12, 23, 20, 20, 20, 20, 20, 20, 20, 21, 24, 10, 0],
+            [ 0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
+            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
+        ],
+        name: 'Düstere Höhle',
+        type: 'quest',
+        allowedEnemyTypes: [],
+        allowedItems: [],
+        maxEnemies: 0,
+        quests: [
+            {
+                npc: {x: 5, y: 2, direction: 'left'},
+                chooseCharacter: true,
+                description: [
+                    'Willkommen, tapferer Abenteurer!',
+                    'chooseCharacter',
+                    'chooseWeapon',
+                    'Wähle dein Charakter und deine Waffe.'
+                ],
+                goal: 0,
+                type: 'RED_POTION',
+                gift: 'RED_KEY',
+                successMessage: 'Gut gemacht! Du bist bereit für die nächste Herausforderung.',
+                spots: []
+            }
+        ]
+    }, {
         // Level 1: Quest: Einführung
         layout: [
             [ 0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 0],
@@ -698,6 +734,12 @@ export const WEAPON_CONFIG = {
             x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 4
         },
         size: {width: 16, height: 32},
-    }
-
+    },
+    SPEAR: {
+        damage: 2,
+        sprite: {
+            x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 10
+        },
+        size: {width: 16, height: 32},
+    },
 }

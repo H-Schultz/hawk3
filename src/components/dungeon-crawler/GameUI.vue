@@ -149,8 +149,8 @@ const questProgressStyle = computed(() => {
             :current-value="props.defeatedEnemies"
             :max-value="props.currentMap?.enemiesRequired"
             type="enemies"
-            :color-from="'rgb(147, 51, 234)'"
-            :color-to="'rgb(168, 85, 247)'"
+            :color-from="'rgb(100,40,0)'"
+            :color-to="'rgb(200,80,0)'"
             :show-value="false"
             :width="200"
           />
