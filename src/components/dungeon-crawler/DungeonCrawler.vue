@@ -111,6 +111,11 @@ const loadMap = (mapIndex) => {
   currentMapIndex.value = mapIndex;
   currentMap.value = mapData;
   dungeonMap.value = processedLayout;
+  traps.value.forEach(trap => {
+    if (trap.timerId) {
+      clearTimeout(trap.timerId);
+    }
+  });
   traps.value = [];
 
   for (let y = 0; y < layout.length; y++) {
@@ -119,9 +124,13 @@ const loadMap = (mapIndex) => {
         startPos = {x, y};
       }
       if (layout[y][x] === 30) {
-        initializeTrap(x, y);
+        traps.value.push({x, y, status: 'active'});
       }
     }
+  }
+
+  if (traps.value.length > 0) {
+    initializeTraps();
   }
 
   player.value.position = startPos;
@@ -167,6 +176,34 @@ const loadMap = (mapIndex) => {
   }
 
   return true;
+};
+
+const initializeTraps = () => {
+  traps.value.forEach(trap => {
+    initializeTrap(trap.x, trap.y);
+  });
+};
+
+const initializeTrap = (x, y) => {
+  const toggleTrapStatus = () => {
+    const trap = traps.value.find(trap => trap.x === x && trap.y === y);
+    if (!trap) return;
+    trap.status = trap.status === 'active' ? 'idle' : 'active';
+    if (trap.status === 'active' && player.value.position.x === x && player.value.position.y === y) {
+
+      console.log('active Trap', trap, x, y, trap.timerId);
+      checkTrapDamage(player.value.position);
+    }
+    trap.timerId = setTimeout(
+        toggleTrapStatus,
+        trap.status === 'active' ? TILES[30].trap.activeTime : TILES[30].trap.activationInterval
+    );
+  };
+  const trap = traps.value.find(trap => trap.x === x && trap.y === y);
+  if (trap) {
+    console.log('Init Trap', trap, x, y, trap.timerId);
+    trap.timerId = setTimeout(toggleTrapStatus, TILES[30].trap.activeTime);
+  }
 };
 
 const startQuest = (quest) => {
@@ -958,34 +995,6 @@ const getTileObjects = (tile, rowIndex, tileIndex) => {
     return TILES[tile];
   }
   return null;
-};
-
-const initializeTrap = (x, y) => {
-  traps.value.push({x, y, status: 'active'});
-  const toggleTrapStatus = () => {
-    const trap = traps.value.find(trap => trap.x === x && trap.y === y);
-    if (!trap) return;
-    trap.status = trap.status === 'active' ? 'idle' : 'active';
-    if (trap.status === 'active') {
-      checkTrapDamage(player.value.position);
-    }
-    trap.timerId = setTimeout(
-        toggleTrapStatus,
-        trap.status === 'active' ? TILES[30].trap.activeTime : TILES[30].trap.activationInterval
-    );
-  };
-  // Starte den ersten Timer
-  const trap = traps.value.find(trap => trap.x === x && trap.y === y);
-  if (trap) {
-    trap.timerId = setTimeout(toggleTrapStatus, TILES[30].trap.activeTime);
-  }
-  // Optional: Cleanup-Funktion zurückgeben
-  return () => {
-    const trap = traps.value.find(trap => trap.x === x && trap.y === y);
-    if (trap && trap.timerId) {
-      clearTimeout(trap.timerId);
-    }
-  };
 };
 
 const checkTrapDamage = (playerPosition) => {

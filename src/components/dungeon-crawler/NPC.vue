@@ -175,11 +175,10 @@ const handleKeyPress = (event) => {
   } else if (showDialog.value && (currentMessage.value === 'chooseCharacter' || currentMessage.value === 'chooseWeapon')) {
     checkChangeMoving();
     const length = currentMessage.value === 'chooseCharacter' ? characters.length : weapons.length;
-    console.log('length', length);
-    if (event.code === 'ArrowUp') {
+    if (event.code === 'ArrowUp' || event.key === 'w') {
       selectedCharacterIndex.value = (selectedCharacterIndex.value - 1 + length) % length;
       changeCharacter(selectedCharacterIndex.value);
-    } else if (event.code === 'ArrowDown') {
+    } else if (event.code === 'ArrowDown' || event.key === 's') {
       selectedCharacterIndex.value = (selectedCharacterIndex.value + 1) % length;
       changeCharacter(selectedCharacterIndex.value);
     }
