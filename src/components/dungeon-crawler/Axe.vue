@@ -46,6 +46,7 @@ const getAxeStyle = () => {
 }
 
 .player--choose .axe {
+  opacity: 1;
   transform: translate(-50px, 40px) !important;
 }
 

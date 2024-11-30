@@ -125,7 +125,7 @@ const handleQuestTransition = () => {
   }
 };
 
-const weapons = ['SWORD', 'MACE', 'AXE', 'SPEAR'];
+const weapons = ['SWORD', 'MACE', 'AXE', 'WAND'];
 const characters = ['DINO', 'KNIGHT', 'HUNTER_MAN', 'HUNTER_WOMAN'];
 const changeCharacter = (index) => {
   selectedCharacterIndex.value = index;

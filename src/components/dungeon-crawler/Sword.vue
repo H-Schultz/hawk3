@@ -82,18 +82,18 @@ const getSwordStyle = () => {
   height: 64px;
   pointer-events: none;
   opacity: 0;
-  border-radius: 80%;
+  border-radius: 40%;
 }
 
 /* Positionen für alle 8 Richtungen */
-.whirl.top-left { left: -64px; top: 0; animation: whirlEffect 0.8s linear; }
-.whirl.top { left: 0; top: 0; animation: whirlEffect 0.8s linear 0.1s; }
-.whirl.top-right { right: -64px; top: 0; animation: whirlEffect 0.8s linear 0.2s; }
-.whirl.left { left: -64px; top: 64px; animation: whirlEffect 0.8s linear 0.3s; }
-.whirl.right { right: -64px; top: 64px; animation: whirlEffect 0.8s linear 0.4s; }
-.whirl.bottom-left { left: -64px; bottom: -64px; animation: whirlEffect 0.8s linear 0.5s; }
-.whirl.bottom { left: 0; bottom: -64px; animation: whirlEffect 0.8s linear 0.6s; }
-.whirl.bottom-right { right: -64px; bottom: -64px; animation: whirlEffect 0.8s linear 0.7s; }
+.whirl.top { left: 0; top: 0; animation: whirlEffect 0.8s linear; }
+.whirl.top-right { right: -64px; top: 0; animation: whirlEffect 0.8s linear 100ms; }
+.whirl.right { right: -64px; top: 64px; animation: whirlEffect 0.8s linear 200ms; }
+.whirl.bottom-right { right: -64px; bottom: -64px; animation: whirlEffect 0.8s linear 300ms; }
+.whirl.bottom { left: 0; bottom: -64px; animation: whirlEffect 0.8s linear 400ms; }
+.whirl.bottom-left { left: -64px; bottom: -64px; animation: whirlEffect 0.8s linear 500ms; }
+.whirl.left { left: -64px; top: 64px; animation: whirlEffect 0.8s linear 600ms; }
+.whirl.top-left { left: -64px; top: 0; animation: whirlEffect 0.8s linear 700ms; }
 
 @keyframes swordChargeSpecial {
   0% {

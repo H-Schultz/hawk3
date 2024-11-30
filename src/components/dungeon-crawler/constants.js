@@ -64,6 +64,7 @@ export const TILES = {
     99: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4}, // NPC Platzhalter
 };
 export const MAPS = [
+    /*
     {
         // Level 1: Quest: Einführung
         layout: [
@@ -81,7 +82,7 @@ export const MAPS = [
         allowedEnemyTypes: ['GOBLIN'],
         allowedItems: ['BLUE_POTION', 'RED_POTION'],
         maxEnemies: 7
-    },
+    },*/
     {
         // Level 0: Choose character and weapon
         layout: [
@@ -739,7 +740,21 @@ export const WEAPON_CONFIG = {
             x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 2
         },
         size: {width: 16, height: 32},
-        chargeTime: 2000,
+        chargeTime: 1000,
+        damagePositions: [
+            { x: 0, y: -1 },
+            { x: 1, y: -1 },
+            { x: 2, y: -1 },
+            { x: 0, y: 0 },
+            { x: 1, y: 0 },
+            { x: 2, y: 0 },
+            { x: 0, y: 1 },
+            { x: 1, y: 1 },
+            { x: 2, y: 1 }
+        ],
+        doubleDamagePositions: [
+            { x: 1, y: 0 }
+        ]
     },
     SWORD: {
         name: 'sword',
@@ -748,7 +763,18 @@ export const WEAPON_CONFIG = {
             x: SPRITE_SIZE * 21, y: 0
         },
         size: {width: 16, height: 32},
-        chargeTime: 2000,
+        chargeTime: 1000,
+        damagePositions: [
+            { x: -1, y: -1 },
+            { x: 0, y: -1 },
+            { x: 1, y: -1 },
+            { x: -1, y: 0 },
+            { x: 1, y: 0 },
+            { x: -1, y: 1 },
+            { x: 0, y: 1 },
+            { x: 1, y: 1 }
+        ],
+        doubleDamagePositions: []
     },
     AXE: {
         name: 'axe',
@@ -758,15 +784,18 @@ export const WEAPON_CONFIG = {
         },
         size: {width: 16, height: 32},
         chargeTime: 1000,
-    },
-    SPEAR: {
-        name: 'spear',
-        damage: 2,
-        sprite: {
-            x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 10
-        },
-        size: {width: 16, height: 32},
-        chargeTime: 1000,
+        damagePositions: [
+            { x: 0, y: -1 }, // Up
+            { x: 0, y: 1 },  // Down
+            { x: 1, y: 0 },  // Right
+            { x: 2, y: 0 },  // Right
+            { x: 1, y: 1 },  // Down-Right
+            { x: 1, y: -1 }  // Up-Right
+        ],
+        doubleDamagePositions: [
+            { x: 1, y: 0 },
+            { x: 2, y: 0 }
+        ]
     },
     WAND: {
         name: 'wand',
@@ -776,5 +805,16 @@ export const WEAPON_CONFIG = {
         },
         size: {width: 16, height: 32},
         chargeTime: 1000,
+        damagePositions: [
+            { x: 1, y: 0 },
+            { x: 2, y: 0 },
+            { x: -1, y: 0 },
+            { x: -2, y: 0 },
+            { x: 0, y: 1 },
+            { x: 0, y: 2 },
+            { x: 0, y: -1 },
+            { x: 0, y: -2 },
+        ],
+        doubleDamagePositions: []
     }
 }

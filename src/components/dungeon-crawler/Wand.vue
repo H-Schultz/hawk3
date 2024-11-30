@@ -45,6 +45,7 @@ const getWandStyle = () => {
 }
 
 .player--choose .wand {
+  opacity: 1;
   transform: translate(-50px, 40px) !important;
 }
 

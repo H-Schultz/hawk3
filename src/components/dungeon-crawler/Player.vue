@@ -15,6 +15,9 @@
     <template v-else-if="player.weapon.name === 'axe'">
       <Axe :player="player" />
     </template>
+    <template v-else-if="player.weapon.name === 'mace'">
+      <Mace :player="player" />
+    </template>
     <template v-else>
       <Sword :player="player" />
     </template>
@@ -28,6 +31,7 @@
   import Sword from './Sword.vue';
   import Wand from './Wand.vue';
   import Axe from './Axe.vue';
+  import Mace from "./Mace.vue";
 
   const props = defineProps({
     player: {

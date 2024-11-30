@@ -40,8 +40,8 @@ const player = ref({
   manaRegeneration: 10000,
   direction: 'right',
   state: 'idle',
-  weapon: WEAPON_CONFIG.AXE,
-  character: PLAYER_CONFIG.KNIGHT,
+  weapon: WEAPON_CONFIG.SWORD,
+  character: PLAYER_CONFIG.DINO,
   isAttacking: false,
   isCharging: false,
   isSpecialAttacking: false,
@@ -639,6 +639,88 @@ const executeLightningAttack = () => {
   }, 400);
 };
 
+const executeSpecialAttack = (basePositions, baseDoubleDamagePositions = []) => {
+  player.value.isSpecialAttacking = true;
+  player.value.mana = Math.max(0, player.value.mana - 1);
+
+  const getAdjustedPositions = (positions, direction) => {
+    return positions.map(pos => {
+      if (direction === 'left') {
+        return { x: -pos.x, y: pos.y };
+      }
+      return pos;
+    });
+  };
+
+  const attackPositions = getAdjustedPositions(basePositions, player.value.direction);
+  const doubleDamagePositions = getAdjustedPositions(baseDoubleDamagePositions, player.value.direction);
+
+  const applyDamage = (positions) => {
+    enemies.value.forEach(enemy => {
+      if (enemy.health > 0) {
+        const relativeEnemyPos = {
+          x: enemy.position.x - player.value.position.x,
+          y: enemy.position.y - player.value.position.y
+        };
+
+        const isInRange = positions.some(pos =>
+            pos.x === relativeEnemyPos.x && pos.y === relativeEnemyPos.y
+        );
+
+        if (isInRange) {
+          const isDoubleDamage = doubleDamagePositions.some(pos =>
+              pos.x === relativeEnemyPos.x && pos.y === relativeEnemyPos.y
+          );
+
+          enemy.health -= isDoubleDamage ? 2 : 1;
+          enemy.isUnderAttack = true;
+
+          if (enemy.health <= 0) {
+            defeatedEnemies.value++;
+            dropItem(enemy);
+
+            if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
+              showStairs();
+            }
+          }
+
+          setTimeout(() => {
+            enemy.isUnderAttack = false;
+          }, 200);
+        }
+      }
+    });
+
+    const destroyedItems = droppedItems.value.filter(item => {
+      const relativeItemPos = {
+        x: item.position.x - player.value.position.x,
+        y: item.position.y - player.value.position.y
+      };
+
+      return item.config.destroyable && positions.some(pos =>
+          pos.x === relativeItemPos.x && pos.y === relativeItemPos.y
+      );
+    });
+
+    if (destroyedItems?.length > 0) {
+      destroyedItems.forEach(item => {
+        if (!item.destroyAnimation) destroyItem(item);
+      });
+    }
+  };
+
+  // Initial attack
+  setTimeout(() => {
+    applyDamage(attackPositions);
+  }, 200);
+
+  // Animation end
+  setTimeout(() => {
+    player.value.isSpecialAttacking = false;
+  }, player.value.weapon.chargeTime);
+};
+
+/*
 const executeSpecialAttack = () => {
   const oldDropItems = JSON.parse(JSON.stringify(droppedItems.value));
   player.value.isSpecialAttacking = true;
@@ -676,7 +758,7 @@ const executeSpecialAttack = () => {
     player.value.isSpecialAttacking = false;
   }, SPECIAL_DURATION);
 };
-
+*/
 const applySpecialDamage = (surroundingPositions, oldDropItems) => {
   enemies.value.forEach(enemy => {
     if (enemy.health > 0) {
@@ -1030,13 +1112,7 @@ const startCharging = () => {
 
     chargeTimer = setTimeout(() => {
       if (player.value.isCharging && player.value.mana > 0) {
-        if (player.value.weapon.name === 'wand') {
-          executeLightningAttack();
-        } else if (player.value.weapon.name === 'axe') {
-          executeAxeAttack();
-        } else {
-          executeSpecialAttack();
-        }
+        executeSpecialAttack(player.value.weapon.damagePositions, player.value.weapon.doubleDamagePositions);
         player.value.isCharging = false;
         player.value.chargeStartTime = null;
         player.value.hasExecutedSpecial = true;
