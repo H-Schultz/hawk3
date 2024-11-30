@@ -47,18 +47,18 @@
   }
 
   .player.charging .sword {
-    animation: swordChargeWhirlwind 2s ease-in-out;
+    animation: swordChargeSpecial 2s ease-in-out;
   }
 
-  .player.chargingWhirlwind .sword {
-    animation: swordChargeWhirlwind 2s ease-in-out;
+  .player.chargingSpecial .sword {
+    animation: swordChargeSpecial 2s ease-in-out;
   }
 
-  .player.whirlwindAttacking .sword {
-    animation: swordWhirlwind 0.8s linear;
+  .player.specialAttacking .sword {
+    animation: swordSpecial 0.8s linear;
   }
 
-  @keyframes swordChargeWhirlwind {
+  @keyframes swordChargeSpecial {
     0% {
       opacity: 0;
       transform: translateY(0) rotate(0deg);
@@ -72,7 +72,7 @@
     }
   }
 
-  @keyframes swordWhirlwind {
+  @keyframes swordSpecial {
     0% {
       opacity: 1;
       transform: translateY(-32px) rotate(-10deg);

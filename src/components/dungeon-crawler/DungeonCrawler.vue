@@ -3,7 +3,7 @@ import {ref, onMounted, onUnmounted, computed, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {
   GAME_STATE, MAPS,
-  MAX_HEALTH, LEVEL_CONFIG, WHIRLWIND_DURATION, CHARGE_TIME,
+  MAX_HEALTH, LEVEL_CONFIG, SPECIAL_DURATION,
   SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG, ITEM_TYPES, MAX_MANA
 } from './constants.js';
 import Player from './Player.vue';
@@ -40,13 +40,13 @@ const player = ref({
   manaRegeneration: 10000,
   direction: 'right',
   state: 'idle',
-  weapon: WEAPON_CONFIG.MACE,
-  character: PLAYER_CONFIG.DINO,
+  weapon: WEAPON_CONFIG.AXE,
+  character: PLAYER_CONFIG.KNIGHT,
   isAttacking: false,
   isCharging: false,
-  isWhirlwindAttacking: false,
+  isSpecialAttacking: false,
   isUnderAttack: false,
-  hasExecutedWhirlwind: false,
+  hasExecutedSpecial: false,
   chargeStartTime: null,
   coins: 0,
   keys: 0,
@@ -468,9 +468,82 @@ const attackWithSword = () => {
   }, 400);
 };
 
-const executeWhirlwindAttack = () => {
+const executeLightningAttack = () => {
+  player.value.isSpecialAttacking = true;
+  player.value.mana = Math.max(0, player.value.mana - 1);
+
+  const lightningPositions = [
+    // Up
+    { x: 0, y: -1 },
+    { x: 0, y: -2 },
+    // Down
+    { x: 0, y: 1 },
+    { x: 0, y: 2 },
+    // Left
+    { x: -1, y: 0 },
+    { x: -2, y: 0 },
+    // Right
+    { x: 1, y: 0 },
+    { x: 2, y: 0 }
+  ];
+
+  const applyLightningDamage = (positions) => {
+    enemies.value.forEach(enemy => {
+      if (enemy.health > 0) {
+        const isInRange = positions.some(pos =>
+            enemy.position.x === player.value.position.x + pos.x &&
+            enemy.position.y === player.value.position.y + pos.y
+        );
+
+        if (isInRange) {
+          enemy.health -= 1;
+          enemy.isUnderAttack = true;
+
+          if (enemy.health <= 0) {
+            defeatedEnemies.value++;
+            dropItem(enemy);
+
+            if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
+              showStairs();
+            }
+          }
+
+          setTimeout(() => {
+            enemy.isUnderAttack = false;
+          }, 200);
+        }
+      }
+    });
+
+    const destroyedItems = droppedItems.value.filter(item =>
+        item.config.destroyable &&
+        positions.some(pos =>
+            item.position.x === player.value.position.x + pos.x &&
+            item.position.y === player.value.position.y + pos.y
+        )
+    );
+
+    if (destroyedItems?.length > 0) {
+      destroyedItems.forEach(item => {
+        if (!item.destroyAnimation) destroyItem(item);
+      });
+    }
+  };
+
+  // First lightning strike
+  setTimeout(() => {
+    applyLightningDamage(lightningPositions);
+  }, 200);
+
+  // Animation end
+  setTimeout(() => {
+    player.value.isSpecialAttacking = false;
+  }, 400);
+};
+
+const executeSpecialAttack = () => {
   const oldDropItems = JSON.parse(JSON.stringify(droppedItems.value));
-  player.value.isWhirlwindAttacking = true;
+  player.value.isSpecialAttacking = true;
   player.value.mana = Math.max(0, player.value.mana - 1);
 
   const surroundingPositions = [
@@ -486,27 +559,27 @@ const executeWhirlwindAttack = () => {
 
   // Erster Treffer nach 200ms (1/4 Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions, oldDropItems);
+    applySpecialDamage(surroundingPositions, oldDropItems);
   }, 200);
 
   // Zweiter Treffer nach 400ms (1/2 Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions, oldDropItems);
+    applySpecialDamage(surroundingPositions, oldDropItems);
   }, 400);
 
   // Dritter Treffer nach 600ms (3/4 Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions, oldDropItems);
+    applySpecialDamage(surroundingPositions, oldDropItems);
   }, 600);
 
   // Letzter Treffer nach 800ms (volle Rotation)
   setTimeout(() => {
-    applyWhirlwindDamage(surroundingPositions, oldDropItems);
-    player.value.isWhirlwindAttacking = false;
-  }, WHIRLWIND_DURATION);
+    applySpecialDamage(surroundingPositions, oldDropItems);
+    player.value.isSpecialAttacking = false;
+  }, SPECIAL_DURATION);
 };
 
-const applyWhirlwindDamage = (surroundingPositions, oldDropItems) => {
+const applySpecialDamage = (surroundingPositions, oldDropItems) => {
   enemies.value.forEach(enemy => {
     if (enemy.health > 0) {
       const isInRange = surroundingPositions.some(pos =>
@@ -851,20 +924,24 @@ const startAttackCheck = () => {
 };
 
 const startCharging = () => {
-  if (player.value.isCharging || player.value.isAttacking || player.value.isWhirlwindAttacking || gameState.value !== GAME_STATE.PLAYING) return;
+  if (player.value.isCharging || player.value.isAttacking || player.value.isSpecialAttacking || gameState.value !== GAME_STATE.PLAYING) return;
 
-  if (!player.value.hasExecutedWhirlwind) {
+  if (!player.value.hasExecutedSpecial) {
     player.value.chargeStartTime = Date.now();
     player.value.isCharging = true;
 
     chargeTimer = setTimeout(() => {
       if (player.value.isCharging && player.value.mana > 0) {
-        executeWhirlwindAttack();
+        if (player.value.weapon.name === 'wand') {
+          executeLightningAttack();
+        } else {
+          executeSpecialAttack();
+        }
         player.value.isCharging = false;
         player.value.chargeStartTime = null;
-        player.value.hasExecutedWhirlwind = true;
+        player.value.hasExecutedSpecial = true;
       }
-    }, CHARGE_TIME);
+    }, player.value.weapon.chargeTime);
   }
 };
 
@@ -982,8 +1059,8 @@ const executeAttack = () => {
   player.value.isCharging = false;
   player.value.chargeStartTime = null;
 
-  // Nur normaler Angriff wenn vor 2 Sekunden losgelassen und kein Whirlwind ausgeführt
-  if (chargeTime < CHARGE_TIME && !player.value.hasExecutedWhirlwind) {
+  // Nur normaler Angriff wenn vor 2 Sekunden losgelassen und kein Special ausgeführt
+  if (chargeTime < player.value.weapon.chargeTime && !player.value.hasExecutedSpecial) {
     attackWithSword();
   }
 };
@@ -1275,7 +1352,7 @@ const handleKeydown = (e) => {
 const handleKeyup = (e) => {
   if (e.key === 'e') {
     executeAttack();
-    player.value.hasExecutedWhirlwind = false;
+    player.value.hasExecutedSpecial = false;
   }
   player.value.state = 'idle';
 };

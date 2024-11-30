@@ -12,8 +12,8 @@ export const DISPLAY_SIZE = SPRITE_SIZE * SPRITE_SCALE;
 export const ANIMATION_SPEED = 150;
 export const MAX_HEALTH = 6;
 export const MAX_MANA = 6;
-export const WHIRLWIND_DURATION = 800;
-export const CHARGE_TIME = 2000;
+export const SPECIAL_DURATION = 800;
+export const CHARGE_TIME = 1000;
 
 export const TILES = {
     10: {x: SPRITE_SIZE, y: SPRITE_SIZE, zIndex: 2}, // Mauer Rechts
@@ -70,10 +70,9 @@ export const MAPS = [
             [0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 0],
             [0, 10, 11, 11, 11, 17, 11, 11, 11, 11, 11, 11, 10, 0],
             [0, 12, 90, 20, 21, 71, 20, 23, 20, 21, 20, 20, 10, 0],
-            [0, 12, 98, 30, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
-            [0, 12, 20, 20, 30, 20, 20, 20, 20, 20, 20, 20, 10, 0],
+            [0, 12, 98, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
             [0, 12, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
-            [0, 12, 40, 40, 40, 40, 12, 40, 40, 40, 40, 40, 10, 0],
+            [0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
             [0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
         ],
         enemiesRequired: 1,
@@ -81,26 +80,7 @@ export const MAPS = [
         type: 'combat',
         allowedEnemyTypes: ['GOBLIN'],
         allowedItems: ['BLUE_POTION', 'RED_POTION'],
-        maxEnemies: 2
-    },
-    {
-        // Level 1: Quest: Einführung
-        layout: [
-            [0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 0],
-            [0, 10, 11, 11, 11, 17, 11, 11, 11, 11, 11, 11, 10, 0],
-            [0, 12, 90, 20, 21, 71, 20, 23, 20, 21, 20, 20, 10, 0],
-            [0, 12, 98, 20, 20, 30, 20, 20, 20, 20, 20, 20, 10, 0],
-            [0, 12, 20, 30, 30, 20, 30, 20, 20, 20, 20, 20, 10, 0],
-            [0, 12, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
-            [0, 12, 40, 40, 40, 40, 12, 40, 40, 40, 40, 40, 10, 0],
-            [0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
-        ],
-        enemiesRequired: 1,
-        name: 'Kriegerhalle',
-        type: 'combat',
-        allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['BLUE_POTION', 'RED_POTION'],
-        maxEnemies: 2
+        maxEnemies: 7
     },
     {
         // Level 0: Choose character and weapon
@@ -753,38 +733,48 @@ export const PLAYER_CONFIG = {
 
 export const WEAPON_CONFIG = {
     MACE: {
+        name: 'mace',
         damage: 1,
         sprite: {
             x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 2
         },
         size: {width: 16, height: 32},
+        chargeTime: 2000,
     },
     SWORD: {
+        name: 'sword',
         damage: 1,
         sprite: {
             x: SPRITE_SIZE * 21, y: 0
         },
         size: {width: 16, height: 32},
+        chargeTime: 2000,
     },
     AXE: {
+        name: 'axe',
         damage: 2,
         sprite: {
             x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 4
         },
         size: {width: 16, height: 32},
+        chargeTime: 2000,
     },
     SPEAR: {
+        name: 'spear',
         damage: 2,
         sprite: {
             x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 10
         },
         size: {width: 16, height: 32},
+        chargeTime: 1000,
     },
     WAND: {
+        name: 'wand',
         damage: 2,
         sprite: {
             x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 8
         },
         size: {width: 16, height: 32},
+        chargeTime: 1000,
     }
 }

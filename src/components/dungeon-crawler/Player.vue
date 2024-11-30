@@ -4,12 +4,17 @@
     :class="{
       'attacking': player.isAttacking,
       'charging': player.isCharging,
-      'whirlwindAttacking': player.isWhirlwindAttacking,
+      'specialAttacking': player.isSpecialAttacking,
       'player--choose': gameState === GAME_STATE.CHOOSE,
     }"
     :style="playerStyle"
   >
-    <Sword :player="player" />
+    <template v-if="player.weapon.name === 'wand'">
+      <Wand :player="player" />
+    </template>
+    <template v-else>
+      <Sword :player="player" />
+    </template>
   </div>
 </template>
 
@@ -18,6 +23,7 @@
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite-v2.png';
   import {DISPLAY_SIZE, ANIMATION_SPEED, GAME_STATE} from './constants.js';
   import Sword from './Sword.vue';
+  import Wand from './Wand.vue';
 
   const props = defineProps({
     player: {
@@ -41,7 +47,7 @@
       backgroundSize: '2048px 2048px',
       left: `${props.player.position.x * DISPLAY_SIZE}px`,
       top: `${props.player.position.y * DISPLAY_SIZE}px`,
-      zIndex: 101 + props.player.position.y,
+      zIndex: 102 + props.player.position.y,
       transform: props.player.direction === 'left' ? 'scaleX(-1)' : 'none',
       filter: props.player.isUnderAttack ? 'brightness(1.5) sepia(1) saturate(1000%) hue-rotate(0deg)' : 'none',
     };
