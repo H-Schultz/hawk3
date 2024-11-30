@@ -12,6 +12,9 @@
     <template v-if="player.weapon.name === 'wand'">
       <Wand :player="player" />
     </template>
+    <template v-else-if="player.weapon.name === 'axe'">
+      <Axe :player="player" />
+    </template>
     <template v-else>
       <Sword :player="player" />
     </template>
@@ -24,6 +27,7 @@
   import {DISPLAY_SIZE, ANIMATION_SPEED, GAME_STATE} from './constants.js';
   import Sword from './Sword.vue';
   import Wand from './Wand.vue';
+  import Axe from './Axe.vue';
 
   const props = defineProps({
     player: {

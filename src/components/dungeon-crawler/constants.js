@@ -757,7 +757,7 @@ export const WEAPON_CONFIG = {
             x: SPRITE_SIZE * 21, y: SPRITE_SIZE * 4
         },
         size: {width: 16, height: 32},
-        chargeTime: 2000,
+        chargeTime: 1000,
     },
     SPEAR: {
         name: 'spear',

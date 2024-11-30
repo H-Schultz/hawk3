@@ -468,6 +468,104 @@ const attackWithSword = () => {
   }, 400);
 };
 
+const executeAxeAttack = () => {
+  player.value.isSpecialAttacking = true;
+  player.value.mana = Math.max(0, player.value.mana - 1);
+
+  const baseAxePositions = [
+    { x: 0, y: -1 }, // Up
+    { x: 0, y: 1 },  // Down
+    { x: 1, y: 0 },  // Right
+    { x: 2, y: 0 },  // Right
+    { x: 1, y: 1 },  // Down-Right
+    { x: 1, y: -1 }  // Up-Right
+  ];
+
+  const baseDoubleDamagePositions = [
+    { x: 1, y: 0 },
+    { x: 2, y: 0 }
+  ];
+
+  const getAxePositions = (direction) => {
+    return baseAxePositions.map(pos => {
+      if (direction === 'left') {
+        return { x: -pos.x, y: pos.y };
+      }
+      return pos;
+    });
+  };
+
+  const getDoubleDamagePositions = (direction) => {
+    return baseDoubleDamagePositions.map(pos => {
+      if (direction === 'left') {
+        return { x: -pos.x, y: pos.y };
+      }
+      return pos;
+    });
+  };
+
+  const axePositions = getAxePositions(player.value.direction);
+  const doubleDamagePositions = getDoubleDamagePositions(player.value.direction);
+
+  const applyAxeDamage = (positions) => {
+    enemies.value.forEach(enemy => {
+      if (enemy.health > 0) {
+        const isInRange = positions.some(pos =>
+            enemy.position.x === player.value.position.x + pos.x &&
+            enemy.position.y === player.value.position.y + pos.y
+        );
+
+        if (isInRange) {
+          const isDoubleDamage = doubleDamagePositions.some(pos =>
+              enemy.position.x === player.value.position.x + pos.x &&
+              enemy.position.y === player.value.position.y + pos.y
+          );
+
+          enemy.health -= isDoubleDamage ? 2 : 1;
+          enemy.isUnderAttack = true;
+
+          if (enemy.health <= 0) {
+            defeatedEnemies.value++;
+            dropItem(enemy);
+
+            if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
+              showStairs();
+            }
+          }
+
+          setTimeout(() => {
+            enemy.isUnderAttack = false;
+          }, 200);
+        }
+      }
+    });
+
+    const destroyedItems = droppedItems.value.filter(item =>
+        item.config.destroyable &&
+        positions.some(pos =>
+            item.position.x === player.value.position.x + pos.x &&
+            item.position.y === player.value.position.y + pos.y
+        )
+    );
+
+    if (destroyedItems?.length > 0) {
+      destroyedItems.forEach(item => {
+        if (!item.destroyAnimation) destroyItem(item);
+      });
+    }
+  };
+
+  // Axe attack
+  setTimeout(() => {
+    applyAxeDamage(axePositions);
+  }, 200);
+
+  // Animation end
+  setTimeout(() => {
+    player.value.isSpecialAttacking = false;
+  }, 400);
+};
+
 const executeLightningAttack = () => {
   player.value.isSpecialAttacking = true;
   player.value.mana = Math.max(0, player.value.mana - 1);
@@ -934,6 +1032,8 @@ const startCharging = () => {
       if (player.value.isCharging && player.value.mana > 0) {
         if (player.value.weapon.name === 'wand') {
           executeLightningAttack();
+        } else if (player.value.weapon.name === 'axe') {
+          executeAxeAttack();
         } else {
           executeSpecialAttack();
         }
