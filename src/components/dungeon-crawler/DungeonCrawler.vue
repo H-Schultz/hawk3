@@ -2,9 +2,8 @@
 import {ref, onMounted, onUnmounted, computed, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {
-  GAME_STATE, MAPS,
-  MAX_HEALTH, LEVEL_CONFIG, SPECIAL_DURATION,
-  SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES, TILES, WEAPON_CONFIG, PLAYER_CONFIG, ITEM_TYPES, MAX_MANA
+  GAME_STATE, MAPS, MAX_HEALTH, LEVEL_CONFIG, SPAWN_CONFIG, ENEMY_CONFIG, ENEMY_TYPES,
+  TILES, WEAPON_CONFIG, PLAYER_CONFIG, ITEM_TYPES, MAX_MANA
 } from './constants.js';
 import Player from './Player.vue';
 import Enemy from './Enemy.vue';
@@ -15,6 +14,7 @@ import Tile from './Tile.vue';
 import NPC from './NPC.vue';
 import Explosion from './Explosion.vue';
 import Camera  from './Camera.vue';
+import Shop from './Shop.vue';
 
 let chargeTimer = null;
 
@@ -30,6 +30,7 @@ const activeQuest = ref(0);
 const questItems = ref([]);
 const traps = ref([]);
 const activeExplosions = ref([]);
+const showShop = ref(false);
 
 const player = ref({
   position: { x: 1, y: 1 },
@@ -40,7 +41,7 @@ const player = ref({
   manaRegeneration: 10000,
   direction: 'right',
   state: 'idle',
-  weapon: WEAPON_CONFIG.WAND,
+  weapon: WEAPON_CONFIG.MACE,
   character: PLAYER_CONFIG.DINO,
   isAttacking: false,
   isCharging: false,
@@ -468,177 +469,6 @@ const attackWithSword = () => {
   }, 400);
 };
 
-const executeAxeAttack = () => {
-  player.value.isSpecialAttacking = true;
-  player.value.mana = Math.max(0, player.value.mana - 1);
-
-  const baseAxePositions = [
-    { x: 0, y: -1 }, // Up
-    { x: 0, y: 1 },  // Down
-    { x: 1, y: 0 },  // Right
-    { x: 2, y: 0 },  // Right
-    { x: 1, y: 1 },  // Down-Right
-    { x: 1, y: -1 }  // Up-Right
-  ];
-
-  const baseDoubleDamagePositions = [
-    { x: 1, y: 0 },
-    { x: 2, y: 0 }
-  ];
-
-  const getAxePositions = (direction) => {
-    return baseAxePositions.map(pos => {
-      if (direction === 'left') {
-        return { x: -pos.x, y: pos.y };
-      }
-      return pos;
-    });
-  };
-
-  const getDoubleDamagePositions = (direction) => {
-    return baseDoubleDamagePositions.map(pos => {
-      if (direction === 'left') {
-        return { x: -pos.x, y: pos.y };
-      }
-      return pos;
-    });
-  };
-
-  const axePositions = getAxePositions(player.value.direction);
-  const doubleDamagePositions = getDoubleDamagePositions(player.value.direction);
-
-  const applyAxeDamage = (positions) => {
-    enemies.value.forEach(enemy => {
-      if (enemy.health > 0) {
-        const isInRange = positions.some(pos =>
-            enemy.position.x === player.value.position.x + pos.x &&
-            enemy.position.y === player.value.position.y + pos.y
-        );
-
-        if (isInRange) {
-          const isDoubleDamage = doubleDamagePositions.some(pos =>
-              enemy.position.x === player.value.position.x + pos.x &&
-              enemy.position.y === player.value.position.y + pos.y
-          );
-
-          enemy.health -= isDoubleDamage ? 2 : 1;
-          enemy.isUnderAttack = true;
-
-          if (enemy.health <= 0) {
-            defeatedEnemies.value++;
-            dropItem(enemy);
-
-            if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
-              showStairs();
-            }
-          }
-
-          setTimeout(() => {
-            enemy.isUnderAttack = false;
-          }, 200);
-        }
-      }
-    });
-
-    const destroyedItems = droppedItems.value.filter(item =>
-        item.config.destroyable &&
-        positions.some(pos =>
-            item.position.x === player.value.position.x + pos.x &&
-            item.position.y === player.value.position.y + pos.y
-        )
-    );
-
-    if (destroyedItems?.length > 0) {
-      destroyedItems.forEach(item => {
-        if (!item.destroyAnimation) destroyItem(item);
-      });
-    }
-  };
-
-  // Axe attack
-  setTimeout(() => {
-    applyAxeDamage(axePositions);
-  }, 200);
-
-  // Animation end
-  setTimeout(() => {
-    player.value.isSpecialAttacking = false;
-  }, 400);
-};
-
-const executeLightningAttack = () => {
-  player.value.isSpecialAttacking = true;
-  player.value.mana = Math.max(0, player.value.mana - 1);
-
-  const lightningPositions = [
-    // Up
-    { x: 0, y: -1 },
-    { x: 0, y: -2 },
-    // Down
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
-    // Left
-    { x: -1, y: 0 },
-    { x: -2, y: 0 },
-    // Right
-    { x: 1, y: 0 },
-    { x: 2, y: 0 }
-  ];
-
-  const applyLightningDamage = (positions) => {
-    enemies.value.forEach(enemy => {
-      if (enemy.health > 0) {
-        const isInRange = positions.some(pos =>
-            enemy.position.x === player.value.position.x + pos.x &&
-            enemy.position.y === player.value.position.y + pos.y
-        );
-
-        if (isInRange) {
-          enemy.health -= 1;
-          enemy.isUnderAttack = true;
-
-          if (enemy.health <= 0) {
-            defeatedEnemies.value++;
-            dropItem(enemy);
-
-            if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
-              showStairs();
-            }
-          }
-
-          setTimeout(() => {
-            enemy.isUnderAttack = false;
-          }, 200);
-        }
-      }
-    });
-
-    const destroyedItems = droppedItems.value.filter(item =>
-        item.config.destroyable &&
-        positions.some(pos =>
-            item.position.x === player.value.position.x + pos.x &&
-            item.position.y === player.value.position.y + pos.y
-        )
-    );
-
-    if (destroyedItems?.length > 0) {
-      destroyedItems.forEach(item => {
-        if (!item.destroyAnimation) destroyItem(item);
-      });
-    }
-  };
-
-  // First lightning strike
-  setTimeout(() => {
-    applyLightningDamage(lightningPositions);
-  }, 200);
-
-  // Animation end
-  setTimeout(() => {
-    player.value.isSpecialAttacking = false;
-  }, 400);
-};
-
 const executeSpecialAttack = (basePositions, baseDoubleDamagePositions = []) => {
   player.value.isSpecialAttacking = true;
   player.value.mana = Math.max(0, player.value.mana - 1);
@@ -720,87 +550,6 @@ const executeSpecialAttack = (basePositions, baseDoubleDamagePositions = []) => 
   }, player.value.weapon.chargeTime);
 };
 
-/*
-const executeSpecialAttack = () => {
-  const oldDropItems = JSON.parse(JSON.stringify(droppedItems.value));
-  player.value.isSpecialAttacking = true;
-  player.value.mana = Math.max(0, player.value.mana - 1);
-
-  const surroundingPositions = [
-    {x: -1, y: 0}, // Links
-    {x: 1, y: 0},  // Rechts
-    {x: 0, y: -1}, // Oben
-    {x: 0, y: 1},  // Unten
-    {x: -1, y: -1}, // Diagonal oben links
-    {x: 1, y: -1},  // Diagonal oben rechts
-    {x: -1, y: 1},  // Diagonal unten links
-    {x: 1, y: 1}    // Diagonal unten rechts
-  ];
-
-  // Erster Treffer nach 200ms (1/4 Rotation)
-  setTimeout(() => {
-    applySpecialDamage(surroundingPositions, oldDropItems);
-  }, 200);
-
-  // Zweiter Treffer nach 400ms (1/2 Rotation)
-  setTimeout(() => {
-    applySpecialDamage(surroundingPositions, oldDropItems);
-  }, 400);
-
-  // Dritter Treffer nach 600ms (3/4 Rotation)
-  setTimeout(() => {
-    applySpecialDamage(surroundingPositions, oldDropItems);
-  }, 600);
-
-  // Letzter Treffer nach 800ms (volle Rotation)
-  setTimeout(() => {
-    applySpecialDamage(surroundingPositions, oldDropItems);
-    player.value.isSpecialAttacking = false;
-  }, SPECIAL_DURATION);
-};
-*/
-const applySpecialDamage = (surroundingPositions, oldDropItems) => {
-  enemies.value.forEach(enemy => {
-    if (enemy.health > 0) {
-      const isInRange = surroundingPositions.some(pos =>
-          enemy.position.x === player.value.position.x + pos.x &&
-          enemy.position.y === player.value.position.y + pos.y
-      );
-
-      if (isInRange) {
-        enemy.health -= 1;
-        enemy.isUnderAttack = true;
-
-        if (enemy.health <= 0) {
-          defeatedEnemies.value++;
-          dropItem(enemy);
-
-          if (defeatedEnemies.value >= currentMap.value.enemiesRequired) {
-            showStairs();
-          }
-        }
-
-        setTimeout(() => {
-          enemy.isUnderAttack = false;
-        }, 200);
-      }
-    }
-  });
-
-  const destroyedItems = oldDropItems.filter(item => {
-    if (item.config.destroyable && surroundingPositions.some(pos =>
-        item.position.x === player.value.position.x + pos.x &&
-        item.position.y === player.value.position.y + pos.y)) {
-      return true;
-    }
-    return false;
-  });
-  if (destroyedItems?.length > 0) {
-    destroyedItems.forEach(item => {
-      if (!item.destroyAnimation) destroyItem(item);
-    });
-  }
-};
 
 const findSpawnPosition = () => {
   const maxAttempts = 20;
@@ -1201,22 +950,22 @@ const startNextLevel = () => {
 
   setTimeout(() => {
     const nextMapIndex = currentMapIndex.value + 1;
+    gameContainer.classList.remove('flip-out');
+    gameContainer.classList.add('flip-in');
 
     if (nextMapIndex < MAPS.length) {
-      if (loadMap(nextMapIndex)) {
-        player.value.health = Math.min(MAX_HEALTH, player.value.health + LEVEL_CONFIG.healthBonus);
-      }
+      showShop.value = true;
     } else {
       gameState.value = GAME_STATE.VICTORY;
     }
-
-    setTimeout(() => {
-      gameContainer.classList.remove('flip-out');
-      gameContainer.classList.add('flip-in');
-
-      gameContainer.classList.remove('flip-in');
-    }, 300);
   }, 300);
+};
+
+const continueToNextLevel = () => {
+  showShop.value = false;
+  if (loadMap(currentMapIndex.value + 1)) {
+    player.value.health = Math.min(MAX_HEALTH, player.value.health + LEVEL_CONFIG.healthBonus);
+  }
 };
 
 const restartGame = () => {
@@ -1569,6 +1318,11 @@ watch(() => gameState.value, (newState) => {
   <div class="wrapper">
     <main class="main-content">
       <div class="game-container">
+        <Shop
+            v-if="showShop"
+            :player="player"
+            :onClose="continueToNextLevel"
+        />
         <GameUI
             :player="player"
             :current-map="currentMap"

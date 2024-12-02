@@ -75,11 +75,11 @@ export const MAPS = [
             [0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
             [0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
         ],
-        enemiesRequired: 3,
+        enemiesRequired: 1,
         name: 'Kriegerhalle',
         type: 'combat',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['BLUE_POTION', 'RED_POTION'],
+        allowedItems: ['COIN'],
         maxEnemies: 7
     },
     {
