@@ -1,11 +1,11 @@
 <template>
-  <div class="wand" :style="getWandStyle()">
-    <div v-if="player.isSpecialAttacking" class="lightning-effects">
-      <div class="lightning up"></div>
-      <div class="lightning down"></div>
-      <div class="lightning left"></div>
-      <div class="lightning right"></div>
-    </div>
+  <div class="wand" :style="getWandStyle()" />
+  <div v-if="player.isSpecialAttacking" class="lightning-effects">
+    <div class="magic-circle"></div>
+    <div class="lightning up"></div>
+    <div class="lightning down"></div>
+    <div class="lightning left"></div>
+    <div class="lightning right"></div>
   </div>
 </template>
 
@@ -58,7 +58,7 @@ const getWandStyle = () => {
 }
 
 .player.specialAttacking .wand {
-  animation: wandSpecialCast 0.8s ease-in-out;
+  animation: wandSpecialCast 1s ease-in-out;
 }
 
 .lightning-effects {
@@ -73,42 +73,79 @@ const getWandStyle = () => {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
   z-index: 205;
+  opacity: 0;
 }
 
 .lightning.up {
   width: 8px;
   height: 128px;
-  top: -128px;
+  top: -40px;
   left: 28px;
   background: linear-gradient(to top, rgba(0, 255, 255, 1) 50%, rgba(0, 255, 255, 0.2) 100%);
-  animation: lightningUp 0.4s ease-out;
+  animation: lightningUp 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
 .lightning.down {
   width: 8px;
   height: 128px;
-  bottom: -48px;
+  bottom: -115px;
   left: 28px;
   background: linear-gradient(to bottom, rgba(0, 255, 255, 1) 50%, rgba(0, 255, 255, 0.2) 100%);
-  animation: lightningDown 0.4s ease-out;
+  animation: lightningDown 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
 .lightning.left {
   width: 128px;
   height: 8px;
-  top: 28px;
+  top: 96px;
   left: -112px;
   background: linear-gradient(to left, rgba(0, 255, 255, 1) 50%, rgba(0, 255, 255, 0.2) 100%);
-  animation: lightningLeft 0.4s ease-out;
+  animation: lightningLeft 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
 .lightning.right {
   width: 128px;
   height: 8px;
-  top: 28px;
+  top: 96px;
   right: -112px;
   background: linear-gradient(to right, rgba(0, 255, 255, 1) 50%, rgba(0, 255, 255, 0.2) 100%);
-  animation: lightningRight 0.4s ease-out;
+  animation: lightningRight 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.magic-circle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: 101px;
+  left: 32px;
+  border: 8px solid rgba(0, 255, 255, 0.9);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 204;
+  animation: magicCirclePulse 0.8s ease-out;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  opacity: 0;
+}
+
+@keyframes magicCirclePulse {
+  0% {
+    opacity: 0;
+    width: 8px;
+    height: 8px;
+    transform: translate(-4px, -4px);
+  }
+  50% {
+    opacity: 1;
+    width: 64px;
+    height: 64px;
+    transform: translate(-32px, -32px);
+  }
+  100% {
+    opacity: 0;
+    width: 8px;
+    height: 8px;
+    transform: translate(-4px, -4px);
+  }
 }
 
 @keyframes wandCast {
@@ -142,87 +179,79 @@ const getWandStyle = () => {
   }
   100% {
     opacity: 1;
-    transform: translate(-80px, -10px) rotate(90deg);
+    transform: translate(-80px, -60px) rotate(120deg);
   }
 }
 
 @keyframes wandSpecialCast {
   0% {
-    transform: translate(-80px, -10px) rotate(90deg);;
+    transform: translate(-80px, -60px) rotate(120deg);
   }
   90% {
-    transform: translate(-80px, -10px) rotate(90deg);
+    transform: translate(-80px, -60px) rotate(120deg);
   }
   100% {
-    transform: rotate(0deg);
+    transform: translate(-80px, -60px) rotate(120deg);
   }
 }
 
 @keyframes lightningUp {
   0% {
     opacity: 0;
-    transform: scaleY(0);
+    transform: rotateY(90deg) scaleY(.2);
   }
-  20% {
+  50% {
     opacity: 1;
-    transform: scaleY(1);
-  }
-  90% {
-    opacity: 1;
+    transform: rotateY(0deg) scaleY(1);
   }
   100% {
     opacity: 0;
+    transform: rotateY(90deg) scaleY(.2);
   }
 }
 
 @keyframes lightningDown {
   0% {
     opacity: 0;
-    transform: scaleY(0);
+    transform: rotateY(90deg) scaleY(.2);
   }
-  20% {
+  50% {
     opacity: 1;
-    transform: scaleY(1);
-  }
-  90% {
-    opacity: 1;
+    transform: rotateY(0deg) scaleY(1);
   }
   100% {
     opacity: 0;
+    transform: rotateY(90deg) scaleY(.2);
   }
 }
 
 @keyframes lightningLeft {
   0% {
     opacity: 0;
-    transform: scaleX(0);
+    transform: rotateY(90deg) scaleY(.2);
   }
-  20% {
+  50% {
     opacity: 1;
-    transform: scaleX(1);
-  }
-  90% {
-    opacity: 1;
+    transform: rotateY(0deg) scaleY(1);
   }
   100% {
     opacity: 0;
+    transform: rotateY(90deg) scaleY(.2);
   }
 }
 
 @keyframes lightningRight {
   0% {
     opacity: 0;
-    transform: scaleX(0);
+    transform: rotateY(90deg) scaleY(.2);
   }
-  20% {
+  50% {
     opacity: 1;
-    transform: scaleX(1);
-  }
-  90% {
-    opacity: 1;
+    transform: rotateY(0deg) scaleY(1);
   }
   100% {
     opacity: 0;
+    transform: rotateY(90deg) scaleY(.2);
   }
 }
 </style>

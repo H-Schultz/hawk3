@@ -49,13 +49,14 @@
 
   const playerStyle = computed(() => {
     const sprite = props.player.character.sprites[props.player.state][currentFrame.value];
+    const zIndex = (props.player.isSpecialAttacking) ? 102 + props.player.position.y : 100 + props.player.position.y + 1;
     return {
       backgroundImage: `url(${dungeonSprite})`,
       backgroundPosition: `-${sprite.x * 4}px -${sprite.y * 4}px`,
       backgroundSize: '2048px 2048px',
       left: `${props.player.position.x * DISPLAY_SIZE}px`,
       top: `${props.player.position.y * DISPLAY_SIZE}px`,
-      zIndex: 102 + props.player.position.y,
+      zIndex: zIndex,
       transform: props.player.direction === 'left' ? 'scaleX(-1)' : 'none',
       filter: props.player.isUnderAttack ? 'brightness(1.5) sepia(1) saturate(1000%) hue-rotate(0deg)' : 'none',
     };

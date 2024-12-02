@@ -149,12 +149,12 @@ const questProgressStyle = computed(() => {
             :current-value="props.defeatedEnemies"
             :max-value="props.currentMap?.enemiesRequired"
             type="enemies"
-            :color-from="'rgb(100,40,0)'"
-            :color-to="'rgb(200,80,0)'"
+            :color-from="'rgb(22,0,100)'"
+            :color-to="'rgb(200,0,130)'"
             :show-value="false"
             :width="200"
           />
-        <span class="quest-text">Combat</span>
+        <span class="quest-text">Combat {{ props.defeatedEnemies }}/{{ props.currentMap?.enemiesRequired }}</span>
       </div>
       <div v-else-if="props.currentMap?.type === 'boss'" class="quest-progress">
         <LiquidIndicator
@@ -186,18 +186,21 @@ const questProgressStyle = computed(() => {
       <div class="bomb-icon" :style="{
         backgroundImage: `url(${dungeonSprite})`,
         backgroundPosition: `-${ITEM_TYPES.BOMB.sprite.x * 4}px -${ITEM_TYPES.BOMB.sprite.y * 4}px`,
-      }"/>
-      <span class="item-count">{{ props.player.bombs }}</span>
+      }">
+        <span class="item-count">{{ props.player.bombs }}</span>
+      </div>
       <div class="key-icon" :style="{
         backgroundImage: `url(${dungeonSprite})`,
-        backgroundPosition: `-${ITEM_TYPES.RED_KEY.sprite.x * 4}px -${ITEM_TYPES.RED_KEY.sprite.y * 4}px`,
-      }"/>
-      <span class="item-count">{{ props.player.keys }}</span>
+        backgroundPosition: `-${ITEM_TYPES.KEY.sprite.x * 4}px -${ITEM_TYPES.KEY.sprite.y * 4}px`,
+      }">
+        <span class="item-count">{{ props.player.keys }}</span>
+      </div>
       <div class="coin-icon" :style="{
         backgroundImage: `url(${dungeonSprite})`,
-        backgroundPosition: `-${ITEM_TYPES.COIN.sprite.x * 4}px -${ITEM_TYPES.COIN.sprite.y * 4}px`,
-      }"/>
-      <span class="item-count">{{ props.player.coins }}</span>
+        backgroundPosition: `-${ITEM_TYPES.COIN_BIG.sprite.x * 4}px -${ITEM_TYPES.COIN_BIG.sprite.y * 4}px`,
+      }">
+        <span class="item-count">{{ props.player.coins }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -255,30 +258,34 @@ const questProgressStyle = computed(() => {
 .items-container {
   position: absolute;
   top: 5px;
-  right: 10px;
+  right: 5px;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 5px 10px;
+  background-color: rgba(255,255,255,0.3);
+  padding: 0;
   border-radius: 15px;
 }
 
 .bomb-icon,
 .key-icon,
 .coin-icon {
-  width: 32px;
-  height: 32px;
+  width: 64px;
+  height: 64px;
   image-rendering: pixelated;
   background-repeat: no-repeat;
   background-size: 2048px 2048px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
 }
 
 .item-count {
   color: white;
   font-size: 24px;
   font-weight: bold;
+  text-shadow: 0 2px 3px black, 0 -3px 3px black;
 }
 
 .quest-progress {

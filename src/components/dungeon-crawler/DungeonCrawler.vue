@@ -40,7 +40,7 @@ const player = ref({
   manaRegeneration: 10000,
   direction: 'right',
   state: 'idle',
-  weapon: WEAPON_CONFIG.SWORD,
+  weapon: WEAPON_CONFIG.WAND,
   character: PLAYER_CONFIG.DINO,
   isAttacking: false,
   isCharging: false,
@@ -341,7 +341,7 @@ const collectItem = (item) => {
   setTimeout(() => {
     if (item.type === 'COIN') {
       player.value.coins++;
-    } else if (item.type === 'RED_KEY') {
+    } else if (item.type === 'KEY') {
       player.value.keys++;
     } else if (item.type === 'HEART') {
       player.value.maxHealth++;

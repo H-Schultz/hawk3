@@ -64,7 +64,6 @@ export const TILES = {
     99: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4}, // NPC Platzhalter
 };
 export const MAPS = [
-    /*
     {
         // Level 1: Quest: Einführung
         layout: [
@@ -76,13 +75,13 @@ export const MAPS = [
             [0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
             [0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
         ],
-        enemiesRequired: 1,
+        enemiesRequired: 3,
         name: 'Kriegerhalle',
         type: 'combat',
         allowedEnemyTypes: ['GOBLIN'],
         allowedItems: ['BLUE_POTION', 'RED_POTION'],
         maxEnemies: 7
-    },*/
+    },
     {
         // Level 0: Choose character and weapon
         layout: [
@@ -113,7 +112,7 @@ export const MAPS = [
                 ],
                 goal: 0,
                 type: 'RED_POTION',
-                gift: 'RED_KEY',
+                gift: 'KEY',
                 successMessage: 'Gut gemacht! Du bist bereit für die nächste Herausforderung.',
                 spots: []
             }
@@ -139,7 +138,7 @@ export const MAPS = [
         name: 'Düstere Höhle',
         type: 'quest',
         allowedEnemyTypes: ['GOBLIN'],
-        allowedItems: ['RED_KEY', 'BOMB', 'HEART', 'MANA'],
+        allowedItems: ['KEY', 'BOMB', 'HEART', 'MANA'],
         maxEnemies: 2,
         chests: [
             { x: 10, y: 6, type: 'CHEST_GOLD' },
@@ -162,13 +161,13 @@ export const MAPS = [
                 ],
                 goal: 3,
                 type: 'RED_POTION',
-                gift: 'RED_KEY',
+                gift: 'KEY',
                 successMessage: 'Gut gemacht! Du bist bereit für die nächste Herausforderung.',
                 spots: [
                     {x: 3, y: 3, collected: false, name: 'item', type: 'RED_POTION'},
                     {x: 5, y: 5, collected: false, name: 'item', type: 'HEART'},
                     {x: 7, y: 6, collected: false, name: 'item', type: 'BOMB'},
-                    {x: 9, y: 7, collected: false, name: 'item', type: 'RED_KEY'},
+                    {x: 9, y: 7, collected: false, name: 'item', type: 'KEY'},
                     {x: 7, y: 7, collected: false, name: 'item', type: 'MANA'}
                 ]
             }
@@ -197,7 +196,7 @@ export const MAPS = [
         name: 'Die Schatzkammer',
         type: 'quest',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN'],
-        allowedItems: ['RED_KEY', 'BOMB', 'RED_POTION'],
+        allowedItems: ['KEY', 'BOMB', 'RED_POTION'],
         maxEnemies: 3,
         chests: [
             { x: 6, y: 6, type: 'CHEST_GOLD' },
@@ -221,7 +220,7 @@ export const MAPS = [
                 ],
                 goal: 10,
                 type: 'COIN',
-                gift: 'RED_KEY',
+                gift: 'KEY',
                 successMessage: 'Unglaublich! Du hast alle Münzen gefunden! Hier ist der Schlüssel zur Bosshalle.',
                 spots: [
                     {x: 8, y: 2, collected: false, name: 'item', type: 'COIN'},
@@ -270,7 +269,7 @@ export const MAPS = [
         enemiesRequired: 1,
         name: 'Kriegerhalle',
         type: 'boss',
-        allowedItems: ['RED_KEY'],
+        allowedItems: ['KEY'],
         chests: [
             { x: 6, y: 3, type: 'CHEST_GOLD' },
         ],
@@ -303,7 +302,7 @@ export const MAPS = [
         name: 'Die Kriegerkammer',
         type: 'quest',
         allowedEnemyTypes: ['SKELETON', 'GOBLIN', 'ORC'],
-        allowedItems: ['RED_KEY', 'BOMB', 'GREEN_POISON', 'RED_POTION', 'BLUE_POTION'],
+        allowedItems: ['KEY', 'BOMB', 'GREEN_POISON', 'RED_POTION', 'BLUE_POTION'],
         maxEnemies: 5,
         chests: [
             { x: 6, y: 6, type: 'CHEST_GOLD' },
@@ -329,7 +328,7 @@ export const MAPS = [
                 ],
                 goal: 8,
                 type: 'ENEMY',
-                gift: 'RED_KEY',
+                gift: 'KEY',
                 successMessage: 'Beeindruckend! Du bist wahrlich ein Meister des Kampfes! Hier ist der Schlüssel zur Bosshalle.',
                 spots: [
                     {x: 8, y: 3, collected: false, name: 'enemy', type: 'SKELETON'},
@@ -396,6 +395,16 @@ export const ITEM_TYPES = {
         frameOffset: SPRITE_SIZE / 2,
         floating: false,
     },
+    COIN_BIG: {
+        name: 'coinBig',
+        sprite: {
+            x: SPRITE_SIZE * 20, y: SPRITE_SIZE * 24
+        },
+        size: {width: 16, height: 16},
+        frames: 1,
+        frameOffset: SPRITE_SIZE,
+        floating: false,
+    },
     RED_POTION: {
         name: 'redPotion',
         sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 22},
@@ -419,9 +428,9 @@ export const ITEM_TYPES = {
         floating: false,
         destroyable: true
     },
-    RED_KEY: {
-        name: 'redKey',
-        sprite: {x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 18},
+    KEY: {
+        name: 'key',
+        sprite: {x: SPRITE_SIZE * 19, y: SPRITE_SIZE * 18},
         size: {width: 16, height: 16},
         frames: 1,
         floating: false,
@@ -815,6 +824,11 @@ export const WEAPON_CONFIG = {
             { x: 0, y: -1 },
             { x: 0, y: -2 },
         ],
-        doubleDamagePositions: []
+        doubleDamagePositions: [
+            { x: 1, y: 0 },
+            { x: -1, y: 0 },
+            { x: 0, y: 1 },
+            { x: 0, y: -1 },
+        ]
     }
 }
