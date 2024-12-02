@@ -946,12 +946,12 @@ const showStairs = () => {
 
 const startNextLevel = () => {
   const gameContainer = document.querySelector('.game-container');
+  gameContainer.classList.remove('flip-in');
   gameContainer.classList.add('flip-out');
+  gameState.value = GAME_STATE.LEVEL_COMPLETE;
 
   setTimeout(() => {
     const nextMapIndex = currentMapIndex.value + 1;
-    gameContainer.classList.remove('flip-out');
-    gameContainer.classList.add('flip-in');
 
     if (nextMapIndex < MAPS.length) {
       showShop.value = true;
@@ -963,9 +963,11 @@ const startNextLevel = () => {
 
 const continueToNextLevel = () => {
   showShop.value = false;
-  if (loadMap(currentMapIndex.value + 1)) {
-    player.value.health = Math.min(MAX_HEALTH, player.value.health + LEVEL_CONFIG.healthBonus);
-  }
+  gameState.value = GAME_STATE.PLAYING;
+  const gameContainer = document.querySelector('.game-container');
+  gameContainer.classList.remove('flip-out');
+  gameContainer.classList.add('flip-in');
+  loadMap(currentMapIndex.value + 1);
 };
 
 const restartGame = () => {
@@ -1425,13 +1427,5 @@ watch(() => gameState.value, (newState) => {
 
   .map-row {
     display: flex;
-  }
-
-  .flip-out {
-    opacity: 0;
-  }
-
-  .flip-in {
-    opacity: 1;
   }
 </style>

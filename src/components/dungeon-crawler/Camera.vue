@@ -90,7 +90,7 @@ defineExpose({ getRelativePosition });
     border: 4px solid #fff;
   }
 
-  .camera-viewport::after {
+  .camera-viewportxx::after {
     content: '';
     display: flex;
     position: absolute;
@@ -106,4 +106,13 @@ defineExpose({ getRelativePosition });
     left: 0;
     transition: transform 0.4s ease;
   }
+
+  .flip-out .game-world {
+    opacity: 0;
+  }
+
+  .flip-in .game-world {
+    opacity: 1;
+  }
+
 </style>

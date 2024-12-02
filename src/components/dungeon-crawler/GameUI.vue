@@ -214,6 +214,7 @@ const questProgressStyle = computed(() => {
   width: 100%;
   top: 0;
   left: 0;
+  pointer-events: all;
 }
 
 .hearts-container {
@@ -262,7 +263,7 @@ const questProgressStyle = computed(() => {
   display: flex;
   align-items: center;
   gap: 0;
-  z-index: 10;
+  z-index: 4000;
   background-color: rgba(255,255,255,0.3);
   padding: 0;
   border-radius: 15px;

@@ -12,8 +12,6 @@ export const DISPLAY_SIZE = SPRITE_SIZE * SPRITE_SCALE;
 export const ANIMATION_SPEED = 150;
 export const MAX_HEALTH = 6;
 export const MAX_MANA = 6;
-export const SPECIAL_DURATION = 800;
-export const CHARGE_TIME = 1000;
 
 export const TILES = {
     10: {x: SPRITE_SIZE, y: SPRITE_SIZE, zIndex: 2}, // Mauer Rechts
@@ -81,42 +79,6 @@ export const MAPS = [
         allowedEnemyTypes: ['GOBLIN'],
         allowedItems: ['COIN'],
         maxEnemies: 7
-    },
-    {
-        // Level 0: Choose character and weapon
-        layout: [
-            [ 0, 14, 14, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 0],
-            [ 0, 10, 11, 11, 11, 11, 11, 17, 11, 11, 11, 11, 10, 0],
-            [ 0, 12, 21, 20, 21, 22, 20, 71, 20, 21, 20, 20, 10, 0],
-            [ 0, 12, 90, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
-            [ 0, 12, 21, 20, 20, 20, 22, 20, 20, 20, 20, 23, 10, 0],
-            [ 0, 12, 98, 20, 20, 23, 20, 21, 20, 20, 20, 20, 10, 0],
-            [ 0, 12, 23, 20, 20, 20, 20, 20, 20, 20, 21, 24, 10, 0],
-            [ 0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
-            [ 0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
-        ],
-        name: 'Düstere Höhle',
-        type: 'quest',
-        allowedEnemyTypes: [],
-        allowedItems: [],
-        maxEnemies: 0,
-        quests: [
-            {
-                npc: {x: 5, y: 2, direction: 'left'},
-                chooseCharacter: true,
-                description: [
-                    'Willkommen, tapferer Abenteurer!',
-                    'chooseCharacter',
-                    'chooseWeapon',
-                    'Wähle dein Charakter und deine Waffe.'
-                ],
-                goal: 0,
-                type: 'RED_POTION',
-                gift: 'KEY',
-                successMessage: 'Gut gemacht! Du bist bereit für die nächste Herausforderung.',
-                spots: []
-            }
-        ]
     }, {
         // Level 1: Quest: Einführung
         layout: [

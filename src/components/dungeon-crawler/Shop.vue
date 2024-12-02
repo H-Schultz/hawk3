@@ -16,48 +16,89 @@ const props = defineProps({
 
 const shopItems = ref([
   {
-    type: 'WAND',
-    name: 'Magic Wand',
-    price: 10,
-    category: 'weapon',
-    config: WEAPON_CONFIG.WAND
-  },
-  {
-    type: 'AXE',
-    name: 'Battle Axe',
-    price: 10,
-    category: 'weapon',
-    config: WEAPON_CONFIG.AXE
-  },
-  {
-    type: 'MACE',
-    name: 'Mace',
-    price: 10,
-    category: 'weapon',
-    config: WEAPON_CONFIG.MACE
-  },
-  {
     type: 'RED_POTION',
     name: 'Health Potion',
     price: 1,
     category: 'consumable',
     config: ITEM_TYPES.RED_POTION
-  },
-  {
+  }, {
     type: 'BLUE_POTION',
     name: 'Mana Potion',
     price: 1,
     category: 'consumable',
     config: ITEM_TYPES.BLUE_POTION
-  },
-  {
+  }, {
+    type: 'KEY',
+    name: 'Key',
+    price: 2,
+    category: 'consumable',
+    config: ITEM_TYPES.KEY
+  }, {
     type: 'BOMB',
     name: 'Bomb',
-    price: 1,
+    price: 2,
     category: 'consumable',
     config: ITEM_TYPES.BOMB
-  }
+  }, {
+    type: 'HEART',
+    name: 'Heart',
+    price: 5,
+    category: 'consumable',
+    config: ITEM_TYPES.HEART
+  }, {
+    type: 'MANA',
+    name: 'Mana',
+    price: 5,
+    category: 'consumable',
+    config: ITEM_TYPES.MANA
+  }, {
+    type: 'WAND',
+    name: 'Magic Wand',
+    price: 10,
+    category: 'weapon',
+    config: WEAPON_CONFIG.WAND
+  }, {
+    type: 'AXE',
+    name: 'Battle Axe',
+    price: 10,
+    category: 'weapon',
+    config: WEAPON_CONFIG.AXE
+  }, {
+    type: 'MACE',
+    name: 'Mace',
+    price: 10,
+    category: 'weapon',
+    config: WEAPON_CONFIG.MACE
+  }, {
+    type: 'SWORD',
+    name: 'Sword',
+    price: 10,
+    category: 'weapon',
+    config: WEAPON_CONFIG.SWORD
+  },
 ]);
+
+const currentSlide = ref(0);
+const itemsPerPage = 3;
+
+const totalPages = computed(() => Math.ceil(shopItems.value.length / itemsPerPage));
+
+const visibleItems = computed(() => {
+  const start = currentSlide.value * itemsPerPage;
+  return shopItems.value.slice(start, start + itemsPerPage);
+});
+
+const nextSlide = () => {
+  if (currentSlide.value < totalPages.value - 1) {
+    currentSlide.value++;
+  }
+};
+
+const prevSlide = () => {
+  if (currentSlide.value > 0) {
+    currentSlide.value--;
+  }
+};
 
 const getItemStyle = (item) => {
   const sprite = item.config.sprite;
@@ -89,6 +130,17 @@ const buyItem = (item) => {
       case 'BLUE_POTION':
         props.player.mana = Math.min(props.player.maxMana, props.player.mana + 1);
         break;
+      case 'HEART':
+        props.player.maxHealth++;
+        props.player.health++;
+        break;
+      case 'MANA':
+        props.player.maxMana++;
+        props.player.mana++;
+        break;
+      case 'KEY':
+        props.player.keys++;
+        break;
     }
   }
 };
@@ -104,32 +156,37 @@ const canBuy = (item) => {
 <template>
   <div class="shop-overlay">
     <div class="shop-container">
-      <div class="shop-header">
-        <h2>Shop</h2>
-        <div class="coin-counter">
-          <div class="coin-sprite"></div>
-          {{ player.coins }}
-        </div>
-      </div>
+      <div class="shop-slider">
+        <button class="slider-button prev" @click="prevSlide" :disabled="currentSlide === 0">
+          ◀
+        </button>
 
-      <div class="shop-items">
-        <div v-for="item in shopItems"
-             :key="item.type"
-             class="shop-item"
-             :class="{ 'owned': item.category === 'weapon' && item.config === player.weapon }">
-          <div class="item-sprite" :style="getItemStyle(item)"></div>
-          <div class="item-info">
-            <span class="item-name">{{ item.name }}</span>
-            <span class="item-price">{{ item.price }}</span>
+        <div class="shop-items">
+          <div v-for="item in visibleItems"
+               :key="item.type"
+               class="shop-item"
+               :class="{
+                 'shop-item--weapon': item.category === 'weapon',
+                 'owned': item.category === 'weapon' && item.config === player.weapon
+               }">
+            <div class="item-sprite" :style="getItemStyle(item)"></div>
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-price">{{ item.price }}</span>
+            </div>
+            <button
+                @click="buyItem(item)"
+                :disabled="!canBuy(item)"
+                :class="['buy-button', { 'disabled': !canBuy(item) }]"
+            >
+              {{ item.category === 'weapon' && item.config === player.weapon ? 'Owned' : 'Buy' }}
+            </button>
           </div>
-          <button
-              @click="buyItem(item)"
-              :disabled="!canBuy(item)"
-              :class="['buy-button', { 'disabled': !canBuy(item) }]"
-          >
-            {{ item.category === 'weapon' && item.config === player.weapon ? 'Owned' : 'Buy' }}
-          </button>
         </div>
+
+        <button class="slider-button next" @click="nextSlide" :disabled="currentSlide >= totalPages - 1">
+          ▶
+        </button>
       </div>
 
       <button class="continue-button" @click="onClose">Continue</button>
@@ -141,69 +198,74 @@ const canBuy = (item) => {
 .shop-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 600;
 }
 
 .shop-container {
   background: #2a323c;
   border: 4px solid #4a5568;
-  border-radius: 8px;
-  padding: 24px;
+  border-radius: 4px;
+  padding: 4px;
   width: 90%;
   max-width: 600px;
 }
 
-.shop-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #4a5568;
-}
-
-.shop-header h2 {
-  color: #fff;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.coin-counter {
+.shop-slider {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ffd700;
-  font-size: 20px;
+  margin-bottom: 8px;
 }
 
-.coin-sprite {
-  width: 32px;
-  height: 32px;
-  background-image: url(../../assets/dungeon-crawler/dungeon-sprite-v2.png);
-  background-position: -128px -64px;
-  background-size: 2048px 2048px;
-  image-rendering: pixelated;
+.slider-button {
+  background: #4a5568;
+  border: none;
+  color: white;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.slider-button:hover:not(:disabled) {
+  background: #2d3748;
+}
+
+.slider-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .shop-items {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .shop-item {
   background: #1a202c;
   border: 2px solid #4a5568;
-  border-radius: 6px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  border-radius: 4px;
+  padding: 4px;
+  display: grid;
+  grid-template-areas:
+    'a b'
+    'a c';
+  gap: 4px;
+  transition: transform 0.3s ease;
+  height: 140px;
+}
+
+.shop-item--weapon .item-sprite {
+  height: 128px !important;
 }
 
 .shop-item.owned {
@@ -211,36 +273,42 @@ const canBuy = (item) => {
 }
 
 .item-sprite {
+  grid-area: a;
   image-rendering: pixelated;
   background-repeat: no-repeat;
-  flex-shrink: 0;
+  align-self: center;
 }
 
 .item-info {
-  flex-grow: 1;
+  grid-area: b;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: center;
 }
 
 .item-name {
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .item-price {
   color: #ffd700;
-  font-size: 14px;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 700;
 }
 
 .buy-button {
+  grid-area: c;
   background: #48bb78;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 8px 16px;
+  padding: 4px 8px;
   cursor: pointer;
   transition: background-color 0.2s;
+  justify-self: stretch;
+  align-self: start;
 }
 
 .buy-button:hover:not(.disabled) {
@@ -259,7 +327,7 @@ const canBuy = (item) => {
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 12px;
+  padding: 4px;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.2s;
