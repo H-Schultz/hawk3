@@ -78,7 +78,7 @@ export const MAPS = [
         type: 'combat',
         allowedEnemyTypes: ['GOBLIN'],
         allowedItems: ['COIN'],
-        maxEnemies: 7
+        maxEnemies: 3
     }, {
         // Level 1: Quest: Einführung
         layout: [

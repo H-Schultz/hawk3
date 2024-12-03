@@ -654,7 +654,7 @@ const spawnEnemy = () => {
 };
 
 const moveEnemy = (enemy) => {
-  if (enemy.isPreparingAttack) return;
+  if (gameState.value !== GAME_STATE.PLAYING || enemy.isPreparingAttack) return;
 
   const dx = player.value.position.x - enemy.position.x;
   const dy = player.value.position.y - enemy.position.y;
@@ -945,9 +945,6 @@ const showStairs = () => {
 };
 
 const startNextLevel = () => {
-  const gameContainer = document.querySelector('.game-container');
-  gameContainer.classList.remove('flip-in');
-  gameContainer.classList.add('flip-out');
   gameState.value = GAME_STATE.LEVEL_COMPLETE;
 
   setTimeout(() => {
@@ -964,9 +961,6 @@ const startNextLevel = () => {
 const continueToNextLevel = () => {
   showShop.value = false;
   gameState.value = GAME_STATE.PLAYING;
-  const gameContainer = document.querySelector('.game-container');
-  gameContainer.classList.remove('flip-out');
-  gameContainer.classList.add('flip-in');
   loadMap(currentMapIndex.value + 1);
 };
 

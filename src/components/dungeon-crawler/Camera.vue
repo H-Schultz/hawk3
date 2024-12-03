@@ -107,12 +107,4 @@ defineExpose({ getRelativePosition });
     transition: transform 0.4s ease;
   }
 
-  .flip-out .game-world {
-    opacity: 0;
-  }
-
-  .flip-in .game-world {
-    opacity: 1;
-  }
-
 </style>

@@ -17,31 +17,31 @@ const props = defineProps({
 const shopItems = ref([
   {
     type: 'RED_POTION',
-    name: 'Health Potion',
+    name: 'Gesundheit',
     price: 1,
     category: 'consumable',
     config: ITEM_TYPES.RED_POTION
   }, {
     type: 'BLUE_POTION',
-    name: 'Mana Potion',
+    name: 'Ausdauer',
     price: 1,
     category: 'consumable',
     config: ITEM_TYPES.BLUE_POTION
   }, {
     type: 'KEY',
-    name: 'Key',
+    name: 'Schlüssel',
     price: 2,
     category: 'consumable',
     config: ITEM_TYPES.KEY
   }, {
     type: 'BOMB',
-    name: 'Bomb',
+    name: 'Bombe',
     price: 2,
     category: 'consumable',
     config: ITEM_TYPES.BOMB
   }, {
     type: 'HEART',
-    name: 'Heart',
+    name: 'Leben',
     price: 5,
     category: 'consumable',
     config: ITEM_TYPES.HEART
@@ -53,25 +53,25 @@ const shopItems = ref([
     config: ITEM_TYPES.MANA
   }, {
     type: 'WAND',
-    name: 'Magic Wand',
+    name: 'Zauberstab',
     price: 10,
     category: 'weapon',
     config: WEAPON_CONFIG.WAND
   }, {
     type: 'AXE',
-    name: 'Battle Axe',
+    name: 'Axt',
     price: 10,
     category: 'weapon',
     config: WEAPON_CONFIG.AXE
   }, {
     type: 'MACE',
-    name: 'Mace',
+    name: 'Keule',
     price: 10,
     category: 'weapon',
     config: WEAPON_CONFIG.MACE
   }, {
     type: 'SWORD',
-    name: 'Sword',
+    name: 'Schwert',
     price: 10,
     category: 'weapon',
     config: WEAPON_CONFIG.SWORD
@@ -167,6 +167,7 @@ const canBuy = (item) => {
                class="shop-item"
                :class="{
                  'shop-item--weapon': item.category === 'weapon',
+                 'shop-item--disabled': !canBuy(item),
                  'owned': item.category === 'weapon' && item.config === player.weapon
                }">
             <div class="item-sprite" :style="getItemStyle(item)"></div>
@@ -179,7 +180,12 @@ const canBuy = (item) => {
                 :disabled="!canBuy(item)"
                 :class="['buy-button', { 'disabled': !canBuy(item) }]"
             >
-              {{ item.category === 'weapon' && item.config === player.weapon ? 'Owned' : 'Buy' }}
+              <template v-if="item.category === 'weapon'">
+                {{ item.category === 'weapon' && item.config === player.weapon ? 'Angelegt' : 'Anlegen' }}
+              </template>
+              <template v-else>
+                Kaufen
+              </template>
             </button>
           </div>
         </div>
@@ -270,6 +276,11 @@ const canBuy = (item) => {
 
 .shop-item.owned {
   border-color: #48bb78;
+}
+
+.shop-item.owned .buy-button {
+  background: #48bb78;
+  color: white;
 }
 
 .item-sprite {
