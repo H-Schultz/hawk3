@@ -638,6 +638,7 @@ export const NPC_SPRITES = {
 
 export const PLAYER_CONFIG = {
     DINO: {
+        name: 'Dino',
         sprites: {
             idle: [
                 {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 14},
@@ -654,6 +655,7 @@ export const PLAYER_CONFIG = {
         }
     },
     KNIGHT: {
+        name: 'Knight',
         sprites: {
             idle: [
                 {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 6},
@@ -670,6 +672,7 @@ export const PLAYER_CONFIG = {
         }
     },
     HUNTER_MAN: {
+        name: 'Hunter Man',
         sprites: {
             idle: [
                 {x: SPRITE_SIZE * 8, y: SPRITE_SIZE * 2},
@@ -686,6 +689,7 @@ export const PLAYER_CONFIG = {
         }
     },
     HUNTER_WOMAN: {
+        name: 'Hunter Woman',
         sprites: {
             idle: [
                 {x: SPRITE_SIZE * 8, y: 0},
