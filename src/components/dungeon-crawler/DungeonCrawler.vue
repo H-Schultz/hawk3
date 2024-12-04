@@ -41,7 +41,7 @@ const player = ref({
   manaRegeneration: 10000,
   direction: 'right',
   state: 'idle',
-  weapon: WEAPON_CONFIG.MACE,
+  weapon: WEAPON_CONFIG.KNIFE,
   character: PLAYER_CONFIG.DINO,
   isAttacking: false,
   isCharging: false,

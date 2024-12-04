@@ -36,11 +36,11 @@ const characters = ref(Object.entries(PLAYER_CONFIG).map(([key, value]) => ({
 
 const weapons = ref([
   {
-    type: 'WAND',
-    name: 'Zauberstab',
-    price: 10,
+    type: 'KNIFE',
+    name: 'Messer',
+    price: 5,
     category: 'weapon',
-    config: WEAPON_CONFIG.WAND
+    config: WEAPON_CONFIG.KNIFE
   }, {
     type: 'AXE',
     name: 'Axt',
@@ -48,17 +48,23 @@ const weapons = ref([
     category: 'weapon',
     config: WEAPON_CONFIG.AXE
   }, {
-    type: 'MACE',
-    name: 'Keule',
-    price: 10,
-    category: 'weapon',
-    config: WEAPON_CONFIG.MACE
-  }, {
     type: 'SWORD',
     name: 'Schwert',
     price: 10,
     category: 'weapon',
     config: WEAPON_CONFIG.SWORD
+  }, {
+    type: 'WAND',
+    name: 'Zauberstab',
+    price: 15,
+    category: 'weapon',
+    config: WEAPON_CONFIG.WAND
+  }, {
+    type: 'MACE',
+    name: 'Keule',
+    price: 15,
+    category: 'weapon',
+    config: WEAPON_CONFIG.MACE
   }
 ]);
 

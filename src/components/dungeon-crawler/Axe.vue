@@ -25,8 +25,7 @@ const getAxeStyle = () => {
     backgroundImage: `url(${dungeonSprite})`,
     backgroundPosition: `-${props.player.weapon.sprite.x * 4}px -${props.player.weapon.sprite.y * 4}px`,
     backgroundSize: '2048px 2048px',
-    transform: props.player.direction === 'left' ? 'scaleX(-1)' : 'none',
-    transformOrigin: props.player.direction === 'left' ? 'calc(100% - 32px) calc(100% - 16px)' : 'calc(100% - 32px) calc(100% - 16px)',
+    transformOrigin: 'calc(100% - 32px) calc(100% - 16px)',
     opacity: props.player.isAttacking || props.player.isCharging || props.player.isSpecialAttacking || props.player.gameState === 'CHOOSE' ? 1 : 0
   };
 };
@@ -43,11 +42,6 @@ const getAxeStyle = () => {
   top: 0;
   transition: transform 0.1s ease;
   z-index: 200;
-}
-
-.player--choose .axe {
-  opacity: 1;
-  transform: translate(-50px, 40px) !important;
 }
 
 .player.attacking .axe {

@@ -708,6 +708,21 @@ export const PLAYER_CONFIG = {
 };
 
 export const WEAPON_CONFIG = {
+    KNIFE: {
+        name: 'knife',
+        damage: 1,
+        sprite: {
+            x: SPRITE_SIZE * 18, y: 0
+        },
+        size: {width: 16, height: 32},
+        chargeTime: 600,
+        damagePositions: [
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 0, y: 1 }
+        ],
+        doubleDamagePositions: []
+    },
     MACE: {
         name: 'mace',
         damage: 1,

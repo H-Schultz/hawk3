@@ -27,8 +27,7 @@ const getSwordStyle = () => {
     backgroundImage: `url(${dungeonSprite})`,
     backgroundPosition: `-${props.player.weapon.sprite.x * 4}px -${props.player.weapon.sprite.y * 4}px`,
     backgroundSize: '2048px 2048px',
-    transform: props.player.direction === 'left' ? 'scaleX(-1)' : 'none',
-    transformOrigin: props.player.direction === 'left' ? 'calc(100% - 32px) calc(100% - 16px)' : 'calc(100% - 32px) calc(100% - 16px)',
+    transformOrigin: 'calc(100% - 32px) calc(100% - 16px)',
   };
 };
 </script>
@@ -47,20 +46,11 @@ const getSwordStyle = () => {
   z-index: 200;
 }
 
-.player--choose .sword {
-  opacity: 1;
-  transform: translate(-50px, 40px) !important;
-}
-
 .player.attacking .sword {
   animation: swordSwing 0.4s ease-in-out;
 }
 
 .player.charging .sword {
-  animation: swordChargeSpecial 2s ease-in-out;
-}
-
-.player.chargingSpecial .sword {
   animation: swordChargeSpecial 2s ease-in-out;
 }
 
@@ -85,7 +75,6 @@ const getSwordStyle = () => {
   border-radius: 40%;
 }
 
-/* Positionen für alle 8 Richtungen */
 .whirl.top { left: 0; top: 0; animation: whirlEffect 0.8s linear; }
 .whirl.top-right { right: -64px; top: 0; animation: whirlEffect 0.8s linear 100ms; }
 .whirl.right { right: -64px; top: 64px; animation: whirlEffect 0.8s linear 200ms; }

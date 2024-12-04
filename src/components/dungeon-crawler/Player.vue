@@ -5,11 +5,15 @@
       'attacking': player.isAttacking,
       'charging': player.isCharging,
       'specialAttacking': player.isSpecialAttacking,
-      'player--choose': gameState === GAME_STATE.CHOOSE,
+      'player--left': player.direction === 'left',
+      'player--right': player.direction === 'right',
     }"
     :style="playerStyle"
   >
-    <template v-if="player.weapon.name === 'wand'">
+    <template v-if="player.weapon.name === 'knife'">
+      <Knife :player="player" />
+    </template>
+    <template v-else-if="player.weapon.name === 'wand'">
       <Wand :player="player" />
     </template>
     <template v-else-if="player.weapon.name === 'axe'">
@@ -28,6 +32,7 @@
   import {computed, onMounted, ref} from 'vue';
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite-v2.png';
   import {DISPLAY_SIZE, ANIMATION_SPEED, GAME_STATE} from './constants.js';
+  import Knife from './Knife.vue';
   import Sword from './Sword.vue';
   import Wand from './Wand.vue';
   import Axe from './Axe.vue';

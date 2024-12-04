@@ -6,5 +6,5 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  base: './',
+  base: 'hawk3/dist/',
 })
