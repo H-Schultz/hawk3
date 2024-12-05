@@ -32,7 +32,7 @@ const traps = ref([]);
 const activeExplosions = ref([]);
 const showShop = ref(false);
 const webMoveCounter = ref(0);
-const stuckInWeb = ref(false);
+const requiredMoves = ref({ id: null, count: false });
 const lastWebPosition = ref(null);
 
 const player = ref({
@@ -892,31 +892,28 @@ const movePlayer = (dx, dy) => {
       trap.y === player.value.position.y
   );
 
-  if (currentTrap && dungeonMap.value[currentTrap.y][currentTrap.x] === 31) {
-    // Spieler ist in einem Spinnennetz
-    if (!stuckInWeb.value ||
+  if (currentTrap && (currentTrap.id === 31 || currentTrap.id === 32)) {
+    if (!requiredMoves.value.id ||
         (lastWebPosition.value.x !== player.value.position.x ||
             lastWebPosition.value.y !== player.value.position.y)) {
-      // Neues Netz oder erstes Mal gefangen
-      stuckInWeb.value = true;
-      webMoveCounter.value = 0;
+      requiredMoves.value.id = currentTrap.id;
+      requiredMoves.value.count = 0;
       lastWebPosition.value = {...player.value.position};
     }
 
-    webMoveCounter.value++;
+    requiredMoves.value.count++;
+    if (TILES[currentTrap.id].trap.damage === 0 && currentTrap.status === 'idle') {
+      requiredMoves.value.count = TILES[currentTrap.id].trap.requiredMoves;
+    }
 
-    // Prüfe ob genug Bewegungen gemacht wurden
-    if (webMoveCounter.value >= TILES[31].trap.requiredMoves) {
-      stuckInWeb.value = false;
-      webMoveCounter.value = 0;
+    if (requiredMoves.value.count >= TILES[currentTrap.id].trap.requiredMoves) {
+      requiredMoves.value = { id: null, count: false };
       lastWebPosition.value = null;
-      // Erlaube Bewegung zum nächsten Feld
       if (isValidMove(newPosition)) {
         player.value.position = newPosition;
         collectItem(newPosition);
       }
     }
-    // Spieler bleibt auf der Position wenn nicht genug Bewegungen
     return;
   }
 
@@ -1034,16 +1031,19 @@ const getTileObjects = (tile, rowIndex, tileIndex) => {
 const checkTrapDamage = (playerPosition) => {
   const trap = traps.value.find(trap => trap.x === playerPosition.x && trap.y === playerPosition.y);
   if (trap && trap.status === 'active') {
-    player.value.isUnderAttack = true;
-    player.value.health -= 1;
-    if (player.value.health <= 0) {
-      gameState.value = GAME_STATE.GAME_OVER;
-      player.value.health = 0;
-    }
+    const trapDamage = TILES[trap.id].trap.damage;
+    if (trapDamage > 0) {
+      player.value.isUnderAttack = true;
+      player.value.health -= trapDamage;
+      if (player.value.health <= 0) {
+        gameState.value = GAME_STATE.GAME_OVER;
+        player.value.health = 0;
+      }
 
-    setTimeout(() => {
-      player.value.isUnderAttack = false;
-    }, 200);
+      setTimeout(() => {
+        player.value.isUnderAttack = false;
+      }, 200);
+    }
   }
 };
 
