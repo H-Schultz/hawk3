@@ -634,7 +634,7 @@ const spawnEnemy = () => {
 
   const newEnemy = {
     id: nextEnemyId++,
-    type: 'default',
+    type: ENEMY_TYPES[randomType].type,
     name: randomType,
     position: position,
     direction: Math.random() > 0.5 ? 'left' : 'right',

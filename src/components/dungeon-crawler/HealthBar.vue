@@ -18,7 +18,7 @@
 <style scoped>
   .health-bar {
     height: 100%;
-    background: #ff0000;
+    background: rgba(255, 0, 0, 0.8);
     transition: width 0.3s ease;
   }
 </style>

@@ -54,6 +54,13 @@ export const TILES = {
                 x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 12
             }
         }}, // Falle
+    31: {
+        x: SPRITE_SIZE,
+        y: SPRITE_SIZE * 11,
+        trap: {
+            damage: 0,
+            slowSpeed: 4
+        }}, // Spinnenfalle
     40: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 14, zIndex: 2}, // Tränke Oben
     41: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 15, zIndex: 2}, // Tränke Oben Verziert
     71: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 2, frames: 3, frameOffset: SPRITE_SIZE}, // rote Tränke Boden
@@ -68,7 +75,7 @@ export const MAPS = [
             [0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 0],
             [0, 10, 11, 11, 11, 17, 11, 11, 11, 11, 11, 11, 10, 0],
             [0, 12, 90, 20, 21, 71, 20, 23, 20, 21, 20, 20, 10, 0],
-            [0, 12, 98, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
+            [0, 12, 98, 20, 31, 20, 20, 20, 20, 20, 20, 20, 10, 0],
             [0, 12, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
             [0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
             [0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
@@ -76,7 +83,7 @@ export const MAPS = [
         enemiesRequired: 1,
         name: 'Kriegerhalle',
         type: 'combat',
-        allowedEnemyTypes: ['GOBLIN'],
+        allowedEnemyTypes: ['EVILY'],
         allowedItems: ['COIN'],
         maxEnemies: 3
     }, {
@@ -457,7 +464,7 @@ export const ITEM_TYPES = {
 export const ENEMY_TYPES = {
     SKELETON: {
         name: 'skeleton',
-        type: 'default',
+        type: 'small',
         maxHealth: 3,
         damage: 1,
         intelligence: 0.2,
@@ -482,6 +489,66 @@ export const ENEMY_TYPES = {
                 {x: SPRITE_SIZE * 28, y: SPRITE_SIZE * 5},
                 {x: SPRITE_SIZE * 29, y: SPRITE_SIZE * 5},
                 {x: SPRITE_SIZE * 30, y: SPRITE_SIZE * 5},
+            ]
+        }
+    },
+    FLENEMY: {
+        name: 'flenemy',
+        type: 'small',
+        maxHealth: 6,
+        damage: 1,
+        intelligence: 0.4,
+        dropChance: 0.9,
+        moveSpeed: 2000,
+        spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE * 23, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 24, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 25, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 26, y: SPRITE_SIZE - 8},
+            ],
+            attack: [
+                {x: SPRITE_SIZE * 27, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 28, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 29, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 30, y: SPRITE_SIZE - 8},
+            ],
+            run: [
+                {x: SPRITE_SIZE * 27, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 28, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 29, y: SPRITE_SIZE - 8},
+                {x: SPRITE_SIZE * 30, y: SPRITE_SIZE - 8},
+            ]
+        }
+    },
+    EVILY: {
+        name: 'evily',
+        type: 'small',
+        maxHealth: 4,
+        damage: 0,
+        intelligence: 0.1,
+        dropChance: 0.9,
+        moveSpeed: 2000,
+        spriteSize: {x: SPRITE_SIZE * SPRITE_SCALE, y: (SPRITE_SIZE * SPRITE_SCALE * 2) - (SPRITE_SIZE / 2)},
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE * 23, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 24, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 25, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 26, y: SPRITE_SIZE * 4 - 8},
+            ],
+            attack: [
+                {x: SPRITE_SIZE * 27, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 28, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 29, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 30, y: SPRITE_SIZE * 4 - 8},
+            ],
+            run: [
+                {x: SPRITE_SIZE * 27, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 28, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 29, y: SPRITE_SIZE * 4 - 8},
+                {x: SPRITE_SIZE * 30, y: SPRITE_SIZE * 4 - 8},
             ]
         }
     },
