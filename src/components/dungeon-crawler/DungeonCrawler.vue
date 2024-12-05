@@ -31,6 +31,9 @@ const questItems = ref([]);
 const traps = ref([]);
 const activeExplosions = ref([]);
 const showShop = ref(false);
+const webMoveCounter = ref(0);
+const stuckInWeb = ref(false);
+const lastWebPosition = ref(null);
 
 const player = ref({
   position: { x: 1, y: 1 },
@@ -41,7 +44,7 @@ const player = ref({
   manaRegeneration: 10000,
   direction: 'right',
   state: 'idle',
-  weapon: WEAPON_CONFIG.KNIFE,
+  weapon: WEAPON_CONFIG.KATANA,
   character: PLAYER_CONFIG.DINO,
   isAttacking: false,
   isCharging: false,
@@ -49,7 +52,7 @@ const player = ref({
   isUnderAttack: false,
   hasExecutedSpecial: false,
   chargeStartTime: null,
-  coins: 0,
+  coins: 30,
   keys: 0,
   bombs: 0,
   gameState
@@ -124,7 +127,7 @@ const loadMap = (mapIndex) => {
       if (layout[y][x] === 90) {
         startPos = {x, y};
       }
-      if (layout[y][x] === 30) {
+      if (layout[y][x] === 30 || layout[y][x] === 31) {
         traps.value.push({x, y, status: 'active'});
       }
     }
@@ -884,6 +887,40 @@ const movePlayer = (dx, dy) => {
 
   player.value.state = 'run';
 
+  // Prüfe ob Spieler in einem Spinnennetz steckt
+  const currentTrap = traps.value.find(trap =>
+      trap.x === player.value.position.x &&
+      trap.y === player.value.position.y
+  );
+
+  if (currentTrap && dungeonMap.value[currentTrap.y][currentTrap.x] === 31) {
+    // Spieler ist in einem Spinnennetz
+    if (!stuckInWeb.value ||
+        (lastWebPosition.value.x !== player.value.position.x ||
+            lastWebPosition.value.y !== player.value.position.y)) {
+      // Neues Netz oder erstes Mal gefangen
+      stuckInWeb.value = true;
+      webMoveCounter.value = 0;
+      lastWebPosition.value = {...player.value.position};
+    }
+
+    webMoveCounter.value++;
+
+    // Prüfe ob genug Bewegungen gemacht wurden
+    if (webMoveCounter.value >= TILES[31].trap.requiredMoves) {
+      stuckInWeb.value = false;
+      webMoveCounter.value = 0;
+      lastWebPosition.value = null;
+      // Erlaube Bewegung zum nächsten Feld
+      if (isValidMove(newPosition)) {
+        player.value.position = newPosition;
+        collectItem(newPosition);
+      }
+    }
+    // Spieler bleibt auf der Position wenn nicht genug Bewegungen
+    return;
+  }
+
   if (isValidMove(newPosition)) {
     player.value.position = newPosition;
     checkTrapDamage(newPosition);
@@ -987,7 +1024,7 @@ const executeAttack = () => {
 };
 
 const getTileObjects = (tile, rowIndex, tileIndex) => {
-  if (tile === 30) {
+  if (tile === 30 || tile === 31) {
     return traps.value.find(trap => trap.x === tileIndex && trap.y === rowIndex);
   } else {
     return TILES[tile];

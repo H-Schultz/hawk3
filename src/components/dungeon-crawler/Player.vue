@@ -13,6 +13,9 @@
     <template v-if="player.weapon.name === 'knife'">
       <Knife :player="player" />
     </template>
+    <template v-else-if="player.weapon.name === 'katana'">
+      <Katana :player="player" />
+    </template>
     <template v-else-if="player.weapon.name === 'wand'">
       <Wand :player="player" />
     </template>
@@ -33,6 +36,7 @@
   import dungeonSprite from '../../assets/dungeon-crawler/dungeon-sprite-v2.png';
   import {DISPLAY_SIZE, ANIMATION_SPEED, GAME_STATE} from './constants.js';
   import Knife from './Knife.vue';
+  import Katana from './Katana.vue';
   import Sword from './Sword.vue';
   import Wand from './Wand.vue';
   import Axe from './Axe.vue';

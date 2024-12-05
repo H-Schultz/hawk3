@@ -55,11 +55,21 @@ export const TILES = {
             }
         }}, // Falle
     31: {
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE, y: SPRITE_SIZE * 11},
+            ],
+            active: [
+                {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 11},
+            ],
+        },
         x: SPRITE_SIZE,
         y: SPRITE_SIZE * 11,
         trap: {
-            damage: 0,
-            slowSpeed: 4
+            activeTime: 0, // Immer aktiv
+            activationInterval: 0,
+            type: 'web',
+            requiredMoves: 4
         }}, // Spinnenfalle
     40: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 14, zIndex: 2}, // Tränke Oben
     41: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 15, zIndex: 2}, // Tränke Oben Verziert
@@ -83,7 +93,7 @@ export const MAPS = [
         enemiesRequired: 1,
         name: 'Kriegerhalle',
         type: 'combat',
-        allowedEnemyTypes: ['EVILY'],
+        allowedEnemyTypes: ['GOBLIN'],
         allowedItems: ['COIN'],
         maxEnemies: 3
     }, {
@@ -789,6 +799,25 @@ export const WEAPON_CONFIG = {
             { x: 0, y: 1 }
         ],
         doubleDamagePositions: []
+    },
+    KATANA: {
+        name: 'katana',
+        damage: 1,
+        sprite: {
+            x: SPRITE_SIZE * 18, y: SPRITE_SIZE * 4
+        },
+        size: {width: 16, height: 32},
+        chargeTime: 600,
+        damagePositions: [
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 2, y: 0 },
+            { x: 0, y: 1 }
+        ],
+        doubleDamagePositions: [
+            { x: 1, y: 0 },
+            { x: 2, y: 0 }
+        ]
     },
     MACE: {
         name: 'mace',

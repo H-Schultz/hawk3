@@ -47,7 +47,7 @@ const getKnifeStyle = () => {
 }
 
 .player.charging .knife {
-  animation: knifeCharge .6s ease-in-out;
+  animation: knifeCharge 0.6s ease-in-out;
 }
 
 .player.specialAttacking .knife {
