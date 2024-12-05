@@ -127,8 +127,8 @@ const loadMap = (mapIndex) => {
       if (layout[y][x] === 90) {
         startPos = {x, y};
       }
-      if (layout[y][x] === 30 || layout[y][x] === 31) {
-        traps.value.push({x, y, status: 'active'});
+      if (layout[y][x] === 30 || layout[y][x] === 31 || layout[y][x] === 32) {
+        traps.value.push({x, y, status: 'active', id: layout[y][x] });
       }
     }
   }
@@ -184,29 +184,28 @@ const loadMap = (mapIndex) => {
 
 const initializeTraps = () => {
   traps.value.forEach(trap => {
-    initializeTrap(trap.x, trap.y);
+    initializeTrap(trap);
   });
 };
 
-const initializeTrap = (x, y) => {
+const initializeTrap = (initTrap) => {
+  const x = initTrap.x;
+  const y = initTrap.y;
   const toggleTrapStatus = () => {
     const trap = traps.value.find(trap => trap.x === x && trap.y === y);
     if (!trap) return;
     trap.status = trap.status === 'active' ? 'idle' : 'active';
     if (trap.status === 'active' && player.value.position.x === x && player.value.position.y === y) {
-
-      console.log('active Trap', trap, x, y, trap.timerId);
       checkTrapDamage(player.value.position);
     }
-    trap.timerId = setTimeout(
-        toggleTrapStatus,
-        trap.status === 'active' ? TILES[30].trap.activeTime : TILES[30].trap.activationInterval
-    );
+    let trapTime = trap.status === 'active' ? TILES[initTrap.id].trap.activeTime : TILES[initTrap.id].trap.activationInterval;
+    trapTime += Math.floor(Math.random() * 300);
+    trap.timerId = setTimeout(toggleTrapStatus, trapTime);
   };
   const trap = traps.value.find(trap => trap.x === x && trap.y === y);
   if (trap) {
-    console.log('Init Trap', trap, x, y, trap.timerId);
-    trap.timerId = setTimeout(toggleTrapStatus, TILES[30].trap.activeTime);
+    const trapTime = Math.floor(Math.random() * 300) + TILES[initTrap.id].trap.activeTime;
+    trap.timerId = setTimeout(toggleTrapStatus, trapTime);
   }
 };
 
@@ -1024,7 +1023,7 @@ const executeAttack = () => {
 };
 
 const getTileObjects = (tile, rowIndex, tileIndex) => {
-  if (tile === 30 || tile === 31) {
+  if (tile === 30 || tile === 31 || tile === 32) {
     return traps.value.find(trap => trap.x === tileIndex && trap.y === rowIndex);
   } else {
     return TILES[tile];

@@ -66,11 +66,30 @@ export const TILES = {
         x: SPRITE_SIZE,
         y: SPRITE_SIZE * 11,
         trap: {
-            activeTime: 0, // Immer aktiv
-            activationInterval: 0,
+            damage: 1,
+            activationInterval: 3000,
+            activeTime: 1000,
             type: 'web',
             requiredMoves: 4
         }}, // Spinnenfalle
+    32: {
+        sprites: {
+            idle: [
+                {x: SPRITE_SIZE, y: SPRITE_SIZE * 10},
+            ],
+            active: [
+                {x: SPRITE_SIZE * 2, y: SPRITE_SIZE * 10},
+            ],
+        },
+        x: SPRITE_SIZE,
+        y: SPRITE_SIZE * 11,
+        trap: {
+            damage: 0,
+            activationInterval: 4000,
+            activeTime: 3000,
+            type: 'hole',
+            requiredMoves: 4
+        }}, // Lochfalle
     40: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 14, zIndex: 2}, // Tränke Oben
     41: {x: SPRITE_SIZE, y: SPRITE_SIZE * 4, layer: 15, zIndex: 2}, // Tränke Oben Verziert
     71: {x: SPRITE_SIZE * 4, y: SPRITE_SIZE * 2, frames: 3, frameOffset: SPRITE_SIZE}, // rote Tränke Boden
@@ -85,8 +104,8 @@ export const MAPS = [
             [0, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 0],
             [0, 10, 11, 11, 11, 17, 11, 11, 11, 11, 11, 11, 10, 0],
             [0, 12, 90, 20, 21, 71, 20, 23, 20, 21, 20, 20, 10, 0],
-            [0, 12, 98, 20, 31, 20, 20, 20, 20, 20, 20, 20, 10, 0],
-            [0, 12, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 0],
+            [0, 12, 98, 20, 31, 32, 20, 20, 20, 20, 20, 20, 10, 0],
+            [0, 12, 20, 20, 32, 31, 20, 20, 20, 20, 20, 20, 10, 0],
             [0, 12, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 10, 0],
             [0, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 0],
         ],
