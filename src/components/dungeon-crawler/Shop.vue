@@ -25,7 +25,7 @@ const itemsPerPage = computed(() => {
   }
 });
 const currentSlide = ref(0);
-const tabs = ['items', 'weapons', 'characters', 'minigame'];
+const tabs = ['items', 'weapons', 'characters', 'casino'];
 
 const characters = ref(Object.entries(PLAYER_CONFIG).map(([key, value]) => ({
   type: key,
@@ -54,6 +54,12 @@ const weapons = ref([
     category: 'weapon',
     config: WEAPON_CONFIG.SWORD
   }, {
+    type: 'KATANA',
+    name: 'Katana',
+    price: 15,
+    category: 'weapon',
+    config: WEAPON_CONFIG.KATANA
+  }, {
     type: 'WAND',
     name: 'Zauberstab',
     price: 15,
@@ -67,6 +73,14 @@ const weapons = ref([
     config: WEAPON_CONFIG.MACE
   }
 ]);
+
+const coinItem = ref({
+  type: 'COIN',
+  name: 'Münze',
+  price: 1,
+  category: 'currency',
+  config: ITEM_TYPES.COIN_BIG
+});
 
 const items = ref([
   {
@@ -225,11 +239,16 @@ const gameMessage = ref('');
 const isReturning = ref(false);
 const winningIndexes = ref([]);
 
-// Erstelle eine längere Liste von Items für die Animation
 const createReelStrip = () => {
   const baseItems = items.value;
-  // Wiederhole die Items mehrmals für einen Endlos-Effekt
-  return [...baseItems, ...baseItems, ...baseItems];
+  const itemsWithCoins = [...baseItems];
+  itemsWithCoins.push(coinItem.value);
+  itemsWithCoins.push(coinItem.value);
+  itemsWithCoins.push(coinItem.value);
+  // shuffle items
+  itemsWithCoins.sort(() => Math.random() - 0.5);
+  console.log(itemsWithCoins);
+  return [...itemsWithCoins];
 };
 
 const reels = ref([
@@ -256,7 +275,7 @@ const reels = ref([
   }
 ]);
 
-const ITEM_HEIGHT = 80; // Höhe jedes Item-Slots
+const ITEM_HEIGHT = 80;
 const SPIN_DURATION = 1000;
 const MAX_SPEED = 50;
 
@@ -268,13 +287,12 @@ const pullLever = async () => {
   gameMessage.value = '';
   winningIndexes.value = [];
 
-  // Starte Spin für jede Rolle mit Verzögerung
   for (let i = 0; i < reels.value.length; i++) {
     const reel = reels.value[i];
     reel.spinning = true;
     reel.spinSpeed = MAX_SPEED;
 
-    const targetIndex = Math.floor(Math.random() * items.value.length);
+    const targetIndex = Math.floor(Math.random() * reel.items.length);
     reel.selectedIndex = targetIndex;
 
     setTimeout(() => {
@@ -282,10 +300,8 @@ const pullLever = async () => {
     }, SPIN_DURATION + (i * 500));
   }
 
-  // Warte bis alle Rollen gestoppt sind
   setTimeout(() => {
     isReturning.value = true;
-    // Warte kurz und setze dann isReturning zurück
     setTimeout(() => {
       checkResults();
       isSpinning.value = false;
@@ -295,27 +311,19 @@ const pullLever = async () => {
 };
 
 const animateReels = () => {
-  reels.value.forEach(reel => {
+  reels.value.forEach((reel, index) => {
     if (!reel.spinning) return;
-
     reel.offset += reel.spinSpeed;
-
-    // Reset position when reaching the end
-    if (reel.offset >= ITEM_HEIGHT * items.value.length) {
+    if (reel.offset >= ITEM_HEIGHT * reels.value[index].items.length) {
       reel.offset = 0;
     }
   });
-
   requestAnimationFrame(animateReels);
 };
 
 const stopReel = (reelIndex) => {
   const reel = reels.value[reelIndex];
-
-  // Berechne die Endposition basierend auf selectedIndex
   const targetOffset = reel.selectedIndex * ITEM_HEIGHT;
-
-  // Langsam zur Endposition kommen
   const slowDown = () => {
     reel.spinSpeed = Math.max(0, reel.spinSpeed - 2);
 
@@ -335,9 +343,32 @@ const stopReel = (reelIndex) => {
 
 const checkResults = () => {
   isSpinning.value = false;
-  const results = reels.value.map(reel => items.value[reel.selectedIndex]);
+  // map reels with reel[selectedIndex]
+  const results = [reels.value[0].items[reels.value[0].selectedIndex], reels.value[1].items[reels.value[1].selectedIndex], reels.value[2].items[reels.value[2].selectedIndex]];
 
-  // Prüfe auf drei gleiche
+  const coinResults = reels.value.map(reel => {
+    const item = reel.items[Math.floor(reel.offset / ITEM_HEIGHT)];
+    return item.type === 'COIN';
+  });
+
+  const coinCount = coinResults.filter(Boolean).length;
+
+  if (coinCount === 3) {
+    winningIndexes.value = [0, 1, 2];
+    gameMessage.value = `Jackpot! 15 Münzen!`;
+    props.player.coins += 15;
+    return;
+  }
+
+  if (coinCount === 2) {
+    const indexes = coinResults.map((isCoin, index) => isCoin ? index : -1).filter(index => index !== -1);
+    winningIndexes.value = indexes;
+    gameMessage.value = '4 Münzen gewonnen!';
+    props.player.coins += 4;
+    return;
+  }
+
+  console.log(reels.value, results, results[0]?.type, results[1]?.type, results[2]?.type);
   if (results[0]?.type === results[1]?.type && results[1]?.type === results[2]?.type) {
     winningIndexes.value = [0, 1, 2];
     gameMessage.value = `Jackpot! 3 ${results[0].name} + 10 Münzen!`;
@@ -348,17 +379,28 @@ const checkResults = () => {
     return;
   }
 
-  // Prüfe auf zwei gleiche
   for (let i = 0; i < results.length - 1; i++) {
     for (let j = i + 1; j < results.length; j++) {
       if (results[i]?.type === results[j]?.type) {
         winningIndexes.value = [i, j];
-        props.player.coins += 1;
-        gameMessage.value = `Gewonnen! 1 ${results[i].name} + 1 Münze!`;
+        gameMessage.value = `Gewonnen! 1 ${results[i].name}`;
         giveReward(results[i]);
+        if (coinCount === 1) {
+          winningIndexes.value = [0, 1, 2];
+          props.player.coins += 1;
+          gameMessage.value += ' + 1 Münze!';
+        }
         return;
       }
     }
+  }
+
+  if (coinCount === 1) {
+    const index = coinResults.findIndex(isCoin => isCoin);
+    winningIndexes.value = [index];
+    gameMessage.value = 'Gewonnen! 1 Münze gewonnen!';
+    props.player.coins += 1;
+    return;
   }
 
   gameMessage.value = 'Kein Gewinn. Nochmal versuchen!';
@@ -393,7 +435,6 @@ const giveReward = (item) => {
   }
 };
 
-// Start animation loop
 onMounted(() => {
   animateReels();
 });
@@ -421,7 +462,7 @@ onMounted(() => {
 
       <div
         class="shop-content"
-        v-if="currentTab !== 'minigame'"
+        v-if="currentTab !== 'casino'"
       >
         <button class="slider-button prev" @click="prevSlide" :disabled="currentSlide === 0" v-show="totalPages > 1">
           ◀
@@ -478,7 +519,7 @@ onMounted(() => {
       </div>
 
 
-      <div v-if="currentTab === 'minigame'" class="minigame-container">
+      <div v-if="currentTab === 'casino'" class="casino-container">
         <div class="slot-machine">
           <div class="reels-container">
             <div
@@ -498,6 +539,7 @@ onMounted(() => {
                   v-for="(item, itemIndex) in reel.items"
                   :key="`${reelIndex}-${itemIndex}`"
                   class="reel-item"
+                  :class="{ [`reel-item--${item.type}`]: true }"
                 >
                   <div class="item-sprite" :style="getItemStyle(item)"></div>
                 </div>
@@ -767,7 +809,7 @@ onMounted(() => {
 
 
 
-.minigame-container {
+.casino-container {
   min-height: 165px;
 }
 
